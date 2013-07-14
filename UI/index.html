@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AppReload</title>
+</head>
+<body>
+<style>
+body
+{
+    font-family: sans-serif;
+}
+#button-reload
+{
+    width: 300px;
+    height: 100px;
+    font-size: 40px;
+}
+#panel-base-path
+{
+    margin-top: 20px;
+}
+#field-base-path
+{
+    width: 300px;
+}
+</style>
+<div id="panel-reload">
+<button id="button-reload">Reload</button>
+</div>
+<div id="panel-base-path">
+Base Path:<br/>
+<input type="text" id="field-base-path" value=""><br/>
+<button id="button-set-base-path">Set Base Path</button><br/>
+</div>
+<h2 id="server-ip"></h2>
+<p id="info"></p>
+<script>
+// TODO: closure + array with client connections
+// Use room, socket.join
+var ioSocket = require('socket.io').listen(4043)
+var mySocket = null
+ioSocket.sockets.on('connection', function(sock) 
+{
+    console.log("sock")
+    console.log(sock)
+    mySocket = sock
+    //socket.emit('news', { hello: 'world' });
+    //socket.on('my other event', function (data) {
+    //  console.log(data);
+    //})
+    
+    // Reload button action.
+    document.querySelector('#button-reload').addEventListener ('click', function()
+    {
+        mySocket.emit('reload', { url: 'http://127.0.0.1:4042/test.html' })
+    })
+})
+
+var FS = require('fs')
+
+var basePathFile = './basepath.txt'
+var basePath = '/'
+if (FS.existsSync(basePathFile))
+{
+    basePath = FS.readFileSync(basePathFile, { encoding: 'utf8'})
+}
+
+var main = require('./main.js')
+
+var webServer = null
+var port = 4042
+var ipAddress = ""
+
+function webServerHookFun(request, response, path)
+{
+    if (path == '/reload.js')
+    {
+        console.log('sending reload.js')
+        var script = FS.readFileSync('./reload.js', { encoding: 'utf8'})
+        script += '("' + ipAddress + '")'
+        webServer.writeRespose(response, script, 'application/javascript')
+        return true
+    }
+    else
+    {
+        return false
+    }
+}
+
+// Create and start web server.
+main.startWebServer(basePath, port, function(server) {
+    webServer = server
+    webServer.getIpAddress(function(address) {
+        ipAddress = address
+        document.querySelector('#server-ip').innerHTML = address + ":" + port
+    })
+    webServer.setHookFun(webServerHookFun)
+})
+
+// Set base path button action.
+document.querySelector('#button-set-base-path').addEventListener ('click', function()
+{
+    var path = document.querySelector("#field-base-path").value
+    webServer.setBasePath(path)
+    FS.writeFileSync(basePathFile, path, { encoding: 'utf8'})
+})
+
+// Display version info.
+document.querySelector('#info').innerHTML = 'node.js ' + process.version
+document.querySelector('#field-base-path').value = basePath
+</script>
+</body>
+</html>
