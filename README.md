@@ -1,4 +1,3 @@
-SilverCord
-==========
+# AppReload
 
-Rapid development of mobile apps in JavaScript
+AppReload is a lightweight tool for rapid development of mobile apps in JavaScript.
