@@ -9,106 +9,184 @@
 body
 {
     font-family: sans-serif;
+    font-size: 18px;
 }
 #button-reload
 {
-    width: 300px;
+    width: 350px;
     height: 100px;
     font-size: 40px;
 }
-#panel-base-path
+#panel-path
 {
     margin-top: 20px;
+    font-size: 18px;
 }
-#field-base-path
+#panel-path
 {
-    width: 300px;
+    margin-top: 20px;
+    font-size: 18px;
+}
+#field-app-path
+{
+    width: 350px;
+    font-size: 18px;
+}
+#button-set-app-path
+{
+    font-size: 18px;
 }
 </style>
 <div id="panel-reload">
 <button id="button-reload">Reload</button>
 </div>
-<div id="panel-base-path">
-Base Path:<br/>
-<input type="text" id="field-base-path" value=""><br/>
-<button id="button-set-base-path">Set Base Path</button><br/>
+<div id="panel-path">
+App Path:<br/>
+<input type="text" id="field-app-path" value=""><br/>
+<button id="button-set-app-path">Set App Path</button><br/>
 </div>
-<h2 id="server-ip"></h2>
+<h3 id="server-ip"></h3>
 <p id="info"></p>
 <script>
-// TODO: closure + array with client connections
-// Use room, socket.join
-var ioSocket = require('socket.io').listen(4043)
-var mySocket = null
-ioSocket.sockets.on('connection', function(sock) 
+// TODO: Remove hard coded port numbers below and
+// in reload.js.
+(function()
 {
-    console.log("sock")
-    console.log(sock)
-    mySocket = sock
-    //socket.emit('news', { hello: 'world' });
-    //socket.on('my other event', function (data) {
-    //  console.log(data);
-    //})
+    var FS = require('fs')
+    var SOCKETIO = require('socket.io')
+    var MAIN = require('./main.js')
+
+    var mBasePath = ""
+    var mAppPath = ""
+    var mAppFile = ""
+    var mSavedAppPath = './app-path.txt'
+
+    var mWebServer = null
+    var mIpAddress = ""
+    var mWebServerPort = 4042    
+    var mSocketIoPort = 4043
+
+    var IO = SOCKETIO.listen(mSocketIoPort)
+
+    function readAppPath()
+    {
+        if (FS.existsSync(mSavedAppPath))
+        {
+            mAppPath = FS.readFileSync(mSavedAppPath, {encoding: 'utf8'})
+            document.querySelector('#field-app-path').value = mAppPath
+            setAppPath(mAppPath)
+        }
+    }
+
+    function setAppPath(appPath)
+    {
+        mAppPath = appPath
+        var pos = mAppPath.lastIndexOf('/') + 1
+        mBasePath = mAppPath.substr(0, pos)
+        mAppFile = mAppPath.substr(pos)
+        mWebServer.setBasePath(mBasePath)
+        FS.writeFileSync(mSavedAppPath, mAppPath, {encoding: 'utf8'})
+    }
+
+    function webServerHookFun(request, response, path)
+    {
+        if (path == '/connect')
+        {
+            console.log('client connection request')
+            var page = FS.readFileSync('./connect.html', {encoding: 'utf8'})
+            mWebServer.writeRespose(response, page, 'text/html')
+            return true
+        }
+        if (path == '/reload.js')
+        {
+            console.log('sending reload.js')
+            var script = FS.readFileSync('./reload.js', {encoding: 'utf8'})
+            script += '("' + mIpAddress + '")'
+            mWebServer.writeRespose(response, script, 'application/javascript')
+            return true
+        }
+        else
+        {
+            return false
+        }
+    }
+
+    // Handle socket connections.
+    IO.sockets.on('connection', function(socket) 
+    {
+        console.log("socket connected 1")
+        /*
+        // Closure that holds socket connection.
+        (function(socket)
+        {
+            console.log("socket connected 2")
+            //mSockets.push_back(socket)
+            //socket.emit('news', { hello: 'world' });
+            socket.on('unregister', function(data)
+            {
+                mSockets.remove(socket)
+            })
+        })(socket)*/
+    })
+
+    // Create and start web server.
+    MAIN.startWebServer(mBasePath, mWebServerPort, function(server)
+    {
+        mWebServer = server
+        mWebServer.getIpAddress(function(address) {
+            mIpAddress = address
+            document.querySelector('#server-ip').innerHTML = 
+                'http://' + address + ':' + mWebServerPort + '/connect'
+        })
+        mWebServer.setHookFun(webServerHookFun)
+    })
+
+    // Set app path button action.
+    document.querySelector('#button-set-app-path').addEventListener ('click', function()
+    {
+        var appPath = document.querySelector("#field-app-path").value
+        setAppPath(appPath)
+    })
+
+    function sendReload()
+    {
+        console.log("sending reload")
+        IO.sockets.emit('reload', {url: 'http://' + mIpAddress + ':4042/' + mAppFile})
+    }
     
     // Reload button action.
     document.querySelector('#button-reload').addEventListener ('click', function()
     {
-        mySocket.emit('reload', { url: 'http://127.0.0.1:4042/test.html' })
-    })
-})
-
-var FS = require('fs')
-
-var basePathFile = './basepath.txt'
-var basePath = '/'
-if (FS.existsSync(basePathFile))
-{
-    basePath = FS.readFileSync(basePathFile, { encoding: 'utf8'})
-}
-
-var main = require('./main.js')
-
-var webServer = null
-var port = 4042
-var ipAddress = ""
-
-function webServerHookFun(request, response, path)
-{
-    if (path == '/reload.js')
+        sendReload()
+    }) 
+    
+    // Display version info.
+    //document.querySelector('#info').innerHTML = 'node.js ' + process.version
+    
+    // Display saved app path.
+    readAppPath()
+    
+    // Hot reload on file update.
+    // TODO: Traverse more levels in the file tree?
+    var mLastReloadTime = Date.now()
+    function fileSystemMonitor()
     {
-        console.log('sending reload.js')
-        var script = FS.readFileSync('./reload.js', { encoding: 'utf8'})
-        script += '("' + ipAddress + '")'
-        webServer.writeRespose(response, script, 'application/javascript')
-        return true
+        var files = FS.readdirSync(mBasePath)
+        for (var i in files)
+        {
+            var stat = FS.statSync(mBasePath + files[i])
+            var t = stat.mtime.getTime()
+            console.log(files[i] + ": " + stat.mtime)
+            if (stat.isFile() && t > mLastReloadTime)
+            {
+                mLastReloadTime = Date.now()
+                sendReload()
+                break
+            }
+        }
     }
-    else
-    {
-        return false
-    }
-}
-
-// Create and start web server.
-main.startWebServer(basePath, port, function(server) {
-    webServer = server
-    webServer.getIpAddress(function(address) {
-        ipAddress = address
-        document.querySelector('#server-ip').innerHTML = address + ":" + port
-    })
-    webServer.setHookFun(webServerHookFun)
-})
-
-// Set base path button action.
-document.querySelector('#button-set-base-path').addEventListener ('click', function()
-{
-    var path = document.querySelector("#field-base-path").value
-    webServer.setBasePath(path)
-    FS.writeFileSync(basePathFile, path, { encoding: 'utf8'})
-})
-
-// Display version info.
-document.querySelector('#info').innerHTML = 'node.js ' + process.version
-document.querySelector('#field-base-path').value = basePath
+    setInterval(fileSystemMonitor, 500)
+})()
 </script>
 </body>
 </html>
