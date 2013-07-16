@@ -66,8 +66,11 @@ App Path:<br/>
     var mWebServerPort = 4042    
     var mSocketIoPort = 4043
 
+    //var IO = SOCKETIO.listen(mSocketIoPort, {log: false})
     var IO = SOCKETIO.listen(mSocketIoPort)
 
+    IO.set('log level', 1)
+    
     function readAppPath()
     {
         if (FS.existsSync(mSavedAppPath))
@@ -90,16 +93,17 @@ App Path:<br/>
 
     function webServerHookFun(request, response, path)
     {
+        console.log(path)
         if (path == '/connect')
         {
-            console.log('client connection request')
+            //console.log('client connection request')
             var page = FS.readFileSync('./connect.html', {encoding: 'utf8'})
             mWebServer.writeRespose(response, page, 'text/html')
             return true
         }
-        if (path == '/reload.js')
+        if (path == '/reloader')
         {
-            console.log('sending reload.js')
+            //console.log('sending reload.js')
             var script = FS.readFileSync('./reload.js', {encoding: 'utf8'})
             script += '("' + mIpAddress + '")'
             mWebServer.writeRespose(response, script, 'application/javascript')
@@ -114,7 +118,7 @@ App Path:<br/>
     // Handle socket connections.
     IO.sockets.on('connection', function(socket) 
     {
-        console.log("socket connected 1")
+        //console.log("socket connected 1")
         /*
         // Closure that holds socket connection.
         (function(socket)
@@ -150,7 +154,7 @@ App Path:<br/>
 
     function sendReload()
     {
-        console.log("sending reload")
+        //console.log("sending reload")
         IO.sockets.emit('reload', {url: 'http://' + mIpAddress + ':4042/' + mAppFile})
     }
     
@@ -171,21 +175,49 @@ App Path:<br/>
     var mLastReloadTime = Date.now()
     function fileSystemMonitor()
     {
-        var files = FS.readdirSync(mBasePath)
+        fileSystemMonitorWorker(mBasePath, 2)
+        setTimeout(fileSystemMonitor, 500)
+    }
+    
+    function fileSystemMonitorWorker(path, level)
+    {
+        if (0 == level) { return }
+
+        var files = FS.readdirSync(path)
         for (var i in files)
         {
-            var stat = FS.statSync(mBasePath + files[i])
-            var t = stat.mtime.getTime()
-            console.log(files[i] + ": " + stat.mtime)
-            if (stat.isFile() && t > mLastReloadTime)
+            try
             {
-                mLastReloadTime = Date.now()
-                sendReload()
-                break
+                var stat = FS.statSync(path + files[i])
+                var t = stat.mtime.getTime()
+                //console.log(files[i] + ": " + stat.mtime)
+                if (stat.isFile() && t > mLastReloadTime)
+                {
+                    mLastReloadTime = Date.now()
+                    sendReload()
+                    break
+                }
+                else if (stat.isDirectory())
+                {
+                    //console.log('decending into: ' + path + files[i])
+                    fileSystemMonitorWorker(path + files[i] + "/", level - 1)
+                }
+            }
+            catch(err)
+            {
+                //console.log('***** ERROR ****** ' + err)
             }
         }
     }
-    setInterval(fileSystemMonitor, 500)
+    
+    /*console.log(mBasePath)
+    var files = FS.readdirSync(mBasePath)
+    for (var i in files)
+    {
+        console.log(files[i])
+    }*/
+
+    fileSystemMonitor()
 })()
 </script>
 </body>

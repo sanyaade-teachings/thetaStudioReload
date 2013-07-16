@@ -6,7 +6,7 @@
     var script = document.createElement('script')
     //script.type = 'text/javascript' // Not needed by HTML5
     script.src = url + ':4043/socket.io/socket.io.js'
-    console.log("socketio url: " + url + ':4043/socket.io/socket.io.js')
+    //console.log("socketio url: " + url + ':4043/socket.io/socket.io.js')
     script.onload = reloadHandler
     document.body.appendChild(script)
     
@@ -14,11 +14,10 @@
     function reloadHandler()
     {
         var socket = io.connect(url + ':4043');
-        console.log('connection to server')
+        //console.log('connection to server')
         socket.on('reload', function(data)
         {
-            console.log('got reload')
-            console.log(data)
+            //console.log('got reload')
             socket.disconnect()
             window.location.href = data.url
             // socket.emit('my other event', { my: 'data' })
