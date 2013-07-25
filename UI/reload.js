@@ -1,4 +1,4 @@
-(function(address)
+;(function(address)
 {
     var url = 'http://' + address
     
@@ -9,7 +9,6 @@
     //console.log("socketio url: " + url + ':4043/socket.io/socket.io.js')
     script.onload = reloadHandler
     document.body.appendChild(script)
-    
     // Will be run when socket.io is loaded.
     function reloadHandler()
     {
@@ -17,7 +16,6 @@
         //console.log('connection to server')
         socket.on('reload', function(data)
         {
-            //console.log('got reload')
             socket.disconnect()
             window.location.href = data.url
             // socket.emit('my other event', { my: 'data' })

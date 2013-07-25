@@ -1,14 +1,16 @@
-package com.divineprog.appreload;
+package com.divineprog.hyperapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions.Callback;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 /**
@@ -32,6 +34,7 @@ public class JavaScriptWebView extends WebView
 		settings.setGeolocationEnabled(true);
 		setVerticalScrollbarOverlay(true);
 
+		setWebViewClient(new MyWebViewClient());
 		setWebChromeClient(new MyChromeClient());
 
 		try {
@@ -48,6 +51,11 @@ public class JavaScriptWebView extends WebView
                 webView.loadUrl("javascript:" + js);
             }
         });
+    }
+
+    class MyWebViewClient extends WebViewClient
+    {
+
     }
 
 	class MyChromeClient extends WebChromeClient
@@ -92,6 +100,12 @@ public class JavaScriptWebView extends WebView
 		{
 		    super.onGeolocationPermissionsShowPrompt(origin, callback);
 		    callback.invoke(origin, true, false);
+		}
+
+        @Override
+		public boolean onConsoleMessage(ConsoleMessage consoleMessage)
+		{
+            return false;
 		}
 	}
 }

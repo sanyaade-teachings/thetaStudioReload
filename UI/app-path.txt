@@ -1,1 +1,1 @@
-/home/miki/code/wordgame/AndroidApp/WordGame/assets/index.html
+/home/miki/code/comikit/js/pixcard2.html

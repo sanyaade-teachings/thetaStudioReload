@@ -1,4 +1,4 @@
-package com.divineprog.appreload;
+package com.divineprog.hyperapp;
 
 import android.webkit.WebView;
 
