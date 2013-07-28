@@ -1,1 +1,1 @@
-/home/miki/code/comikit/js/pixcard2.html
+/home/miki/code/AppReload/UI/test2.html

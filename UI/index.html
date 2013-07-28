@@ -2,43 +2,44 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>AppReload</title>
+    <title>HyperApp Workbench</title>
+	<style>
+	body
+	{
+		font-family: sans-serif;
+		font-size: 18px;
+	}
+	#button-reload
+	{
+		width: 350px;
+		height: 100px;
+		font-size: 40px;
+	}
+	#panel-path
+	{
+		margin-top: 20px;
+		font-size: 18px;
+	}
+	#panel-path
+	{
+		margin-top: 20px;
+		font-size: 18px;
+	}
+	#field-app-path
+	{
+		width: 350px;
+		font-size: 18px;
+	}
+	#button-set-app-path
+	{
+		font-size: 18px;
+	}
+	</style>
 </head>
 <body>
-<style>
-body
-{
-    font-family: sans-serif;
-    font-size: 18px;
-}
-#button-reload
-{
-    width: 350px;
-    height: 100px;
-    font-size: 40px;
-}
-#panel-path
-{
-    margin-top: 20px;
-    font-size: 18px;
-}
-#panel-path
-{
-    margin-top: 20px;
-    font-size: 18px;
-}
-#field-app-path
-{
-    width: 350px;
-    font-size: 18px;
-}
-#button-set-app-path
-{
-    font-size: 18px;
-}
-</style>
+	
 <div id="panel-reload">
-<button id="button-reload">Reload</button>
+<button id="button-reload">Run</button>
 </div>
 <div id="panel-path">
 App Path:<br/>
@@ -47,48 +48,79 @@ App Path:<br/>
 </div>
 <h3 id="server-ip"></h3>
 <p id="info"></p>
+
 <script>
 // TODO: Remove hard coded port numbers below and
 // in reload.js.
-(function()
+;(function()
 {
     var FS = require('fs')
     var SOCKETIO = require('socket.io')
     var MAIN = require('./main.js')
 
-    var mBasePath = ""
-    var mAppPath = ""
-    var mAppFile = ""
+    var mBasePath = ''
+    var mAppPath = ''
+    var mAppFile = ''
     var mSavedAppPath = './app-path.txt'
 
     var mWebServer = null
-    var mIpAddress = ""
+    var mIpAddress = ''
     var mWebServerPort = 4042    
     var mSocketIoPort = 4043
 
-    //var IO = SOCKETIO.listen(mSocketIoPort, {log: false})
-    var IO = SOCKETIO.listen(mSocketIoPort)
+    var IO
 
-    IO.set('log level', 1)
+	function main()
+	{
+		setUIActions()
+		startServers()
+		readSavedAppPath()
+		fileSystemMonitor()
+	}
+	
+    function setUIActions()
+    {
+		// Set app path button action.
+		document.querySelector('#button-set-app-path').addEventListener ('click', function()
+		{
+			updateAppPath()
+		})
+
+		// Reload button action.
+		document.querySelector('#button-reload').addEventListener ('click', function()
+		{
+			updateAppPath()
+			sendReload()
+		})
+	}
     
-    function readAppPath()
+    function readSavedAppPath()
     {
         if (FS.existsSync(mSavedAppPath))
         {
-            mAppPath = FS.readFileSync(mSavedAppPath, {encoding: 'utf8'})
-            document.querySelector('#field-app-path').value = mAppPath
-            setAppPath(mAppPath)
+            var appPath = FS.readFileSync(mSavedAppPath, {encoding: 'utf8'})
+            document.querySelector('#field-app-path').value = appPath
+            setAppPath(appPath)
         }
     }
 
+	function updateAppPath()
+	{
+		var appPath = document.querySelector('#field-app-path').value
+		setAppPath(appPath)
+	}
+	
     function setAppPath(appPath)
     {
-        mAppPath = appPath
-        var pos = mAppPath.lastIndexOf('/') + 1
-        mBasePath = mAppPath.substr(0, pos)
-        mAppFile = mAppPath.substr(pos)
-        mWebServer.setBasePath(mBasePath)
-        FS.writeFileSync(mSavedAppPath, mAppPath, {encoding: 'utf8'})
+		if (appPath != mAppPath)
+		{
+			mAppPath = appPath
+			var pos = mAppPath.lastIndexOf('/') + 1
+			mBasePath = mAppPath.substr(0, pos)
+			mAppFile = mAppPath.substr(pos)
+			mWebServer.setBasePath(mBasePath)
+			FS.writeFileSync(mSavedAppPath, mAppPath, {encoding: 'utf8'})
+		}
     }
 
     function webServerHookFun(request, response, path)
@@ -115,42 +147,52 @@ App Path:<br/>
         }
     }
 
-    // Handle socket connections.
-    IO.sockets.on('connection', function(socket) 
-    {
-        //console.log("socket connected 1")
-        /*
-        // Closure that holds socket connection.
-        (function(socket)
-        {
-            console.log("socket connected 2")
-            //mSockets.push_back(socket)
-            //socket.emit('news', { hello: 'world' });
-            socket.on('unregister', function(data)
-            {
-                mSockets.remove(socket)
-            })
-        })(socket)*/
-    })
+	function startServers()
+	{
+		//IO = SOCKETIO.listen(mSocketIoPort, {log: false})
+		IO = SOCKETIO.listen(mSocketIoPort)
 
-    // Create and start web server.
-    MAIN.startWebServer(mBasePath, mWebServerPort, function(server)
-    {
-        mWebServer = server
-        mWebServer.getIpAddress(function(address) {
-            mIpAddress = address
-            document.querySelector('#server-ip').innerHTML = 
-                'http://' + address + ':' + mWebServerPort + '/connect'
-        })
-        mWebServer.setHookFun(webServerHookFun)
-    })
+		IO.set('log level', 1)
+		
+		// Handle socket connections.
+		IO.sockets.on('connection', function(socket) 
+		{
+			console.log("Client connected")
+			
+			socket.on('logMessage', function(data)
+			{
+				displayLogMessage(data)
+			})
+			
+			socket.on('evalResult', function(data)
+			{
+				displayEvalResult(data)
+			})
+			
+			// Closure that holds socket connection.
+			/*(function(socket)
+			{
+				//mSockets.push_back(socket)
+				//socket.emit('news', { hello: 'world' });
+				socket.on('unregister', function(data)
+				{
+					mSockets.remove(socket)
+				})
+			})(socket)*/
+		})
 
-    // Set app path button action.
-    document.querySelector('#button-set-app-path').addEventListener ('click', function()
-    {
-        var appPath = document.querySelector("#field-app-path").value
-        setAppPath(appPath)
-    })
+		// Create and start web server.
+		MAIN.startWebServer(mBasePath, mWebServerPort, function(server)
+		{
+			mWebServer = server
+			mWebServer.getIpAddress(function(address) {
+				mIpAddress = address
+				document.querySelector('#server-ip').innerHTML = 
+					'http://' + address + ':' + mWebServerPort + '/connect'
+			})
+			mWebServer.setHookFun(webServerHookFun)
+		})
+	}
 
     function sendReload()
     {
@@ -158,31 +200,44 @@ App Path:<br/>
         IO.sockets.emit('reload', {url: 'http://' + mIpAddress + ':4042/' + mAppFile})
     }
     
-    // Reload button action.
-    document.querySelector('#button-reload').addEventListener ('click', function()
+    function sendEvalJS(code)
     {
-        sendReload()
-    }) 
+        IO.sockets.emit('evaljs', code)
+    }
     
+	function displayLogMessage(message)
+	{
+		console.log('LOG: ' + message)
+	}
+	
+	function displayEvalResult(result)
+	{
+		console.log('EVALRES: ' + result)
+	}
+
     // Display version info.
     //document.querySelector('#info').innerHTML = 'node.js ' + process.version
-    
-    // Display saved app path.
-    readAppPath()
     
     // Hot reload on file update.
     // TODO: Traverse more levels in the file tree?
     var mLastReloadTime = Date.now()
+    
     function fileSystemMonitor()
     {
-        fileSystemMonitorWorker(mBasePath, 2)
-        setTimeout(fileSystemMonitor, 500)
+        var filesUpdated = fileSystemMonitorWorker(mBasePath, 0)
+        if (filesUpdated)
+        {
+			sendReload()
+			setTimeout(fileSystemMonitor, 1000)
+		}
+		else
+		{
+			setTimeout(fileSystemMonitor, 500)
+		}
     }
     
     function fileSystemMonitorWorker(path, level)
     {
-        if (0 == level) { return }
-
         var files = FS.readdirSync(path)
         for (var i in files)
         {
@@ -194,13 +249,12 @@ App Path:<br/>
                 if (stat.isFile() && t > mLastReloadTime)
                 {
                     mLastReloadTime = Date.now()
-                    sendReload()
-                    break
+                    return true
                 }
-                else if (stat.isDirectory())
+                else if (stat.isDirectory() && level > 0)
                 {
-                    //console.log('decending into: ' + path + files[i])
-                    fileSystemMonitorWorker(path + files[i] + "/", level - 1)
+                    console.log('decending into: ' + path + files[i])
+                    return fileSystemMonitorWorker(path + files[i] + "/", level - 1)
                 }
             }
             catch(err)
@@ -208,6 +262,7 @@ App Path:<br/>
                 //console.log('***** ERROR ****** ' + err)
             }
         }
+        return false
     }
     
     /*console.log(mBasePath)
@@ -217,7 +272,7 @@ App Path:<br/>
         console.log(files[i])
     }*/
 
-    fileSystemMonitor()
+	main()
 })()
 </script>
 </body>

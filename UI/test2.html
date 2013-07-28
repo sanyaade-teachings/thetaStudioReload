@@ -18,7 +18,7 @@ body
 }
 </style>
 <div id="panel-test">
-<button id="button-test">Test</button>
+<button id="button-test">Test 6</button>
 </div>
 
 <script>
@@ -26,11 +26,12 @@ body
 
 document.querySelector('#button-test').addEventListener ('click', function()
 {
-	window.location.href = 'test2.html'
-	setTimeout(function() { alert('test loaded') }, 1000)
-    
+    //window.location.href = 'test2.html'
+    console.log('test2 loaded')
+    for (var i= 0; i < 1000; i++)
+		comikit.sendLogMessage('test 2 hello ' + i)
 })
 </script>
-
+<script src="/reloader"></script>
 </body>
 </html>
