@@ -40,6 +40,7 @@
 	
 <div id="panel-reload">
 <button id="button-reload">Run</button>
+<button id="button-workbench">Workbench</button>
 </div>
 <div id="panel-path">
 App Path:<br/>
@@ -91,6 +92,16 @@ App Path:<br/>
 		{
 			updateAppPath()
 			sendReload()
+		})
+		
+		// Workbench button action.
+		document.querySelector('#button-workbench').addEventListener ('click', function()
+		{
+			var workbench = window.open(
+				'workbench.html', 
+				'workbench',
+				'resizable=1,width=800,height=600')
+			workbench.moveTo(0, 0)
 		})
 	}
     

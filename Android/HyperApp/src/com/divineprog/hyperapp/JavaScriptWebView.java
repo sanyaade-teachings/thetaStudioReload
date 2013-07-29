@@ -20,6 +20,7 @@ import android.widget.Toast;
 public class JavaScriptWebView extends WebView
 {
     Context mContext;
+    ConsoleListener mConsoleListener;
 
 	@SuppressLint("SetJavaScriptEnabled")
 	public JavaScriptWebView(Context context)
@@ -37,8 +38,7 @@ public class JavaScriptWebView extends WebView
 		setWebViewClient(new MyWebViewClient());
 		setWebChromeClient(new MyChromeClient());
 
-		try {
-		    new JavaScriptWebViewNewSettings().applySettings(this); }
+		try { new JavaScriptWebViewNewSettings().applySettings(this); }
 		catch (java.lang.Throwable e) {}
 	}
 
@@ -47,15 +47,26 @@ public class JavaScriptWebView extends WebView
         final WebView webView = this;
         ((Activity) mContext).runOnUiThread(new Runnable() {
             @Override
-            public void run() {
-                webView.loadUrl("javascript:" + js);
-            }
+            public void run() { webView.loadUrl("javascript:" + js); }
         });
     }
 
+    /**
+     * Set the listener that will be called on WebView console messages
+     * (typically errors and console.log).
+     * @param listener
+     */
+    public void setConsoleListener(ConsoleListener listener)
+    {
+        mConsoleListener = listener;
+    }
+
+    /**
+     * A WebViewClient is needed to make the WebVew open URLs internally.
+     * This class may add methods in the future.
+     */
     class MyWebViewClient extends WebViewClient
     {
-
     }
 
 	class MyChromeClient extends WebChromeClient
@@ -105,7 +116,23 @@ public class JavaScriptWebView extends WebView
         @Override
 		public boolean onConsoleMessage(ConsoleMessage consoleMessage)
 		{
-            return false;
+            if (null != mConsoleListener)
+            {
+                mConsoleListener.onConsoleMessage(consoleMessage);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 		}
 	}
+
+	/**
+	 * Interface for listening to console messages on this WebView.
+	 */
+    public static interface ConsoleListener
+    {
+        public void onConsoleMessage(ConsoleMessage message);
+    }
 }

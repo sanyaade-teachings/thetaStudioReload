@@ -1,25 +1,32 @@
 ;(function(address)
 {
-    if (!window.comikit)
+    if (!window.hyperapp)
     {
-		window.comikit = {}
+		window.hyperapp = {}
 	}
 	
-	window.comikit.sendEvalResult = function(result)
+	window.hyperapp.sendEvalResult = function(result)
 	{
-		comikit.IoSocket.emit('evalResult', result)
+		hyperapp.IoSocket.emit('evalResult', result)
 	}
 	
-	window.comikit.sendLogMessage = function(message)
+	window.hyperapp.sendLogMessage = function(message)
 	{
-		comikit.IoSocket.emit('logMessage', message)
+		hyperapp.IoSocket.emit('logMessage', message)
 	}
+	
+	window.hyperapp.nativeConsoleMessageCallBack = function(message)
+	{
+		hyperapp.IoSocket.emit('logMessage', message)
+	}
+	
 	/*
 	window.console.log = function(message)
 	{
-		window.comikit.sendLogMessage(message)
+		window.hyperapp.sendLogMessage(message)
 	}
 	*/
+	
 	var url = 'http://' + address
 		
     // Load socket.io
@@ -37,12 +44,12 @@
     function reloadHandler()
     {
         var socket = io.connect(url + ':4043')
-        window.comikit.IoSocket = socket
+        window.hyperapp.IoSocket = socket
         //console.log('connection to server')
         socket.on('reload', function(data)
         {
             socket.disconnect()
-            window.location.href = data.url
+            window.location.replace(data.url)
             // socket.emit('my other event', { my: 'data' })
         })
         socket.on('evaljs', function(data)
@@ -50,11 +57,11 @@
             try
             {
 				var result = eval(data)
-				window.comikit.sendEvalResult(result)
+				window.hyperapp.sendEvalResult(result)
 			}
 			catch (err)
 			{
-				window.comikit.sendEvalResult(err)
+				window.hyperapp.sendEvalResult(err)
 			}
         })
         displayConnectedMessage()

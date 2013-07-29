@@ -1,1 +1,1 @@
-/home/miki/code/AppReload/UI/test2.html
+/home/miki/code/hyperapp/UI/test2.html

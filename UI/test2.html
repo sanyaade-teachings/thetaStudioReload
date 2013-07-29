@@ -18,12 +18,22 @@ body
 }
 </style>
 <div id="panel-test">
-<button id="button-test">Test 6</button>
+<button id="button-test">Test 13</button>
 </div>
 
 <script>
-// https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps
+console.log("STEP1")
+bar()
+console.log("STEP2")
+</script>
 
+<script>
+console.log("STEP3")
+</script>
+
+<script>
+// https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps
+foo()
 document.querySelector('#button-test').addEventListener ('click', function()
 {
     //window.location.href = 'test2.html'
