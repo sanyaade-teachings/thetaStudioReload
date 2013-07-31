@@ -3,41 +3,41 @@
 <head>
     <meta charset="utf-8">
     <title>HyperApp Workbench</title>
-	<style>
-	body
-	{
-		font-family: sans-serif;
-		font-size: 18px;
-	}
-	#button-reload
-	{
-		width: 350px;
-		height: 100px;
-		font-size: 40px;
-	}
-	#panel-path
-	{
-		margin-top: 20px;
-		font-size: 18px;
-	}
-	#panel-path
-	{
-		margin-top: 20px;
-		font-size: 18px;
-	}
-	#field-app-path
-	{
-		width: 350px;
-		font-size: 18px;
-	}
-	#button-set-app-path
-	{
-		font-size: 18px;
-	}
-	</style>
+    <style>
+    body
+    {
+        font-family: sans-serif;
+        font-size: 18px;
+    }
+    #button-reload
+    {
+        width: 350px;
+        height: 100px;
+        font-size: 40px;
+    }
+    #panel-path
+    {
+        margin-top: 20px;
+        font-size: 18px;
+    }
+    #panel-path
+    {
+        margin-top: 20px;
+        font-size: 18px;
+    }
+    #field-app-path
+    {
+        width: 350px;
+        font-size: 18px;
+    }
+    #button-set-app-path
+    {
+        font-size: 18px;
+    }
+    </style>
 </head>
 <body>
-	
+    
 <div id="panel-reload">
 <button id="button-reload">Run</button>
 <button id="button-workbench">Workbench</button>
@@ -71,39 +71,39 @@ App Path:<br/>
 
     var IO
 
-	function main()
-	{
-		setUIActions()
-		startServers()
-		readSavedAppPath()
-		fileSystemMonitor()
-	}
-	
+    function main()
+    {
+        setUIActions()
+        startServers()
+        readSavedAppPath()
+        fileSystemMonitor()
+    }
+    
     function setUIActions()
     {
-		// Set app path button action.
-		document.querySelector('#button-set-app-path').addEventListener ('click', function()
-		{
-			updateAppPath()
-		})
+        // Set app path button action.
+        document.querySelector('#button-set-app-path').addEventListener ('click', function()
+        {
+            updateAppPath()
+        })
 
-		// Reload button action.
-		document.querySelector('#button-reload').addEventListener ('click', function()
-		{
-			updateAppPath()
-			sendReload()
-		})
-		
-		// Workbench button action.
-		document.querySelector('#button-workbench').addEventListener ('click', function()
-		{
-			var workbench = window.open(
-				'workbench.html', 
-				'workbench',
-				'resizable=1,width=800,height=600')
-			workbench.moveTo(0, 0)
-		})
-	}
+        // Reload button action.
+        document.querySelector('#button-reload').addEventListener ('click', function()
+        {
+            updateAppPath()
+            sendReload()
+        })
+        
+        // Workbench button action.
+        document.querySelector('#button-workbench').addEventListener ('click', function()
+        {
+            var workbench = window.open(
+                'workbench.html', 
+                'workbench',
+                'resizable=1,width=800,height=600')
+            workbench.moveTo(0, 0)
+        })
+    }
     
     function readSavedAppPath()
     {
@@ -115,23 +115,23 @@ App Path:<br/>
         }
     }
 
-	function updateAppPath()
-	{
-		var appPath = document.querySelector('#field-app-path').value
-		setAppPath(appPath)
-	}
-	
+    function updateAppPath()
+    {
+        var appPath = document.querySelector('#field-app-path').value
+        setAppPath(appPath)
+    }
+    
     function setAppPath(appPath)
     {
-		if (appPath != mAppPath)
-		{
-			mAppPath = appPath
-			var pos = mAppPath.lastIndexOf('/') + 1
-			mBasePath = mAppPath.substr(0, pos)
-			mAppFile = mAppPath.substr(pos)
-			mWebServer.setBasePath(mBasePath)
-			FS.writeFileSync(mSavedAppPath, mAppPath, {encoding: 'utf8'})
-		}
+        if (appPath != mAppPath)
+        {
+            mAppPath = appPath
+            var pos = mAppPath.lastIndexOf('/') + 1
+            mBasePath = mAppPath.substr(0, pos)
+            mAppFile = mAppPath.substr(pos)
+            mWebServer.setBasePath(mBasePath)
+            FS.writeFileSync(mSavedAppPath, mAppPath, {encoding: 'utf8'})
+        }
     }
 
     function webServerHookFun(request, response, path)
@@ -144,12 +144,30 @@ App Path:<br/>
             mWebServer.writeRespose(response, page, 'text/html')
             return true
         }
-        if (path == '/reloader')
+        else if (path == '/reloader')
         {
-            //console.log('sending reload.js')
-            var script = FS.readFileSync('./reload.js', {encoding: 'utf8'})
-            script += '("' + mIpAddress + '")'
+            var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
+            script += '("' + mIpAddress + '", true)'
             mWebServer.writeRespose(response, script, 'application/javascript')
+            return true
+        }
+        else if (path == '/' + mAppFile)
+        {
+            
+            var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
+            var scriptBegin = '<' + 'script' + '>\n'
+            var scriptBeginSrc = '<' + 'script src='
+            var scriptEnd = '</' + 'script' + '>\n'
+            script =
+                scriptBeginSrc +
+                '"http://' + mIpAddress + ':4043/socket.io/socket.io.js">' +
+                scriptEnd +
+                scriptBegin +
+                script + '("' + mIpAddress + '", false)' +
+                scriptEnd
+            var file = FS.readFileSync('./' + mAppFile, {encoding: 'utf8'})
+            file = file.replace('<!--hyperapp.reloader-->', script)
+            mWebServer.writeRespose(response, file, 'text/html')
             return true
         }
         else
@@ -158,52 +176,52 @@ App Path:<br/>
         }
     }
 
-	function startServers()
-	{
-		//IO = SOCKETIO.listen(mSocketIoPort, {log: false})
-		IO = SOCKETIO.listen(mSocketIoPort)
+    function startServers()
+    {
+        //IO = SOCKETIO.listen(mSocketIoPort, {log: false})
+        IO = SOCKETIO.listen(mSocketIoPort)
 
-		IO.set('log level', 1)
-		
-		// Handle socket connections.
-		IO.sockets.on('connection', function(socket) 
-		{
-			console.log("Client connected")
-			
-			socket.on('logMessage', function(data)
-			{
-				displayLogMessage(data)
-			})
-			
-			socket.on('evalResult', function(data)
-			{
-				displayEvalResult(data)
-			})
-			
-			// Closure that holds socket connection.
-			/*(function(socket)
-			{
-				//mSockets.push_back(socket)
-				//socket.emit('news', { hello: 'world' });
-				socket.on('unregister', function(data)
-				{
-					mSockets.remove(socket)
-				})
-			})(socket)*/
-		})
+        IO.set('log level', 1)
+        
+        // Handle socket connections.
+        IO.sockets.on('connection', function(socket) 
+        {
+            console.log("Client connected")
+            
+            socket.on('logMessage', function(data)
+            {
+                displayLogMessage(data)
+            })
+            
+            socket.on('evalResult', function(data)
+            {
+                displayEvalResult(data)
+            })
+            
+            // Closure that holds socket connection.
+            /*(function(socket)
+            {
+                //mSockets.push_back(socket)
+                //socket.emit('news', { hello: 'world' });
+                socket.on('unregister', function(data)
+                {
+                    mSockets.remove(socket)
+                })
+            })(socket)*/
+        })
 
-		// Create and start web server.
-		MAIN.startWebServer(mBasePath, mWebServerPort, function(server)
-		{
-			mWebServer = server
-			mWebServer.getIpAddress(function(address) {
-				mIpAddress = address
-				document.querySelector('#server-ip').innerHTML = 
-					'http://' + address + ':' + mWebServerPort + '/connect'
-			})
-			mWebServer.setHookFun(webServerHookFun)
-		})
-	}
+        // Create and start web server.
+        MAIN.startWebServer(mBasePath, mWebServerPort, function(server)
+        {
+            mWebServer = server
+            mWebServer.getIpAddress(function(address) {
+                mIpAddress = address
+                document.querySelector('#server-ip').innerHTML = 
+                    'http://' + address + ':' + mWebServerPort + '/connect'
+            })
+            mWebServer.setHookFun(webServerHookFun)
+        })
+    }
 
     function sendReload()
     {
@@ -216,15 +234,15 @@ App Path:<br/>
         IO.sockets.emit('evaljs', code)
     }
     
-	function displayLogMessage(message)
-	{
-		console.log('LOG: ' + message)
-	}
-	
-	function displayEvalResult(result)
-	{
-		console.log('EVALRES: ' + result)
-	}
+    function displayLogMessage(message)
+    {
+        console.log('LOG: ' + message)
+    }
+    
+    function displayEvalResult(result)
+    {
+        console.log('EVALRES: ' + result)
+    }
 
     // Display version info.
     //document.querySelector('#info').innerHTML = 'node.js ' + process.version
@@ -238,13 +256,13 @@ App Path:<br/>
         var filesUpdated = fileSystemMonitorWorker(mBasePath, 0)
         if (filesUpdated)
         {
-			sendReload()
-			setTimeout(fileSystemMonitor, 1000)
-		}
-		else
-		{
-			setTimeout(fileSystemMonitor, 500)
-		}
+            sendReload()
+            setTimeout(fileSystemMonitor, 1000)
+        }
+        else
+        {
+            setTimeout(fileSystemMonitor, 500)
+        }
     }
     
     function fileSystemMonitorWorker(path, level)
@@ -283,7 +301,7 @@ App Path:<br/>
         console.log(files[i])
     }*/
 
-	main()
+    main()
 })()
 </script>
 </body>

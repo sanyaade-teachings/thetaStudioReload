@@ -20,6 +20,8 @@ public class MainActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        // Create WebView.
         mWebView = new JavaScriptWebView(this);
         mWebView.setConsoleListener(this);
         mWebView.loadUrl("file:///android_asset/index.html");

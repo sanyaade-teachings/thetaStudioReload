@@ -5,6 +5,7 @@
   <title>Test</title>
 </head>
 <body>
+<!--hyperapp.reloader-->
 <style>
 body
 {
@@ -18,7 +19,7 @@ body
 }
 </style>
 <div id="panel-test">
-<button id="button-test">Test 13</button>
+<button id="button-test">Test 24</button>
 </div>
 
 <script>
@@ -29,19 +30,19 @@ console.log("STEP2")
 
 <script>
 console.log("STEP3")
+fooo()
 </script>
 
 <script>
 // https://github.com/rogerwang/node-webkit/wiki/How-to-run-apps
-foo()
 document.querySelector('#button-test').addEventListener ('click', function()
 {
     //window.location.href = 'test2.html'
     console.log('test2 loaded')
+    foofar()
     for (var i= 0; i < 1000; i++)
 		comikit.sendLogMessage('test 2 hello ' + i)
 })
 </script>
-<script src="/reloader"></script>
 </body>
 </html>

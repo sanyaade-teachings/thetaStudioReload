@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>HyperApp Connect</title>
+    <meta charset="utf-8">
+    <title>HyperApp Connect</title>
 </head>
 <body>
+<script src="/reloader"></script>
+<script>
+hyperapp.onConnected(function()
+{
+    var element = document.querySelector('#connect-status')
+    element.innerHTML = 'Connected'
+})
+</script>
 <style>
 body
 {
     font-family: sans-serif;
 }
 </style>
-
 <h1 id="connect-status">Connecting...</h1>
-
-<script src="/reloader"></script>
 </body>
 </html>
