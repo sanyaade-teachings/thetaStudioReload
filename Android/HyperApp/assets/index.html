@@ -2,13 +2,19 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes">
     <title>HyperApp Home Screen</title>
 </head>
 <body>
 <div id="MainUI">
+	<div>
+		<h1>HyperApp</h1>
+	</div>
+	<div>
+		<p>Enter IP-address of HyperApp UI and press Connect.</p>
+	</div>
     <div>
-        <input id="IpAddressField" value="ip" type="text" size="30"/>
+        <input id="IpAddressField" value="ip" type="url" size="30"/>
         <br />
         <input value="Connect" type="button" onmousedown="DoConnect()" />
     </div>

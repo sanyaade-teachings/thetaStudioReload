@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>HyperApp Workbench</title>
+    <style>
+    body
+    {
+        font-family: sans-serif;
+        font-size: 18px;
+    }
+    #button-reload
+    {
+        width: 350px;
+        height: 100px;
+        font-size: 40px;
+    }
+    #panel-path
+    {
+        margin-top: 20px;
+        font-size: 18px;
+    }
+    #panel-path
+    {
+        margin-top: 20px;
+        font-size: 18px;
+    }
+    #field-app-path
+    {
+        width: 350px;
+        font-size: 18px;
+    }
+    #button-set-app-path
+    {
+        font-size: 18px;
+    }
+    </style>
+</head>
+<body>
+    
+<div id="panel-reload">
+<button id="button-reload">Run</button>
+<button id="button-workbench">Workbench</button>
+</div>
+<div id="panel-path">
+App Path:<br/>
+<input type="text" id="field-app-path" value=""><br/>
+<button id="button-set-app-path">Set App Path</button><br/>
+</div>
+<h3 id="server-ip"></h3>
+<p id="info"></p>
+
+<script>
+// TODO: Remove hard coded port numbers below and
+// in reload.js.
+;(function()
+{
+    var FS = require('fs')
+    var SOCKETIO = require('socket.io')
+    var MAIN = require('./main.js')
+
+    var mBasePath = ''
+    var mAppPath = ''
+    var mAppFile = ''
+    var mSavedAppPath = './app-path.txt'
+
+    var mWebServer = null
+    var mIpAddress = ''
+    var mWebServerPort = 4042    
+    var mSocketIoPort = 4043
+
+    var IO
+
+    function main()
+    {
+        setUIActions()
+        startServers()
+        readSavedAppPath()
+        fileSystemMonitor()
+    }
+    
+    function setUIActions()
+    {
+        // Set app path button action.
+        document.querySelector('#button-set-app-path').addEventListener ('click', function()
+        {
+            updateAppPath()
+        })
+
+        // Reload button action.
+        document.querySelector('#button-reload').addEventListener ('click', function()
+        {
+            updateAppPath()
+            sendReload()
+        })
+        
+        // Workbench button action.
+        document.querySelector('#button-workbench').addEventListener ('click', function()
+        {
+            var workbench = window.open(
+                'workbench.html', 
+                'workbench',
+                'resizable=1,width=800,height=600')
+            workbench.moveTo(0, 0)
+        })
+    }
+    
+    function readSavedAppPath()
+    {
+        if (FS.existsSync(mSavedAppPath))
+        {
+            var appPath = FS.readFileSync(mSavedAppPath, {encoding: 'utf8'})
+            document.querySelector('#field-app-path').value = appPath
+            setAppPath(appPath)
+        }
+    }
+
+    function updateAppPath()
+    {
+        var appPath = document.querySelector('#field-app-path').value
+        setAppPath(appPath)
+    }
+    
+    function setAppPath(appPath)
+    {
+        if (appPath != mAppPath)
+        {
+            mAppPath = appPath
+            var pos = mAppPath.lastIndexOf('/') + 1
+            mBasePath = mAppPath.substr(0, pos)
+            mAppFile = mAppPath.substr(pos)
+            mWebServer.setBasePath(mBasePath)
+            FS.writeFileSync(mSavedAppPath, mAppPath, {encoding: 'utf8'})
+        }
+    }
+
+    function webServerHookFun(request, response, path)
+    {
+        console.log(path)
+        if (path == '/connect')
+        {
+            //console.log('client connection request')
+            var page = FS.readFileSync('./connect.html', {encoding: 'utf8'})
+            mWebServer.writeRespose(response, page, 'text/html')
+            return true
+        }
+        else if (path == '/reloader')
+        {
+            var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
+            script += '("' + mIpAddress + '", true)'
+            mWebServer.writeRespose(response, script, 'application/javascript')
+            return true
+        }
+        else if (path == '/' + mAppFile)
+        {
+            
+            var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
+            var scriptBegin = '<' + 'script' + '>\n'
+            var scriptBeginSrc = '<' + 'script src='
+            var scriptEnd = '</' + 'script' + '>\n'
+            script =
+                scriptBeginSrc +
+                '"http://' + mIpAddress + ':4043/socket.io/socket.io.js">' +
+                scriptEnd +
+                scriptBegin +
+                script + '("' + mIpAddress + '", false)' +
+                scriptEnd
+            var file = FS.readFileSync('./' + mAppFile, {encoding: 'utf8'})
+            file = file.replace('<!--hyperapp.reloader-->', script)
+            mWebServer.writeRespose(response, file, 'text/html')
+            return true
+        }
+        else
+        {
+            return false
+        }
+    }
+
+    function startServers()
+    {
+        //IO = SOCKETIO.listen(mSocketIoPort, {log: false})
+        IO = SOCKETIO.listen(mSocketIoPort)
+
+        IO.set('log level', 1)
+        
+        // Handle socket connections.
+        IO.sockets.on('connection', function(socket) 
+        {
+            console.log("Client connected")
+            
+            socket.on('logMessage', function(data)
+            {
+                displayLogMessage(data)
+            })
+            
+            socket.on('evalResult', function(data)
+            {
+                displayEvalResult(data)
+            })
+            
+            // Closure that holds socket connection.
+            /*(function(socket)
+            {
+                //mSockets.push_back(socket)
+                //socket.emit('news', { hello: 'world' });
+                socket.on('unregister', function(data)
+                {
+                    mSockets.remove(socket)
+                })
+            })(socket)*/
+        })
+
+        // Create and start web server.
+        MAIN.startWebServer(mBasePath, mWebServerPort, function(server)
+        {
+            mWebServer = server
+            mWebServer.getIpAddress(function(address) {
+                mIpAddress = address
+                document.querySelector('#server-ip').innerHTML = 
+                    'http://' + address + ':' + mWebServerPort + '/connect'
+            })
+            mWebServer.setHookFun(webServerHookFun)
+        })
+    }
+
+    function sendReload()
+    {
+        //console.log("sending reload")
+        IO.sockets.emit('reload', {url: 'http://' + mIpAddress + ':4042/' + mAppFile})
+    }
+    
+    function sendEvalJS(code)
+    {
+        IO.sockets.emit('evaljs', code)
+    }
+    
+    function displayLogMessage(message)
+    {
+        console.log('LOG: ' + message)
+    }
+    
+    function displayEvalResult(result)
+    {
+        console.log('EVALRES: ' + result)
+    }
+
+    // Display version info.
+    //document.querySelector('#info').innerHTML = 'node.js ' + process.version
+    
+    // Hot reload on file update.
+    // TODO: Traverse more levels in the file tree?
+    var mLastReloadTime = Date.now()
+    
+    function fileSystemMonitor()
+    {
+        var filesUpdated = fileSystemMonitorWorker(mBasePath, 0)
+        if (filesUpdated)
+        {
+            sendReload()
+            setTimeout(fileSystemMonitor, 1000)
+        }
+        else
+        {
+            setTimeout(fileSystemMonitor, 500)
+        }
+    }
+    
+    function fileSystemMonitorWorker(path, level)
+    {
+        var files = FS.readdirSync(path)
+        for (var i in files)
+        {
+            try
+            {
+                var stat = FS.statSync(path + files[i])
+                var t = stat.mtime.getTime()
+                //console.log(files[i] + ": " + stat.mtime)
+                if (stat.isFile() && t > mLastReloadTime)
+                {
+                    mLastReloadTime = Date.now()
+                    return true
+                }
+                else if (stat.isDirectory() && level > 0)
+                {
+                    console.log('decending into: ' + path + files[i])
+                    return fileSystemMonitorWorker(path + files[i] + "/", level - 1)
+                }
+            }
+            catch(err)
+            {
+                //console.log('***** ERROR ****** ' + err)
+            }
+        }
+        return false
+    }
+    
+    /*console.log(mBasePath)
+    var files = FS.readdirSync(mBasePath)
+    for (var i in files)
+    {
+        console.log(files[i])
+    }*/
+
+    main()
+})()
+</script>
+</body>
+</html>

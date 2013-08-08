@@ -1,20 +1,24 @@
 package com.divineprog.hyperapp.app;
 
 import com.divineprog.hyperapp.app.R;
+import com.divineprog.hyperapp.Input;
+import com.divineprog.hyperapp.InputActivity;
 import com.divineprog.hyperapp.JavaScriptWebView;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.webkit.ConsoleMessage;
 
 public class MainActivity
-    extends Activity
+    extends InputActivity
     implements JavaScriptWebView.ConsoleListener
 {
     JavaScriptWebView mWebView;
+    String mHomePageUrl = "file:///android_asset/index.html";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -24,9 +28,42 @@ public class MainActivity
         // Create WebView.
         mWebView = new JavaScriptWebView(this);
         mWebView.setConsoleListener(this);
-        mWebView.loadUrl("file:///android_asset/index.html");
+        mWebView.loadUrl(mHomePageUrl);
         //mWebView.loadUrl("http://192.168.43.226:4042/connect");
         setContentView(mWebView);
+        createInputListener();
+    }
+
+    /**
+     * Handle back key.
+     */
+    void createInputListener()
+    {
+        addInputListener(new Input.Adapter()
+        {
+            @Override
+            public boolean onKeyUp(int keyCode)
+            {
+                if (KeyEvent.KEYCODE_BACK == keyCode)
+                {
+                    if (mWebView.getUrl().equals(mHomePageUrl))
+                    {
+                        // If on home page then exit app.
+                        finish();
+                    }
+                    else
+                    {
+                        // Otherwise show app home page.
+                        mWebView.loadUrl(mHomePageUrl);
+                    }
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        });
     }
 
     @Override
