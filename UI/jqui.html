@@ -10,8 +10,9 @@
     <script src="libs/jquery/jquery-2.0.3.min.js"></script>
     <script src="libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="libs/jquery/jquery.layout-latest.min.js"></script>
-
+	<script src="jqui-create.js"></script>
 <script>
+/*
 $(function() {
 $( "input[type=submit], a, button" )
 .button()
@@ -19,13 +20,22 @@ $( "input[type=submit], a, button" )
 event.preventDefault();
 });
 });
+*/
+
+$(function() {console.log('s1')})
+
+
+$(function() {console.log('s2')})
+
+
 </script>
+
 </head>
 <body>
 	<div class="ui-layout-west">
-		<button>A button element</button>
-		<input type="submit" value="A submit button" />
-		<a href="#">An anchor</a>
+		<button data-widget="button">A button element</button>
+		<input  data-widget="button" type="submit" value="A submit button" />
+		<a  data-widget="button" href="#">An anchor</a>
 	</div>
 	
 	<style>
