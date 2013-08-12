@@ -17,12 +17,22 @@
     body
     {
         font-family: sans-serif;
-        font-size: 18px;
     }
+    
+	#panel-open-tools
+    {
+		width: 100%;
+    }
+	
+	#button-workbench, #button-documentation
+    {
+		width: 45%;
+    }
+    
     #button-reload
     {
 		width: 100%;
-        height: 100px;
+        height: 80px;
         font-size: 40px;
     }
     #panel-path
@@ -60,8 +70,13 @@
     
 </head>
 <body>
-	<div id="panel-projects" class="ui-layout-west">
+	<div id="panel-projects">
 	
+		<div id="panel-open-tools">
+			<button id="button-workbench">Workbench</button>
+			<button id="button-documentation">Documentation</button>
+		</div>
+		
 		<div id="panel-reload">
 			<button id="button-reload">Run App</button>
 		</div>
@@ -74,15 +89,111 @@
 		
 		<h3 id="server-ip"></h3>
 		
-	<div id="drag-overlay"></div>
-	</div> <!-- west -->
+		<div id="drag-overlay"></div>
+		</div> 
 	
 	</div>
-	<div class="ui-layout-center">
-		Hello Workbench
-	</div> <!-- center -->
 	
 	<script>
+	// UI setup.
+	;(function()
+	{
+		function setupUI()
+		{
+			styleUI()
+			setUIActions()
+			setUpFileDrop()
+		}
+		
+		function styleUI()
+		{
+			// Apply jQuery UI button style.
+			$('button').button()
+			
+			// Set layout properties.
+			/*
+			$('body').layout(
+			{ 
+				west: { size: 400 },
+				center: { maskContents: true },
+				fxName: 'none'
+			})
+			*/
+		}
+		
+		function setUpFileDrop()
+		{
+			var originalDropTaget = null
+			
+			// Block change page on drop.
+			window.ondragover = function(e) { e.preventDefault(); return false }
+			window.ondragend = function(e) { e.preventDefault(); return false }
+			window.ondrop = function(e) { e.preventDefault(); return false }
+
+			// Set up drop handling using a drop target overlay area.
+			var dropTarget = $('#panel-projects')
+			dropTarget.on('dragenter', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').show();
+			})
+			$('#drag-overlay').on('dragleave dragend', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').hide();
+			})
+			$('#drag-overlay').on('drop', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').hide();
+				var files = e.originalEvent.dataTransfer.files
+				setAppPath(files[0].path)
+				for (var i = 0; i < files.length; ++i) 
+				{
+					// TODO: Add this file to the UI
+					console.log(files[i].path);
+				}
+			})
+		}
+		
+		function setUIActions()
+		{
+			// Set app path button action.
+			/*$('#button-set-app-path').click(function()
+			{
+				updateAppPath()
+			})*/
+
+			// Reload button action.
+			$('#button-reload').click(function()
+			{
+				updateAppPath()
+				SERVER.sendReload()
+			})
+			
+			/*
+			// Workbench button action.
+			$('#button-workbench').click(function()
+			{
+				var workbench = window.open(
+					'workbench.html', 
+					'workbench',
+					'resizable=1,width=800,height=600')
+				workbench.moveTo(0, 0)
+			})
+			*/
+		}
+
+		setupUI()
+	})()
+	
+	</script>
+	
+	<script>
+	// Server set up.
 	// TODO: Remove hard coded port numbers below and
 	// in reload.js.
 	;(function()
@@ -92,14 +203,14 @@
 
 		var mSavedAppPath = './app-path.txt'
 
-		function main()
+		function setupServer()
 		{
 			SERVER.startServers()
 			SERVER.setTraverseNumDirectoryLevels(0)
 			SERVER.fileSystemMonitor()
-			styleUI()
-			setUIActions()
-			setUpFileDrop()
+			//styleUI()
+			//setUIActions()
+			//setUpFileDrop()
 			readSavedAppPath()
 			displayServerIpAddress()
 		}
@@ -217,7 +328,7 @@
 		// Display version info.
 		//document.querySelector('#info').innerHTML = 'node.js ' + process.version
 
-		main()
+		setupServer()
 	})()
 	</script>
 </body>

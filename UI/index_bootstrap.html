@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+	<!-- HTML 5 differences from HTML 4: http://www.w3.org/TR/2008/WD-html5-diff-20080122/ -->
+<head>
+    <meta charset="utf-8">
+    
+    <title>HyperApp</title>
+    
+    <link href="libs/bootstrap-v3.0.0.rc1-dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        
+    <script src="libs/jquery/jquery-2.0.3.min.js"></script>
+    <script src="libs/bootstrap-v3.0.0.rc1-dist/js/bootstrap.min.js"></script>
+    
+    <style>
+    body
+    {
+        font-family: sans-serif;
+    }
+    /*
+	#panel-open-tools
+    {
+		width: 100%;
+    }
+	#button-workbench, #button-documentation
+    {
+		width: 45%;
+    }
+    #button-reload
+    {
+		width: 100%;
+        height: 80px;
+        font-size: 40px;
+    }
+    */
+    #panel-path
+    {
+		margin: 20px 0px;
+		width: 100%;
+        font-size: 18px;
+    }
+    #field-app-path
+    {
+		width: 100%;
+        font-size: 18px;
+    }
+    #button-set-app-path
+    {
+		width: 100%;
+        font-size: 18px;
+    }
+    
+    #panel-projects.non-hover { background: blue; }
+	#panel-projects.hover { background: red; }
+	
+	#drag-overlay
+	{
+		position: absolute;
+		left: 0px;
+		top: 0px;
+		margin: 0px;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(100,255,100,0.3);
+		display: none;
+	}
+    </style>
+    
+</head>
+<body>
+	<div id="panel-projects">
+	<p>
+		<div id="panel-open-tools" class="btn-group btn-group-justified">
+			<a id="button-workbench" type="button" class="btn btn-primary">Workbench</a>
+			<a id="button-documentation" type="button" class="btn btn-success">Documentation</a>
+		</div></p>
+
+		<h4><span class="label label-default">Use in HyperApp mobile client</span> 127.0.0.1</h4>
+		<h4><span class="label label-default">Use to connect from browser</span> http://127.0.0.1/connect</h4>
+<!--
+		<div id="panel-reload"> 	
+			<button id="button-reload" type="button" class="btn btn-warning btn-lg btn-block">Run App</button>
+		</div>
+		
+		</p>
+		<p>
+		<div class="input-group">
+			<span class="input-group-addon">File:</span>
+			<input type="text" class="form-control" placeholder="/full/path/to/Main-HTML-file.html">
+			<span class="input-group-btn">
+				<button class="btn btn-default" type="button">Add</button>
+			</span>
+		</div>
+		</p>
+		<h3 id="server-ip"></h3>
+		-->
+		<ul class="list-group">
+			<li class="list-group-item">
+				Drop HTML file here
+			</li>
+			<li class="list-group-item">
+				<span class="badge">25555555 555555555555 555555</span>
+				<button>Project Two</button><button>Run</button>
+			</li>
+			<li class="list-group-item">
+				<span class="badge"><a href="#">X</a></span>
+			<h4 class="list-group-item-heading">List group item heading</h4>
+    <p class="list-group-item-text">Project 3</p>
+			</li>
+		</ul>
+
+<p>What fruits do you like?</p>
+<ol ondragstart="dragStartHandler(event)">
+ <li draggable="true" data-value="fruit-apple">Apples</li>
+ <li draggable="true" data-value="fruit-orange">Oranges</li>
+ <li draggable="true" data-value="fruit-pear">Pears</li>
+</ol>
+<script>
+  var internalDNDType = 'text/x-example'; // set this to something specific to your site
+  function dragStartHandler(event) {
+    if (event.target instanceof HTMLLIElement) {
+      // use the element's data-value="" attribute as the value to be moving:
+      event.dataTransfer.setData(internalDNDType, event.target.dataset.value);
+      event.dataTransfer.effectAllowed = 'move'; // only allow moves
+    } else {
+      event.preventDefault(); // don't allow selection to be dragged
+    }
+  }
+</script>
+
+
+		<div id="drag-overlay"></div>
+		</div> 
+	
+	</div>
+	
+	<script>
+	// UI setup.
+	;(function()
+	{
+		function setupUI()
+		{
+			styleUI()
+			setUIActions()
+			setUpFileDrop()
+		}
+		
+		function styleUI()
+		{
+			// Apply jQuery UI button style.
+			//$('button').button()
+			
+			// Set layout properties.
+			/*
+			$('body').layout(
+			{ 
+				west: { size: 400 },
+				center: { maskContents: true },
+				fxName: 'none'
+			})
+			*/
+		}
+		
+		function setUpFileDrop()
+		{
+			var originalDropTaget = null
+			
+			// Block change page on drop.
+			window.ondragover = function(e) { e.preventDefault(); return false }
+			window.ondragend = function(e) { e.preventDefault(); return false }
+			window.ondrop = function(e) { e.preventDefault(); return false }
+
+			// Set up drop handling using a drop target overlay area.
+			var dropTarget = $('#panel-projects')
+			dropTarget.on('dragenter', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').show();
+			})
+			$('#drag-overlay').on('dragleave dragend', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').hide();
+			})
+			$('#drag-overlay').on('drop', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').hide();
+				var files = e.originalEvent.dataTransfer.files
+				setAppPath(files[0].path)
+				for (var i = 0; i < files.length; ++i) 
+				{
+					// TODO: Add this file to the UI
+					console.log(files[i].path);
+				}
+			})
+		}
+		
+		function setUIActions()
+		{
+			// Set app path button action.
+			/*$('#button-set-app-path').click(function()
+			{
+				updateAppPath()
+			})*/
+
+			// Reload button action.
+			$('#button-reload').click(function()
+			{
+				updateAppPath()
+				SERVER.sendReload()
+			})
+			
+			/*
+			// Workbench button action.
+			$('#button-workbench').click(function()
+			{
+				var workbench = window.open(
+					'workbench.html', 
+					'workbench',
+					'resizable=1,width=800,height=600')
+				workbench.moveTo(0, 0)
+			})
+			*/
+		}
+
+		setupUI()
+	})()
+	
+	</script>
+	
+	<script>
+	// Server set up.
+	// TODO: Remove hard coded port numbers below and
+	// in reload.js.
+	;(function()
+	{
+		var SERVER = require('./server.js')
+		var FS = require('fs')
+
+		var mSavedAppPath = './app-path.txt'
+
+		function setupServer()
+		{
+			SERVER.startServers()
+			SERVER.setTraverseNumDirectoryLevels(0)
+			SERVER.fileSystemMonitor()
+			//styleUI()
+			//setUIActions()
+			//setUpFileDrop()
+			readSavedAppPath()
+			displayServerIpAddress()
+		}
+		
+		function displayServerIpAddress()
+		{
+			SERVER.getWebServerIpAndPort(function(ip, port) {
+				document.querySelector('#server-ip').innerHTML = 
+					'http://' + ip + ':' + port + '/connect'
+			})
+		}
+		
+		function styleUI()
+		{
+			// Apply jQuery UI button style.
+			$('button').button()
+			
+			// Set layout properties.
+			$('body').layout(
+			{ 
+				west: { size: 400 },
+				center: { maskContents: true },
+				fxName: 'none'
+			})
+		}
+		
+		function setUpFileDrop()
+		{
+			var originalDropTaget = null
+			
+			// Block change page on drop.
+			window.ondragover = function(e) { e.preventDefault(); return false }
+			window.ondragend = function(e) { e.preventDefault(); return false }
+			window.ondrop = function(e) { e.preventDefault(); return false }
+
+			// Set up drop handling using a drop target overlay area.
+			var dropTarget = $('#panel-projects')
+			dropTarget.on('dragenter', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').show();
+			})
+			$('#drag-overlay').on('dragleave dragend', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').hide();
+			})
+			$('#drag-overlay').on('drop', function(e) 
+			{
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').hide();
+				var files = e.originalEvent.dataTransfer.files
+				setAppPath(files[0].path)
+				for (var i = 0; i < files.length; ++i) 
+				{
+					// TODO: Add this file to the UI
+					console.log(files[i].path);
+				}
+			})
+		}
+		
+		function setUIActions()
+		{
+			// Set app path button action.
+			/*$('#button-set-app-path').click(function()
+			{
+				updateAppPath()
+			})*/
+
+			// Reload button action.
+			$('#button-reload').click(function()
+			{
+				updateAppPath()
+				SERVER.sendReload()
+			})
+			
+			/*
+			// Workbench button action.
+			$('#button-workbench').click(function()
+			{
+				var workbench = window.open(
+					'workbench.html', 
+					'workbench',
+					'resizable=1,width=800,height=600')
+				workbench.moveTo(0, 0)
+			})
+			*/
+		}
+		
+		function readSavedAppPath()
+		{
+			if (FS.existsSync(mSavedAppPath))
+			{
+				var appPath = FS.readFileSync(mSavedAppPath, {encoding: 'utf8'})
+				setAppPath(appPath)
+			}
+		}
+
+		function updateAppPath()
+		{
+			var appPath = document.querySelector('#field-app-path').value
+			setAppPath(appPath)
+		}
+		
+		function setAppPath(appPath)
+		{
+			SERVER.setAppPath(appPath)
+			FS.writeFileSync(mSavedAppPath, appPath, {encoding: 'utf8'})
+			document.querySelector('#field-app-path').value = appPath
+		}
+
+		// Display version info.
+		//document.querySelector('#info').innerHTML = 'node.js ' + process.version
+
+		setupServer()
+	})()
+	</script>
+</body>
+</html>

@@ -1,178 +1,239 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>HyperApp Workbench</title>
-<link rel="stylesheet" href="css/dsedit.css" />
+	<meta charset="utf-8">
 
-<script>
-function receiveMessage(event)
-{
-  console.log('I got : ' + event.data)
-  window.parent.postMessage('pingback', '*')
-}
-window.addEventListener('message', receiveMessage, false)
+	<title>HyperApp Workbench</title>
 
-</script>
-
-
-<scriptx src="js/jquery-1.4.2.min.js"></scriptx>
-<scriptx src="js/jquery-ui-1.8.custom.min.js"></scriptx>
-<scriptx src="js/jquery.layout-latest.js"></scriptx>
-<scriptx src="js/CodeMirror/js/codemirror.js"></scriptx>
-
-<scriptx>
-$(document).ready(function() 
-{
-    var editor = CodeMirror.fromTextArea("codeeditor", 
-    {
-        parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-        path: "js/CodeMirror/js/",
-        stylesheet: "js/CodeMirror/css/jscolors.css",
-        height: "100%",
-        width: "100%",
-        indentUnit: 4,
-        autoMatchParens: true
-        // lineNumbers: true
-    });
+    <link rel="stylesheet" href="libs/jquery/themes/sunny/jquery-ui.min.css" />
+    <link rel="stylesheet" href="libs/jquery/layout-default-latest.css" />
+        
+    <script src="libs/jquery/jquery-2.0.3.min.js"></script>
+    <script src="libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="libs/jquery/jquery.layout-latest.min.js"></script>
+    <script src="libs/jquery/jquery.layout-latest.min.js"></script>
     
-    var result = CodeMirror.fromTextArea("resulteditor",
-    {
-        parserfile: ["tokenizejavascript.js", "parsejavascript.js"],
-        path: "js/CodeMirror/js/",
-        stylesheet: "js/CodeMirror/css/jscolors.css",
-        height: "100%",
-        width: "100%"
-    });    
-
-    $("input.buttonEval").click(function() 
-    {
-        var code = editor.selection(); //.getCode();
-        var ipaddress = getDeviceIpAddress();
-        var res = sendToDevice("eval", code, ipaddress);
-        showResult(res);
-    });
-
-    $("input.buttonRunActivity").click(function() 
-    {
-        var code = editor.selection(); //.getCode();
-        var ipaddress = getDeviceIpAddress();
-        var res = sendToDevice("run", code, ipaddress);
-        showResult(res);
-    });
-
-    $("input.buttonIndentSelection").click(function() 
-    {
-        editor.reindentSelection(); 
-    });
+    <link rel="stylesheet" href="libs/codemirror-3.15/lib/codemirror.css">
+    <script src="libs/codemirror-3.15/lib/codemirror.js"></script>
+    <script src="libs/codemirror-3.15/addon/edit/matchbrackets.js"></script>
+    <script src="libs/codemirror-3.15/addon/edit/continuecomment.js"></script>
+    <script src="libs/codemirror-3.15/addon/comment/comment.js"></script>
+    <script src="libs/codemirror-3.15/mode/javascript/javascript.js"></script>
     
-    $("input.buttonUndo").click(function() 
-    {
-        editor.undo(); 
-    });
+	<style>
 
-    $("input.buttonRedo").click(function() 
-    {
-        editor.redo(); 
-    });
-    
-    $("input.buttonClearResult").click(function() 
-    {
-        result.setCode(""); 
-    });
+	.CodeMirror 
+	{
+		font-family: monospace;
+		font-size: 18px;
+		height: 100%;
+	}
 
-    $("input.buttonEvalInBrowser").click(function() 
-    {
-        try {
-            var code = editor.selection();
-            var res = eval(code);
-            showResult(res); }
-        catch (error) {
-             showResult("{*.*} " + error); }
-    });
-    
-    function getDeviceIpAddress()
-    {
-        return jQuery.trim($("input.ipaddress").val());
-    }
-    
-    function showResult(res)
-    {
-        result.setCode(res + "\n" + result.getCode()); 
-    }
+	.ui-layout-pane {
+		background: #FFF; 
+		border: 1px solid #BBB;
+		padding: 0px; 
+		overflow: auto;
+	} 
+/*
+	.ui-layout-resizer {
+		background: #EEEEEE; 
+	} 
 
-    function sendToDevice(action, code, ipaddress) 
-    {
-        var result = "[*_*] Cannot communicate with the device!";
-        try
-        {
-            var deviceUrl = "http://" + ipaddress + ":4042/" + action + "/";
-            var response = $.ajax(
-            {
-                url: deviceUrl,
-                type: "PUT",
-                data: code,
-                processData: false,
-                dataType: "text/plain",
-                async: false,
-                timeout: 5000,
-                success: function(data)
-                {
-                    result = data;
-                },
-                error: function(req, status, err)
-                {
-                    result = "['_'] " + status;
-                }
-             });
-        }
-        catch (error)
-        {
-            result = "[*_*] " + error;
-        }
-        return result;
-    }
+	.ui-layout-toggler {
+		background: #999999; 
+	} 
+*/
+	#toolbar {
+		color: #111111;
+		background: #EEEEE0;
+		border: 1px solid #BBB;
+		border-bottom-style:solid;
+		border-bottom-width:1px;
+		border-bottom-color:#BBB;
+		padding: 5px 5px 5px 5px; 
+		font-size: 0.8em; 
+		font-family: Verdana, Helvetica, sans-serif;
+	}
 
-    //$("body").layout({ applyDefaultStyles: true });
-    $("body").layout();
-    
-});
-</scriptx>
+	#codearea {
+		padding: 0px; 
+	}
+
+	#resultarea {
+		padding: 0px; 
+		height: 8em;
+	}
+
+	body {
+	}
+
+	button {
+		line-height: normal;
+	}
+
+	a {
+		color: #111111;
+	}
+
+	</style>
+	
+	<script>
+	function receiveMessage(event)
+	{
+	  console.log('I got : ' + event.data)
+	  window.parent.postMessage('pingback', '*')
+	}
+	window.addEventListener('message', receiveMessage, false)
+	</script>
+
+	<script>
+	$(document).ready(function() 
+	{
+		var editor = CodeMirror.fromTextArea(document.getElementById('codeeditor'), 
+		{
+			mode: 'javascript',
+			indentUnit: 4,
+			autoMatchParens: true,
+			lineNumbers: true,
+			matchBrackets: true,
+			continueComments: 'Enter',
+			extraKeys: {'Ctrl-Q': 'toggleComment'}
+		})
+
+		var result = CodeMirror.fromTextArea(document.getElementById('resulteditor'), 
+		{
+		})
+
+		$('input.buttonEval').click(function() 
+		{
+			var code = editor.selection(); //.getCode();
+			var ipaddress = getDeviceIpAddress();
+			var res = sendToDevice('eval', code, ipaddress);
+			showResult(res);
+		});
+
+		$('input.buttonRunActivity').click(function() 
+		{
+			var code = editor.selection(); //.getCode();
+			var ipaddress = getDeviceIpAddress();
+			var res = sendToDevice('run', code, ipaddress);
+			showResult(res);
+		});
+
+		$('input.buttonIndentSelection').click(function() 
+		{
+			editor.reindentSelection(); 
+		});
+		
+		$('input.buttonUndo').click(function() 
+		{
+			editor.undo(); 
+		});
+
+		$('input.buttonRedo').click(function() 
+		{
+			editor.redo(); 
+		});
+		
+		$('input.buttonClearResult').click(function() 
+		{
+			result.setValue('')
+		});
+
+		$('input.buttonEvalInBrowser').click(function() 
+		{
+			try {
+				var code = editor.selection();
+				var res = eval(code);
+				showResult(res); }
+			catch (error) {
+				 showResult('{*.*} ' + error); }
+		});
+		
+		function getDeviceIpAddress()
+		{
+			return jQuery.trim($('input.ipaddress').val());
+		}
+		
+		function showResult(res)
+		{
+			result.setCode(res + '\n' + result.getCode()); 
+		}
+
+		function sendToDevice(action, code, ipaddress) 
+		{
+			var result = '[*_*] Cannot communicate with the device!';
+			try
+			{
+				var deviceUrl = 'http://' + ipaddress + ':4042/' + action + '/';
+				var response = $.ajax(
+				{
+					url: deviceUrl,
+					type: 'PUT',
+					data: code,
+					processData: false,
+					dataType: 'text/plain',
+					async: false,
+					timeout: 5000,
+					success: function(data)
+					{
+						result = data;
+					},
+					error: function(req, status, err)
+					{
+						result = "['_'] " + status;
+					}
+				 });
+			}
+			catch (error)
+			{
+				result = '[*_*] ' + error;
+			}
+			return result;
+		}
+
+		//$('body').layout({ applyDefaultStyles: true });
+		$('body').layout();
+		
+	});
+	</script>
 </head>
 <body>
 
 <div class="ui-layout-center">
+	
 <div id="codearea">
 <textarea id="codeeditor">
-// **********************************************
-// ***** Welcome to the HyperApp Workbench! *****
-// **********************************************
+// -----------------------------------------------------
+//                  Welcome to HyperApp   
+// -----------------------------------------------------
 // 
-// HyperApp is a programming tool for mobile development. The text in this
-// window is JavaScript code that can run on your device.
+// HyperApp is a programming tool for running mobile development. 
+// 
 //
-1 + 3
-22 * 99 - 7
-function twice(n) { return n * 2; }
-twice(22)
 </textarea>
 </div>
+
 </div>
 
 <div class="ui-layout-south">
+
 <div id="toolbar">
-<input value="Evaluate Selection" class="buttonRun" type="button" />
-<input value="Run File" class="buttonRunActivity" type="button" />
-<input value="Indent Selection" class="buttonIndentSelection" type="button" />
-<input value="Undo" class="buttonUndo" type="button" />
-<input value="Redo" class="buttonRedo" type="button" />
-<input value="Clear result area" class="buttonClearResult" type="button" />
+	<input value="Evaluate Selection" class="buttonRun" type="button" />
+	<input value="Run File" class="buttonRunActivity" type="button" />
+	<input value="Indent Selection" class="buttonIndentSelection" type="button" />
+	<input value="Undo" class="buttonUndo" type="button" />
+	<input value="Redo" class="buttonRedo" type="button" />
+	<input value="Clear result area" class="buttonClearResult" type="button" />
 </div>
+
 <div id="resultarea">
 <textarea id="resulteditor" >
 </textarea>
 </div>
 
 </div>
+
 </body>
 </html>
