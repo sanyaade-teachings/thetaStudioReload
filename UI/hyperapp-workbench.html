@@ -1,204 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
+<meta charset="utf-8">
 
-	<title>HyperApp Workbench</title>
+<title>HyperApp Workbench</title>
 
-    <link rel="stylesheet" href="libs/jquery/themes/sunny/jquery-ui.min.css" />
-    <link rel="stylesheet" href="libs/jquery/layout-default-latest.css" />
-        
-    <script src="libs/jquery/jquery-2.0.3.min.js"></script>
-    <script src="libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="libs/jquery/jquery.layout-latest.min.js"></script>
-    <script src="libs/jquery/jquery.layout-latest.min.js"></script>
-    
-    <link rel="stylesheet" href="libs/codemirror-3.15/lib/codemirror.css">
-    <script src="libs/codemirror-3.15/lib/codemirror.js"></script>
-    <script src="libs/codemirror-3.15/addon/edit/matchbrackets.js"></script>
-    <script src="libs/codemirror-3.15/addon/edit/continuecomment.js"></script>
-    <script src="libs/codemirror-3.15/addon/comment/comment.js"></script>
-    <script src="libs/codemirror-3.15/mode/javascript/javascript.js"></script>
-    
-	<style>
-
-	.CodeMirror 
-	{
-		font-family: monospace;
-		font-size: 18px;
-		height: 100%;
-	}
-
-	.ui-layout-pane {
-		background: #FFF; 
-		border: 1px solid #BBB;
-		padding: 0px; 
-		overflow: auto;
-	} 
-/*
-	.ui-layout-resizer {
-		background: #EEEEEE; 
-	} 
-
-	.ui-layout-toggler {
-		background: #999999; 
-	} 
-*/
-	#toolbar {
-		color: #111111;
-		background: #EEEEE0;
-		border: 1px solid #BBB;
-		border-bottom-style:solid;
-		border-bottom-width:1px;
-		border-bottom-color:#BBB;
-		padding: 5px 5px 5px 5px; 
-		font-size: 0.8em; 
-		font-family: Verdana, Helvetica, sans-serif;
-	}
-
-	#codearea {
-		padding: 0px; 
-	}
-
-	#resultarea {
-		padding: 0px; 
-		height: 8em;
-	}
-
-	body {
-	}
-
-	button {
-		line-height: normal;
-	}
-
-	a {
-		color: #111111;
-	}
-
-	</style>
+<link rel="stylesheet" href="libs/jquery/themes/sunny/jquery-ui.min.css" />
+<link rel="stylesheet" href="libs/jquery/layout-default-latest.css" />
 	
-	<script>
-	function receiveMessage(event)
-	{
-	  console.log('I got : ' + event.data)
-	  window.parent.postMessage('pingback', '*')
-	}
-	window.addEventListener('message', receiveMessage, false)
-	</script>
+<script src="libs/jquery/jquery-2.0.3.min.js"></script>
+<script src="libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="libs/jquery/jquery.layout-latest.min.js"></script>
+<script src="libs/jquery/jquery.layout-latest.min.js"></script>
 
-	<script>
-	$(document).ready(function() 
-	{
-		var editor = CodeMirror.fromTextArea(document.getElementById('codeeditor'), 
-		{
-			mode: 'javascript',
-			indentUnit: 4,
-			autoMatchParens: true,
-			lineNumbers: true,
-			matchBrackets: true,
-			continueComments: 'Enter',
-			extraKeys: {'Ctrl-Q': 'toggleComment'}
-		})
+<link rel="stylesheet" href="libs/codemirror-3.15/lib/codemirror.css">
+<script src="libs/codemirror-3.15/lib/codemirror.js"></script>
+<script src="libs/codemirror-3.15/addon/edit/matchbrackets.js"></script>
+<script src="libs/codemirror-3.15/addon/edit/continuecomment.js"></script>
+<script src="libs/codemirror-3.15/addon/comment/comment.js"></script>
+<script src="libs/codemirror-3.15/mode/javascript/javascript.js"></script>
 
-		var result = CodeMirror.fromTextArea(document.getElementById('resulteditor'), 
-		{
-		})
+<style>
+.CodeMirror 
+{
+	font-family: monospace;
+	font-size: 18px;
+	height: 100%;
+}
 
-		$('input.buttonEval').click(function() 
-		{
-			var code = editor.selection(); //.getCode();
-			var ipaddress = getDeviceIpAddress();
-			var res = sendToDevice('eval', code, ipaddress);
-			showResult(res);
-		});
+.ui-layout-pane 
+{
+	background: #FFF; 
+	border: 1px solid #BBB;
+	padding: 0px; 
+	overflow: auto;
+} 
 
-		$('input.buttonRunActivity').click(function() 
-		{
-			var code = editor.selection(); //.getCode();
-			var ipaddress = getDeviceIpAddress();
-			var res = sendToDevice('run', code, ipaddress);
-			showResult(res);
-		});
+#toolbar 
+{
+	color: #111111;
+	background: #EEEEE0;
+	border: 1px solid #BBB;
+	border-bottom-style:solid;
+	border-bottom-width:1px;
+	border-bottom-color:#BBB;
+	padding: 5px 5px 5px 5px; 
+	font-size: 0.8em; 
+	font-family: Sans-serif;
+}
 
-		$('input.buttonIndentSelection').click(function() 
-		{
-			editor.reindentSelection(); 
-		});
-		
-		$('input.buttonUndo').click(function() 
-		{
-			editor.undo(); 
-		});
+#codearea 
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px; 
+}
 
-		$('input.buttonRedo').click(function() 
-		{
-			editor.redo(); 
-		});
-		
-		$('input.buttonClearResult').click(function() 
-		{
-			result.setValue('')
-		});
+#resultarea 
+{
+	position: absolute;
+	left: 0px;
+	top: 2.5em;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px; 
+}
 
-		$('input.buttonEvalInBrowser').click(function() 
-		{
-			try {
-				var code = editor.selection();
-				var res = eval(code);
-				showResult(res); }
-			catch (error) {
-				 showResult('{*.*} ' + error); }
-		});
-		
-		function getDeviceIpAddress()
-		{
-			return jQuery.trim($('input.ipaddress').val());
-		}
-		
-		function showResult(res)
-		{
-			result.setCode(res + '\n' + result.getCode()); 
-		}
-
-		function sendToDevice(action, code, ipaddress) 
-		{
-			var result = '[*_*] Cannot communicate with the device!';
-			try
-			{
-				var deviceUrl = 'http://' + ipaddress + ':4042/' + action + '/';
-				var response = $.ajax(
-				{
-					url: deviceUrl,
-					type: 'PUT',
-					data: code,
-					processData: false,
-					dataType: 'text/plain',
-					async: false,
-					timeout: 5000,
-					success: function(data)
-					{
-						result = data;
-					},
-					error: function(req, status, err)
-					{
-						result = "['_'] " + status;
-					}
-				 });
-			}
-			catch (error)
-			{
-				result = '[*_*] ' + error;
-			}
-			return result;
-		}
-
-		//$('body').layout({ applyDefaultStyles: true });
-		$('body').layout();
-		
-	});
-	</script>
+button 
+{
+	line-height: normal;
+}
+</style>
 </head>
+
 <body>
 
 <div class="ui-layout-center">
@@ -206,34 +83,145 @@
 <div id="codearea">
 <textarea id="codeeditor">
 // -----------------------------------------------------
-//                  Welcome to HyperApp   
+//            Welcome to HyperApp Workbench 
 // -----------------------------------------------------
-// 
-// HyperApp is a programming tool for running mobile development. 
-// 
 //
+// The Workbench has two parts. This part is a JavaScript editor
+// where you can select and evaluate code on connected devides.
+// Get started by selecting a line of the example code below, and 
+// then press the Eval button.
+//
+hyperapp.log('Hello World')
+document.body.innerHTML = '<h1>Hello World</h1>'
 </textarea>
 </div>
 
-</div>
+</div> <!-- center -->
 
 <div class="ui-layout-south">
 
 <div id="toolbar">
-	<input value="Evaluate Selection" class="buttonRun" type="button" />
-	<input value="Run File" class="buttonRunActivity" type="button" />
-	<input value="Indent Selection" class="buttonIndentSelection" type="button" />
+	<input value="Eval" class="buttonEval" type="button" />
 	<input value="Undo" class="buttonUndo" type="button" />
 	<input value="Redo" class="buttonRedo" type="button" />
-	<input value="Clear result area" class="buttonClearResult" type="button" />
+	<input value="Clear Log" class="buttonClearLog" type="button" />
 </div>
 
 <div id="resultarea">
 <textarea id="resulteditor" >
+Message Area - Log messages are displayed here
 </textarea>
 </div>
 
-</div>
+</div> <!-- south -->
 
+
+<script>
+</script>
+
+<script>
+$(function() 
+{
+	// Main application window
+	var mMainWindow = window.opener
+	
+	// Editor component.
+	var editor = CodeMirror.fromTextArea(document.getElementById('codeeditor'), 
+	{
+		mode: 'javascript',
+		indentUnit: 4,
+		autoMatchParens: true,
+		lineNumbers: true,
+		matchBrackets: true,
+		continueComments: 'Enter',
+		extraKeys: {'Ctrl-Q': 'toggleComment'}
+	})
+
+	// Result/log component.
+	var result = CodeMirror.fromTextArea(document.getElementById('resulteditor'), 
+	{
+	})
+
+	$('input.buttonEval').click(function() 
+	{
+		if (!mMainWindow)
+		{
+			showResult('Error: Could not find main window - report to developer')
+			return
+		}
+		
+		if (!editor.somethingSelected())
+		{
+			showResult('Select some code to evaluate')
+			return
+		}
+		
+		var code = editor.getSelection()
+		mMainWindow.postMessage({ message: 'eval', code: code }, '*')
+	})
+	
+	$('input.buttonUndo').click(function() 
+	{
+		editor.undo()
+	})
+
+	$('input.buttonRedo').click(function() 
+	{
+		editor.redo()
+	})
+	
+	$('input.buttonClearLog').click(function() 
+	{
+		result.setValue('')
+	})
+
+	/*
+	$('input.buttonEvalInBrowser').click(function() 
+	{
+		try 
+		{
+			var code = editor.selection();
+			var res = eval(code);
+			showResult(res); 
+		}
+		catch (error) 
+		{
+			 showResult('Error: ' + error); }
+	});
+	*/
+	
+	function showResult(res)
+	{
+		result.setValue(res + '\n' + result.getValue()); 
+	}
+
+	//$('body').layout({ applyDefaultStyles: true })
+	$('body').layout(
+	{
+		south: { size: 300 },
+		//center: { maskContents: true },
+		fxName: 'none'
+	})
+	
+	function receiveMessage(event)
+	{
+		//console.log('Workbench got : ' + event.data.message)
+		if ('hello' == event.data.message)
+		{
+			mMainWindow = event.source
+		}
+		else if ('log' == event.data.message)
+		{
+			showResult('LOG: ' + event.data.logMessage)
+		}
+		else if ('jsResult' == event.data.message)
+		{
+			showResult('JS: ' + event.data.result)
+		}
+	}
+	
+	window.addEventListener('message', receiveMessage, false)
+})
+</script>
 </body>
 </html>

@@ -18,3 +18,8 @@ local.properties
 # Eclipse project files
 .classpath
 .project
+
+# node-webkit binaries
+UI/libffmpegsumo.so
+UI/nw
+UI/nw.pak

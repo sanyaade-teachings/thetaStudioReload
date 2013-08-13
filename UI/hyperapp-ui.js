@@ -12,6 +12,9 @@ hyperapp.UI = {}
 // UI setup.
 ;(function()
 {
+	var mWorkbenchWindow = null
+	var mDocumentationWindow = null
+	
 	function setupUI()
 	{
 		styleUI()
@@ -33,12 +36,74 @@ hyperapp.UI = {}
 			fxName: 'none'
 		})
 		*/
+	}
+	
+	function setUIActions()
+	{
+		// Workbench button action.
+		$('#button-workbench').click(function()
+		{
+			if (mWorkbenchWindow && !mWorkbenchWindow.closed)
+			{
+				// Bring existing window to front.
+				mWorkbenchWindow.focus()
+			}
+			else
+			{
+				// Create new window.
+				mWorkbenchWindow = window.open(
+					'hyperapp-workbench.html', 
+					'workbench',
+					'resizable=1,width=800,height=600')
+				mWorkbenchWindow.moveTo(50, 50)
+				// Establish contact. Not needed/used.
+				mWorkbenchWindow.postMessage({ message: 'hello' }, '*')
+			}
+		})
 		
+		// Documentation button action.
+		$('#button-documentation').click(function()
+		{
+			if (mDocumentationWindow && !mDocumentationWindow.closed)
+			{
+				// Bring existing window to front.
+				mDocumentationWindow.focus()
+			}
+			else
+			{
+				// Create new window.
+				mDocumentationWindow = window.open(
+					'https://github.com/divineprog/hyperapp', 
+					'documentation',
+					'resizable=1,width=800,height=600')
+				mDocumentationWindow.moveTo(50, 50)
+			}
+		})
+		
+		// Reorder of project list by drag and drop.
 		$(function() 
 		{
-			$('#project-list').sortable()
+			$('#project-list').sortable(
+			{
+				stop: function() 
+				{
+					updateProjectList()
+				}
+			})
 			$('#project-list').disableSelection()
 		})
+		
+		// Message handler.
+		window.addEventListener('message', receiveMessage, false)
+	}
+	
+	function receiveMessage(event)
+	{
+		console.log('Main got : ' + event.data.message)
+		if ('eval' == event.data.message)
+		{
+			hyperapp.SERVER.sendEvalJS(event.data.code)
+		}
 	}
 	
 	function setUpFileDrop()
@@ -70,26 +135,6 @@ hyperapp.UI = {}
 			e.preventDefault()
 			$('#drag-overlay').hide();
 			handleFileDrop(e.originalEvent.dataTransfer.files)
-		})
-	}
-	
-	function setUIActions()
-	{
-		// Workbench button action.
-		$('#button-workbench').click(function()
-		{
-			var workbench = window.open(
-				'hyperapp-workbench.html', 
-				'workbench',
-				'resizable=1,width=800,height=600')
-			workbench.moveTo(0, 0)
-		})
-		
-		// Documentation button action.
-		$('#button-documentation').click(function()
-		{
-			console.log('hello')
-			createProjectEntry('')
 		})
 	}
 	
@@ -127,16 +172,29 @@ hyperapp.UI = {}
 	function createProjectEntry(path)
 	{
 		// Template for project items.
-		var entry = '<div class="ui-state-default ui-corner-all">'
 		var html = 
-			'<button ' +
-				'type="button" ' +
-				'class="button-run btn btn-primary" ' +
-				'onclick="hyperapp.runApp(\'__PATH1__\')">' +
-				'Run App' +
-			'</button>' +
-			'<h4>__NAME__</h4>' +
-			'<p>__PATH2__</p>'
+			'<div class="ui-state-default ui-corner-all">'
+				+ '<button '
+				+	'type="button" '
+				+	'class="button-open btn btn-success" '
+				+	'onclick="hyperapp.openFileFolder(\'__PATH1__\')">'
+				+	'Open'
+				+ '</button>'
+				+ '<button '
+				+	'type="button" '
+				+	'class="button-run btn btn-primary" '
+				+	'onclick="hyperapp.runApp(\'__PATH2__\')">'
+				+	'Run App'
+				+ '</button>'
+				+ '<h4>__NAME__</h4>'
+				+ '<p>__PATH3__</p>'
+				+ '<button '
+				+	'type="button" '
+				+	'class="close button-delete" '
+				+	'onclick="hyperapp.UI.deleteEntry(this)">'
+				+	'&times;'
+				+ '</button>'
+			+ '</div>'
 		
 		// Get name of project, use title tag as first choise.
 		var data = hyperapp.FS.readFileSync(path, {encoding: 'utf8'})
@@ -149,12 +207,12 @@ hyperapp.UI = {}
 		// Replace fields in template.
 		html = html.replace('__PATH1__', path)
 		html = html.replace('__PATH2__', path)
+		html = html.replace('__PATH3__', path)
 		html = html.replace('__NAME__', name)
 		
 		// Create element.
-		var element = $(entry)
-		console.log(html)
-		element.html(html)
+		var element = $(html)
+		//console.log(html)
 		
 		// Insert element first in list.
 		$('#project-list').prepend(element)
@@ -183,6 +241,22 @@ hyperapp.UI = {}
 		return path.substring(pos + 1)
 	}
 	
+	// Project list has been reordered/changed, save new list.
+	function updateProjectList()
+	{
+		var projects = []
+		var elements = $('#project-list > div')
+		elements.each(function(index, element)
+		{
+			var path = $(element).find('p').text()
+			if (path != '')
+			{
+				projects.push(path)
+			}
+		})
+		hyperapp.setProjectList(projects)
+	}
+	
 	hyperapp.UI.displayIpAddress = function(ip, port)
 	{
 		document.querySelector('#ip-address').innerHTML = ip
@@ -199,6 +273,22 @@ hyperapp.UI = {}
 		}
 	}
 
+	hyperapp.UI.setServerMessageFun = function()
+	{
+		// Server message callback.
+		hyperapp.SERVER.setMessageCallbackFun(function(msg)
+		{
+			if (mWorkbenchWindow) { mWorkbenchWindow.postMessage(msg, '*') }
+		})
+	}
+	
+	hyperapp.UI.deleteEntry = function(obj)
+	{
+		console.log($(obj).parent())
+		$(obj).parent().remove()
+		updateProjectList()
+	}
+	
 	setupUI()
 })()
 
@@ -215,14 +305,20 @@ hyperapp.UI = {}
 
 	var mProjectListFile = './project-list.json'
 	var mProjectList = []
+	var mApplicationBasePath = process.cwd()
 
 	function setupServer()
 	{
+		// Start server tasks.
 		SERVER.startServers()
 		SERVER.setTraverseNumDirectoryLevels(3)
 		SERVER.fileSystemMonitor()
+		
+		// Populate the UI.
+		// TODO: Consider moving these calls to a function in hyperapp.UI.
 		readProjectList()
 		hyperapp.UI.displayProjectList(mProjectList)
+		hyperapp.UI.setServerMessageFun()
 		displayServerIpAddress()
 	}
 	
@@ -235,14 +331,16 @@ hyperapp.UI = {}
 	
 	hyperapp.runApp = function(path)
 	{
+		// Prepend base path if needed.
+		if (path.substring(0,1) != "/")
+		{
+			path = mApplicationBasePath + '/' + path
+		}
+		
+		console.log('runApp: ' + path)
+		
 		SERVER.setAppPath(path)
 		SERVER.sendReload()
-	}
-	
-	function setAppPath(appPath)
-	{
-		SERVER.setAppPath(appPath)
-		//FS.writeFileSync(mProjectListFile, appPath, {encoding: 'utf8'})
 	}
 	
 	// TODO: Should saved apps belong to the UI, rather than to the server?
@@ -262,14 +360,97 @@ hyperapp.UI = {}
 		FS.writeFileSync(mProjectListFile, json, {encoding: 'utf8'})
 	}
 	
+	// Check: https://github.com/jjrdn/node-open
+	function openFolder(folderPath) 
+	{
+        try 
+        {
+            var exec = require('child_process').exec;
+
+            function puts(error, stdout, stderr) 
+            {
+                //console.log('stdout: ' + stdout);
+                //console.log('stderr: ' + stderr);
+                //console.log('error: ' + error);
+            }
+            
+            var command = 'nautilus ' + folderPath
+            console.log(exec(command, puts))
+/*
+            var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+            var linux = vars.globals.localPlatform.indexOf("linux") >=0;
+            if (darwin) {
+                var command =
+                    "open "
+                    + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                    + vars.globals.fileSeparator
+                    + this.fixPathsUnix(projectFolder)
+                    + "/LocalFiles"
+                    ;
+            } else if (linux) {
+                var commandStat = fs.statSync("/usr/bin/nautilus");
+                if(commandStat.isFile()) {
+                  var command =
+                      "nautilus "
+                      + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                      + vars.globals.fileSeparator
+                      + this.fixPathsUnix(projectFolder)
+                      + "/LocalFiles &"
+                      ;
+                } else {
+                  var command =
+                      "dolphin "
+                      + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+                      + vars.globals.fileSeparator
+                      + this.fixPathsUnix(projectFolder)
+                      + "/LocalFiles &"
+                      ;
+                }
+            } else {
+                var command =
+                    "explorer \""
+                    + vars.globals.rootWorkspacePath
+                    + vars.globals.fileSeparator
+                    + projectFolder
+                    + "\\LocalFiles\"";
+            }
+            */
+        }
+        catch(err) 
+        {
+            console.log("ERROR in openFolder: " + err)
+        }
+    }
+    
+	// TODO: Simplify, use updateProjectList instead.
 	hyperapp.addProject = function(path)
 	{
 		mProjectList.unshift(path)
 		saveProjectList()
 	}
 	
+	hyperapp.setProjectList = function(list)
+	{
+		mProjectList = list
+		saveProjectList()
+	}
+	
+	hyperapp.openFileFolder = function(path) 
+	{
+		// Prepend base path if needed.
+		if (path.substring(0,1) != "/")
+		{
+			path = mApplicationBasePath + '/' + path
+		}
+		
+		// Drop filename part of path.
+		var pos = path.lastIndexOf('/')
+		var folderPath = path.substring(0, pos)
+		openFolder(folderPath)
+    }
+    
 	// Display Node.js version info. Not used.
 	//document.querySelector('#info').innerHTML = 'node.js ' + process.version
-
+	
 	setupServer()
 })()

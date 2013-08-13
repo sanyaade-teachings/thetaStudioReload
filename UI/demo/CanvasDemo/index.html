@@ -5,8 +5,23 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
 	<title>Canvas Demo</title>
 	<!--hyperapp.reloader-->
+    <style>
+	canvas { border: 1px solid black; }
+    </style>
 </head>
 <body>
 	<h1>Canvas Demo</h1>
+	<canvas id="tutorial" width="200" height="200"></canvas>
+	<script>
+	var canvas = document.getElementById('tutorial')
+
+	var ctx = canvas.getContext('2d')
+
+	ctx.fillStyle = 'rgb(200,0,0)'
+	ctx.fillRect(0, 0, 150, 150)
+
+	ctx.fillStyle = 'rgba(0, 0, 200, 0.5)'
+	ctx.fillRect(50, 50, 150, 150)
+    </script>
 </body>
 </html>

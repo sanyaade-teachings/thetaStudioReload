@@ -24,21 +24,21 @@
 	}
 	
 	// Send result of evaluating JS to the UI.
-    window.hyperapp.sendEvalResult = function(result)
+    window.hyperapp.sendJsResult = function(result)
     {
-        hyperapp.IoSocket.emit('evalResult', result)
+        hyperapp.IoSocket.emit('jsResult', result)
     }
     
     // Log to UI.
     window.hyperapp.log = function(message)
     {
-        hyperapp.IoSocket.emit('logMessage', message)
+        hyperapp.IoSocket.emit('log', message)
     }
     
     // Called from native code.
     window.hyperapp.nativeConsoleMessageCallBack = function(message)
     {
-        hyperapp.IoSocket.emit('logMessage', message)
+        hyperapp.IoSocket.emit('log', message)
     }
     
     /*
@@ -65,11 +65,11 @@
             try
             {
                 var result = eval(data)
-                window.hyperapp.sendEvalResult(result)
+                window.hyperapp.sendJsResult(result)
             }
             catch (err)
             {
-                window.hyperapp.sendEvalResult(err)
+                window.hyperapp.sendJsResult(err)
             } 
         })
         socket.on('connect', function()

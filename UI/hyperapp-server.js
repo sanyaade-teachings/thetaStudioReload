@@ -24,6 +24,7 @@ var mAppFile
 var mIpAddress
 var mWebServerPort = 4042    
 var mSocketIoPort = 4043
+var mMessageCallback = null
 
 /*** Server functions ***/
 
@@ -82,9 +83,13 @@ function webServerHookFun(request, response, path)
 	}
 }
 
-// Insert the script at the template tag, if no template tag is
-// found, insert at alternative locations in the document.
-// TODO: Experimental and non-general code, improve and clean up.
+/**
+ * Internal.
+ * 
+ * Insert the script at the template tag, if no template tag is
+ * found, insert at alternative locations in the document.
+ * TODO: Experimental and non-general code, improve and clean up.
+ */
 function insertReloaderScript(file, script)
 {
 	// Is there a template tag?
@@ -134,14 +139,14 @@ function startServers()
 	{
 		console.log("Client connected")
 		
-		socket.on('logMessage', function(data)
+		socket.on('log', function(data)
 		{
 			displayLogMessage(data)
 		})
 		
-		socket.on('evalResult', function(data)
+		socket.on('jsResult', function(data)
 		{
-			displayEvalResult(data)
+			displayJsResult(data)
 		})
 		
 		// Closure that holds socket connection.
@@ -197,23 +202,43 @@ function setAppPath(appPath)
  */
 function sendReload()
 {
-	//console.log("sending reload")
+	console.log("sending reload")
 	mIO.sockets.emit('reload', {url: 'http://' + mIpAddress + ':4042/' + mAppFile})
 }
 
+/**
+ * External.
+ */
 function sendEvalJS(code)
 {
 	mIO.sockets.emit('evaljs', code)
 }
 
-function displayLogMessage(message)
+/**
+ * External.
+ * 
+ * Callback form: fun(object)
+ */
+function setMessageCallbackFun(fun)
 {
-	console.log('LOG: ' + message)
+	mMessageCallback = fun
 }
 
-function displayEvalResult(result)
+
+function displayLogMessage(message)
 {
-	console.log('EVALRES: ' + result)
+	if (mMessageCallback)
+	{
+		mMessageCallback({ message: 'log', logMessage: message })
+	}
+}
+
+function displayJsResult(result)
+{
+	if (mMessageCallback)
+	{
+		mMessageCallback({ message: 'jsResult', result: result })
+	}
 }
 
 // Display version info.
@@ -311,6 +336,8 @@ exports.startServers = startServers
 exports.getWebServerIpAndPort = getWebServerIpAndPort
 exports.setAppPath = setAppPath
 exports.sendReload = sendReload
+exports.sendEvalJS = sendEvalJS
+exports.setMessageCallbackFun = setMessageCallbackFun
 
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
 exports.fileSystemMonitor = fileSystemMonitor

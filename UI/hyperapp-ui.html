@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     
-    <title>HyperApp</title>
+    <title>HyperApp Launchpad</title>
     
     <link href="libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
     <link href="libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
@@ -29,17 +29,30 @@
 		
 		<div id="panel-middle">
 			<div id="project-list">
+				<!--
 				<div class="ui-state-default ui-corner-all">
+					<button
+						type="button" 
+						class="button-open btn btn-success"
+						onclick="hyperapp.openFileFolder('/home/miki/code/hyperapp/UI/demo/HelloWorld/index.html')">
+						Open
+					</button>
 					<button
 						type="button" 
 						class="button-run btn btn-primary"
 						onclick="hyperapp.runApp('/home/miki/code/hyperapp/UI/demo/HelloWorld/index.html')">
 						Run App
 					</button>
+					<button
+						type="button" 
+						class="close button-delete"
+						onclick="hyperapp.UI.deleteEntry(this)">
+						&times;
+					</button>
 					<h4>Hello World</h4>
 					<p>/home/miki/code/hyperapp/UI/demo/HelloWorld/index.html</p>
 				</div>
-				
+				-->
 				<div class="ui-state-default ui-corner-all">
 					<h4>Tip: Drag and drop HTML files here to add them to the project list</h4>
 				</div>
