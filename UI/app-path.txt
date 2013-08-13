@@ -1,1 +1,0 @@
-/home/miki/code/hyperapp/UI/test2.html

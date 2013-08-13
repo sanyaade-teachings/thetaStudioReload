@@ -1,4 +1,16 @@
 {
-  "name": "nw-demo",
-  "main": "index.html"
+  "main": "hyperapp-ui.html",
+  "name": "HyperApp",
+  "description": "HTML/JS mobile live-coding development tool",
+  "version": "0.1",
+  "keywords": ["hyperapp", "mobile", "javascript"],
+  "window": 
+  {
+    "title": "HyperApp",
+    "toolbar": true,
+    "frame": true,
+    "width": 500,
+    "height": 600,
+    "position": "mouse"
+  }
 }

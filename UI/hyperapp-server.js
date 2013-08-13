@@ -60,7 +60,6 @@ function webServerHookFun(request, response, path)
 	}
 	else if (path == '/' + mAppFile)
 	{
-		
 		var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
 		var scriptBegin = '<' + 'script' + '>\n'
 		var scriptBeginSrc = '<' + 'script src='
@@ -72,14 +71,51 @@ function webServerHookFun(request, response, path)
 			scriptBegin +
 			script + '("' + mIpAddress + '", false)' +
 			scriptEnd
-		var file = FS.readFileSync('./' + mAppFile, {encoding: 'utf8'})
-		file = file.replace('<!--hyperapp.reloader-->', script)
+		var file = FS.readFileSync(mBasePath + mAppFile, {encoding: 'utf8'})
+		file = insertReloaderScript(file, script)
 		mWebServer.writeRespose(response, file, 'text/html')
 		return true
 	}
 	else
 	{
 		return false
+	}
+}
+
+// Insert the script at the template tag, if no template tag is
+// found, insert at alternative locations in the document.
+// TODO: Experimental and non-general code, improve and clean up.
+function insertReloaderScript(file, script)
+{
+	// Is there a template tag?
+	var hasTemplateTag = (-1 != file.indexOf('<!--hyperapp.reloader-->'))
+	if (hasTemplateTag)
+	{
+		return file.replace('<!--hyperapp.reloader-->', script)
+	}
+	
+	// Fallback: Insert last in head.
+	// TODO: Rewrite to use regular expressions to capture more cases.
+	var pos = file.indexOf('</head>')
+	if (pos > -1)
+	{
+		return file.replace('</head>', script + '</head>')
+	}
+	
+	// Fallback: Insert first in body.
+	// TODO: Rewrite to use regular expressions to capture more cases.
+	pos = file.indexOf('<body>')
+	if (pos > -1)
+	{
+		return file.replace('<body>', script + '<body>')
+	}
+	
+	// Fallback: Insert last in body.
+	// TODO: Rewrite to use regular expressions to capture more cases.
+	pos = file.indexOf('</body>')
+	if (pos > -1)
+	{
+		return file.replace('</body>', script + '</body>')
 	}
 }
 
