@@ -42,7 +42,7 @@ function CreateServerObject()
 	var self = {}
 
 	// The current base directory. Must NOT end with a slash.
-	var mBasePath = '/'
+	var mBasePath = ''
     
     // Hook function allows to trap URL.
     var mHookFun = null
@@ -52,6 +52,15 @@ function CreateServerObject()
 	 */
 	self.setBasePath = function(path)
 	{
+		if (!path) { return }
+		
+		// Strip any trailing slash from path.
+		var last = path.length - 1
+		if (path.charAt(last) === '/')
+		{
+			path = path.substr(0, last)
+		}
+		
 		mBasePath = path
 	}
 
@@ -113,6 +122,7 @@ function CreateServerObject()
 
 	function ServeFile(path, response)
 	{
+		//console.log('ServeFile fillpath: ' + mBasePath + path)
 		var file = GetFileStatus(mBasePath + path)
 		if (!file)
 		{

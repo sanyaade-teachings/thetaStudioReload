@@ -184,7 +184,7 @@ hyperapp.UI = {}
 				+	'type="button" '
 				+	'class="button-run btn btn-primary" '
 				+	'onclick="hyperapp.runApp(\'__PATH2__\')">'
-				+	'Run App'
+				+	'Run'
 				+ '</button>'
 				+ '<h4>__NAME__</h4>'
 				+ '<p>__PATH3__</p>'
@@ -374,7 +374,7 @@ hyperapp.UI = {}
                 //console.log('error: ' + error);
             }
             
-            var command = 'nautilus ' + folderPath
+            var command = 'nautilus "' + folderPath + '"'
             console.log(exec(command, puts))
 /*
             var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;

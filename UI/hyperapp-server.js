@@ -44,8 +44,8 @@ function startWebServer(basePath, port, fun)
  */
 function webServerHookFun(request, response, path)
 {
-	console.log(path)
-	if (path == '/connect')
+	//console.log('webServerHookFun path: ' + path)
+	if (path == '/')
 	{
 		//console.log('client connection request')
 		var page = FS.readFileSync('./connect.html', {encoding: 'utf8'})
@@ -99,6 +99,14 @@ function insertReloaderScript(file, script)
 		return file.replace('<!--hyperapp.reloader-->', script)
 	}
 	
+	// Fallback: Insert after title tag.
+	// TODO: Rewrite to use regular expressions to capture more cases.
+	var pos = file.indexOf('</title>')
+	if (pos > -1)
+	{
+		return file.replace('</title>', '</title>' + script)
+	}
+	
 	// Fallback: Insert last in head.
 	// TODO: Rewrite to use regular expressions to capture more cases.
 	var pos = file.indexOf('</head>')
@@ -112,7 +120,7 @@ function insertReloaderScript(file, script)
 	pos = file.indexOf('<body>')
 	if (pos > -1)
 	{
-		return file.replace('<body>', script + '<body>')
+		return file.replace('<body>', '<body>' + script)
 	}
 	
 	// Fallback: Insert last in body.
@@ -287,9 +295,17 @@ function fileSystemMonitor()
  */
 function fileSystemMonitorWorker(path, level)
 {
+	//console.log('fileSystemMonitorWorker path:level: ' + path + ':' + level)
 	if (!path) { return false }
 	try
 	{
+		/*var files = FS.readdirSync(path)
+		for (var i in files)
+		{
+			console.log(path + files[i])
+		}
+		return false*/
+		
 		var files = FS.readdirSync(path)
 		for (var i in files)
 		{
@@ -297,26 +313,31 @@ function fileSystemMonitorWorker(path, level)
 			{
 				var stat = FS.statSync(path + files[i])
 				var t = stat.mtime.getTime()
-				//console.log(files[i] + ": " + stat.mtime)
+				//console.log('Checking file: ' + files[i] + ': ' + stat.mtime)
 				if (stat.isFile() && t > mLastReloadTime)
 				{
+					console.log('***** File has changed ***** ' + files[i])
 					mLastReloadTime = Date.now()
 					return true
 				}
 				else if (stat.isDirectory() && level > 0)
 				{
-					//console.log('decending into: ' + path + files[i])
-					return fileSystemMonitorWorker(path + files[i] + "/", level - 1)
+					//console.log('Decending into: ' + path + files[i])
+					var changed = fileSystemMonitorWorker(
+						path + files[i] + '/',
+						level - 1)
+					if (changed) { return true }
 				}
 			}
 			catch(err2)
 			{
-				//console.log('***** ERROR ****** ' + err)
+				console.log('***** ERROR2 fileSystemMonitorWorker ****** ' + err2)
 			}
 		}
 	}
 	catch(err1)
 	{
+		console.log('***** ERROR1 fileSystemMonitorWorker ****** ' + err1)
 	}
 	return false
 }
