@@ -9,7 +9,7 @@
     "title": "HyperReload",
     "toolbar": true,
     "frame": true,
-    "width": 550,
+    "width": 580,
     "height": 600,
     "position": "mouse"
   }

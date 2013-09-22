@@ -259,9 +259,10 @@ hyper.UI = {}
 	
 	hyper.UI.displayIpAddress = function(ip, port)
 	{
-		document.querySelector('#ip-address').innerHTML = ip
+		// document.querySelector('#ip-address').innerHTML = ip
 		document.querySelector('#connect-address').innerHTML = 
-			'http://' + ip + ':' + port + '/connect'
+			'http://' + ip + ':' + port
+		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
 	
 	hyper.UI.displayProjectList = function(projectList)
