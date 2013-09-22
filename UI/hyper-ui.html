@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     
-    <title>HyperApp Launchpad</title>
+    <title>HyperReload</title>
     
     <link href="libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
     <link href="libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
@@ -14,7 +14,7 @@
 	<script src="libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
 	<script src="libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
 
-    <link href="hyperapp-ui.css" rel="stylesheet" />
+    <link href="hyper-ui.css" rel="stylesheet" />
 </head>
 <body>
 	<div id="panel-page">
@@ -34,23 +34,23 @@
 					<button
 						type="button" 
 						class="button-open btn btn-success"
-						onclick="hyperapp.openFileFolder('/home/miki/code/hyperapp/UI/demo/HelloWorld/index.html')">
+						onclick="hyper.openFileFolder('/home/miki/code/HyperReload/UI/demo/HelloWorld/index.html')">
 						Open
 					</button>
 					<button
 						type="button" 
 						class="button-run btn btn-primary"
-						onclick="hyperapp.runApp('/home/miki/code/hyperapp/UI/demo/HelloWorld/index.html')">
+						onclick="hyper.runApp('/home/miki/code/HyperReload/UI/demo/HelloWorld/index.html')">
 						Run
 					</button>
 					<button
 						type="button" 
 						class="close button-delete"
-						onclick="hyperapp.UI.deleteEntry(this)">
+						onclick="hyper.UI.deleteEntry(this)">
 						&times;
 					</button>
 					<h4>Hello World</h4>
-					<p>/home/miki/code/hyperapp/UI/demo/HelloWorld/index.html</p>
+					<p>/home/miki/code/HyperReload/UI/demo/HelloWorld/index.html</p>
 				</div>
 				-->
 				<!--
@@ -61,7 +61,7 @@
 				<div class="ui-state-default ui-corner-all">
 					<h4>QuickStart</h4> 
 					<ul style="font-size: 130%;">
-						<li>Connect from any web browser or HyperApp client using url: <b>http://192.168.43.226:4042</b></li>
+						<li>Connect from any web browser or HyperReload app using url: <b>http://192.168.43.226:4042</b></li>
 						<li>Drag and drop HTML files here to add them to the project list</li>
 						<li>Click <b>Run</b> to run a project on connected clients</li>
 						<li>Updating and saving a file in the project will automatically Run it</li>
@@ -72,7 +72,7 @@
 
 		<div id="panel-bottom">
 			<div>
-				<p>Address to use with HyperApp mobile: <span id="ip-address">[Server not running]</span></p>
+				<p>Address to use with HyperReload mobile: <span id="ip-address">[Server not running]</span></p>
 				<p>Address to connect from a browser: <span id="connect-address">[Server not running]</span></p>
 			</div>
 		</div>
@@ -88,6 +88,6 @@
 
 	</div> <!-- panel-page -->
 	
-    <script src="hyperapp-ui.js"></script>
+    <script src="hyper-ui.js"></script>
 </body>
 </html>

@@ -111,6 +111,7 @@ function CreateServerObject()
 	function HandleRequest(request, response)
 	{
 		//request.setEncoding('utf8')
+		//console.log('HandleRequest url: ' + request.url)
 		var path = unescape(URL.parse(request.url).pathname)
         if (null != mHookFun)
         {

@@ -29,7 +29,7 @@ public class MainActivity
         mWebView = new JavaScriptWebView(this);
         mWebView.setConsoleListener(this);
         mWebView.loadUrl(mHomePageUrl);
-        //mWebView.loadUrl("http://192.168.43.226:4042/connect");
+        //mWebView.loadUrl("http://192.168.43.226:4042");
         setContentView(mWebView);
         createInputListener();
     }

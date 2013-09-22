@@ -1,17 +1,19 @@
 // Load socket.io and open a connection to the server.
 ;(function(address, loadSocketIoFlag)
-{ 
-    if (!window.hyperapp)
+{
+	var hyper = {}
+	
+    if (!window.hyper)
     {
-        window.hyperapp = {}
+        window.hyper = hyper
     }
     
     // Connection notifications.
-	window.hyperapp.isConnected = false
-    window.hyperapp.onConnectedFun = null
-    window.hyperapp.onConnected = function(fun)
+	hyper.isConnected = false
+    hyper.onConnectedFun = null
+    hyper.onConnected = function(fun)
     {
-		if (window.hyperapp.isConnected)
+		if (hyper.isConnected)
 		{
 			// Already connected.
 			fun()
@@ -19,33 +21,33 @@
 		else
 		{
 			// Call when connected.
-			window.hyperapp.onConnectedFun = fun
+			hyper.onConnectedFun = fun
 		}
 	}
 	
 	// Send result of evaluating JS to the UI.
-    window.hyperapp.sendJsResult = function(result)
+    hyper.sendJsResult = function(result)
     {
-        hyperapp.IoSocket.emit('jsResult', result)
+        hyper.IoSocket.emit('jsResult', result)
     }
     
     // Log to UI.
-    window.hyperapp.log = function(message)
+    hyper.log = function(message)
     {
-        hyperapp.IoSocket.emit('log', message)
+        hyper.IoSocket.emit('log', message)
     }
     
     // Called from native code.
-    window.hyperapp.nativeConsoleMessageCallBack = function(message)
+    hyper.nativeConsoleMessageCallBack = function(message)
     {
-        hyperapp.IoSocket.emit('log', message)
+        hyper.IoSocket.emit('log', message)
     }
     
     /*
     // Replace console.log
     window.console.log = function(message)
     {
-        window.hyperapp.log(message)
+        hyper.log(message)
     }
     */
     
@@ -54,7 +56,7 @@
     function connect()
     {
         var socket = io.connect(url + ':4043')
-        window.hyperapp.IoSocket = socket
+        hyper.IoSocket = socket
         socket.on('reload', function(data)
         {
             socket.disconnect()
@@ -65,19 +67,19 @@
             try
             {
                 var result = eval(data)
-                window.hyperapp.sendJsResult(result)
+                hyper.sendJsResult(result)
             }
             catch (err)
             {
-                window.hyperapp.sendJsResult(err)
+                hyper.sendJsResult(err)
             } 
         })
         socket.on('connect', function()
         {
-			window.hyperapp.isConnected = true
-            if (window.hyperapp.onConnectedFun)
+			hyper.isConnected = true
+            if (hyper.onConnectedFun)
             {
-				window.hyperapp.onConnectedFun()
+				hyper.onConnectedFun()
 			}
         })
     }

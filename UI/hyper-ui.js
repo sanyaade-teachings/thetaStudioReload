@@ -1,13 +1,13 @@
 // Code below is split into two parts, one for the UI 
 // and one for ther server. This is to prepare for an
-// eventual headless version of HyperApp. Code currently
+// eventual headless version of HyperReload. Code currently
 // contains serveral dependencies, however.
 
 // Global object that holds globally available functions.
-var hyperapp = {}
+var hyper = {}
 
 // UI-related functions.
-hyperapp.UI = {}
+hyper.UI = {}
 
 // UI setup.
 ;(function()
@@ -52,7 +52,7 @@ hyperapp.UI = {}
 			{
 				// Create new window.
 				mWorkbenchWindow = window.open(
-					'hyperapp-workbench.html', 
+					'hyper-workbench.html', 
 					'workbench',
 					'resizable=1,width=800,height=600')
 				mWorkbenchWindow.moveTo(50, 50)
@@ -73,7 +73,7 @@ hyperapp.UI = {}
 			{
 				// Create new window.
 				mDocumentationWindow = window.open(
-					'https://github.com/divineprog/hyperapp', 
+					'https://github.com/divineprog/HyperReload', 
 					'documentation',
 					'resizable=1,width=800,height=600')
 				mDocumentationWindow.moveTo(50, 50)
@@ -102,7 +102,7 @@ hyperapp.UI = {}
 		console.log('Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
-			hyperapp.SERVER.sendEvalJS(event.data.code)
+			hyper.SERVER.sendEvalJS(event.data.code)
 		}
 	}
 	
@@ -151,8 +151,8 @@ hyperapp.UI = {}
 			var path = files[0].path
 			if (fileIsHTML(path))
 			{
-				hyperapp.SERVER.setAppPath(path)
-				hyperapp.addProject(path)
+				hyper.SERVER.setAppPath(path)
+				hyper.addProject(path)
 				createProjectEntry(path)
 			}
 			else
@@ -177,13 +177,13 @@ hyperapp.UI = {}
 				+ '<button '
 				+	'type="button" '
 				+	'class="button-open btn btn-success" '
-				+	'onclick="hyperapp.openFileFolder(\'__PATH1__\')">'
+				+	'onclick="hyper.openFileFolder(\'__PATH1__\')">'
 				+	'Open'
 				+ '</button>'
 				+ '<button '
 				+	'type="button" '
 				+	'class="button-run btn btn-primary" '
-				+	'onclick="hyperapp.runApp(\'__PATH2__\')">'
+				+	'onclick="hyper.runApp(\'__PATH2__\')">'
 				+	'Run'
 				+ '</button>'
 				+ '<h4>__NAME__</h4>'
@@ -191,13 +191,13 @@ hyperapp.UI = {}
 				+ '<button '
 				+	'type="button" '
 				+	'class="close button-delete" '
-				+	'onclick="hyperapp.UI.deleteEntry(this)">'
+				+	'onclick="hyper.UI.deleteEntry(this)">'
 				+	'&times;'
 				+ '</button>'
 			+ '</div>'
 		
 		// Get name of project, use title tag as first choise.
-		var data = hyperapp.FS.readFileSync(path, {encoding: 'utf8'})
+		var data = hyper.FS.readFileSync(path, {encoding: 'utf8'})
 		var name = getTagContent(data, 'title')
 		if (!name)
 		{
@@ -254,17 +254,17 @@ hyperapp.UI = {}
 				projects.push(path)
 			}
 		})
-		hyperapp.setProjectList(projects)
+		hyper.setProjectList(projects)
 	}
 	
-	hyperapp.UI.displayIpAddress = function(ip, port)
+	hyper.UI.displayIpAddress = function(ip, port)
 	{
 		document.querySelector('#ip-address').innerHTML = ip
 		document.querySelector('#connect-address').innerHTML = 
 			'http://' + ip + ':' + port + '/connect'
 	}
 	
-	hyperapp.UI.displayProjectList = function(projectList)
+	hyper.UI.displayProjectList = function(projectList)
 	{
 		for (var i = projectList.length - 1; i > -1; --i)
 		{
@@ -273,16 +273,16 @@ hyperapp.UI = {}
 		}
 	}
 
-	hyperapp.UI.setServerMessageFun = function()
+	hyper.UI.setServerMessageFun = function()
 	{
 		// Server message callback.
-		hyperapp.SERVER.setMessageCallbackFun(function(msg)
+		hyper.SERVER.setMessageCallbackFun(function(msg)
 		{
 			if (mWorkbenchWindow) { mWorkbenchWindow.postMessage(msg, '*') }
 		})
 	}
 	
-	hyperapp.UI.deleteEntry = function(obj)
+	hyper.UI.deleteEntry = function(obj)
 	{
 		console.log($(obj).parent())
 		$(obj).parent().remove()
@@ -297,11 +297,11 @@ hyperapp.UI = {}
 // in reload.js.
 ;(function()
 {
-	var SERVER = require('./hyperapp-server.js')
+	var SERVER = require('./hyper-server.js')
 	var FS = require('fs')
 
-	hyperapp.SERVER = SERVER     
-	hyperapp.FS = FS
+	hyper.SERVER = SERVER     
+	hyper.FS = FS
 
 	var mProjectListFile = './project-list.json'
 	var mProjectList = []
@@ -315,21 +315,21 @@ hyperapp.UI = {}
 		SERVER.fileSystemMonitor()
 		
 		// Populate the UI.
-		// TODO: Consider moving these calls to a function in hyperapp.UI.
+		// TODO: Consider moving these calls to a function in hyper.UI.
 		readProjectList()
-		hyperapp.UI.displayProjectList(mProjectList)
-		hyperapp.UI.setServerMessageFun()
+		hyper.UI.displayProjectList(mProjectList)
+		hyper.UI.setServerMessageFun()
 		displayServerIpAddress()
 	}
 	
 	function displayServerIpAddress()
 	{
 		SERVER.getWebServerIpAndPort(function(ip, port) {
-			hyperapp.UI.displayIpAddress(ip, port)
+			hyper.UI.displayIpAddress(ip, port)
 		})
 	}
 	
-	hyperapp.runApp = function(path)
+	hyper.runApp = function(path)
 	{
 		// Prepend base path if needed.
 		if (path.substring(0,1) != "/")
@@ -423,19 +423,19 @@ hyperapp.UI = {}
     }
     
 	// TODO: Simplify, use updateProjectList instead.
-	hyperapp.addProject = function(path)
+	hyper.addProject = function(path)
 	{
 		mProjectList.unshift(path)
 		saveProjectList()
 	}
 	
-	hyperapp.setProjectList = function(list)
+	hyper.setProjectList = function(list)
 	{
 		mProjectList = list
 		saveProjectList()
 	}
 	
-	hyperapp.openFileFolder = function(path) 
+	hyper.openFileFolder = function(path) 
 	{
 		// Prepend base path if needed.
 		if (path.substring(0,1) != "/")

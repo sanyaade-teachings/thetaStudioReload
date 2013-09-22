@@ -1,15 +1,15 @@
 {
-  "main": "hyperapp-ui.html",
-  "name": "HyperApp Launchpad",
+  "main": "hyper-ui.html",
+  "name": "HyperReload",
   "description": "HTML/JS mobile live-coding development tool",
   "version": "0.1",
-  "keywords": ["hyperapp", "mobile", "javascript"],
+  "keywords": ["HyperReload", "mobile", "JavaScript"],
   "window": 
   {
-    "title": "HyperApp",
-    "toolbar": false,
+    "title": "HyperReload",
+    "toolbar": true,
     "frame": true,
-    "width": 650,
+    "width": 550,
     "height": 600,
     "position": "mouse"
   }

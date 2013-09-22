@@ -1,6 +1,6 @@
 /*
-File: server.js
-Description: HyperApp server functionality.
+File: hyper-server.js
+Description: HyperReload server functionality.
 Author: Mikael Kindborg
 */
 
@@ -93,10 +93,10 @@ function webServerHookFun(request, response, path)
 function insertReloaderScript(file, script)
 {
 	// Is there a template tag?
-	var hasTemplateTag = (-1 != file.indexOf('<!--hyperapp.reloader-->'))
+	var hasTemplateTag = (-1 != file.indexOf('<!--hyper.reloader-->'))
 	if (hasTemplateTag)
 	{
-		return file.replace('<!--hyperapp.reloader-->', script)
+		return file.replace('<!--hyper.reloader-->', script)
 	}
 	
 	// Fallback: Insert after title tag.
