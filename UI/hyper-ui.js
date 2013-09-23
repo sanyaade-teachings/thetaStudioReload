@@ -270,7 +270,12 @@ hyper.UI = {}
 		for (var i = projectList.length - 1; i > -1; --i)
 		{
 			var path = projectList[i]
+			try{
 			createProjectEntry(path)
+			}
+			catch(err){
+			console.log('Err in displayProjectList')
+			}
 		}
 	}
 
