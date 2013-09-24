@@ -9,6 +9,8 @@ Author: Mikael Kindborg
 var WEBSERVER = require('./webserver')
 var SOCKETIO = require('socket.io')
 var FS = require('fs')
+var PATH = require('path')
+var FILE_UTIL = require('./file-util.js')
 
 /*********************************/
 /***       Server code         ***/
@@ -59,8 +61,9 @@ function webServerHookFun(request, response, path)
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
-	else if (path == '/' + mAppFile)
+	else if (FILE_UTIL.fileIsHTML(path))
 	{
+		// Here we insert the realoader script in all HTML files requested.
 		var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
 		var scriptBegin = '<' + 'script' + '>\n'
 		var scriptBeginSrc = '<' + 'script src='
@@ -198,7 +201,7 @@ function setAppPath(appPath)
 	if (appPath != mAppPath)
 	{
 		mAppPath = appPath
-		var pos = mAppPath.lastIndexOf('/') + 1
+		var pos = mAppPath.lastIndexOf(PATH.sep) + 1
 		mBasePath = mAppPath.substr(0, pos)
 		mAppFile = mAppPath.substr(pos)
 		mWebServer.setBasePath(mBasePath)
@@ -324,7 +327,7 @@ function fileSystemMonitorWorker(path, level)
 				{
 					//console.log('Decending into: ' + path + files[i])
 					var changed = fileSystemMonitorWorker(
-						path + files[i] + '/',
+						path + files[i] + PATH.sep,
 						level - 1)
 					if (changed) { return true }
 				}

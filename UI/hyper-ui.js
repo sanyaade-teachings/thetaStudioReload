@@ -1,7 +1,22 @@
+/*
+File: hyper-ui.js
+Description: HyperReload UI functionality.
+Author: Mikael Kindborg
+*/
+
 // Code below is split into two parts, one for the UI 
 // and one for ther server. This is to prepare for an
 // eventual headless version of HyperReload. Code currently
 // contains serveral dependencies, however.
+
+/*** Modules used ***/
+
+var FS = require('fs')
+var PATH = require('path')
+var OS = require('os')
+var FILE_UTIL = require('./file-util.js')
+
+/*** Globals ***/
 
 // Global object that holds globally available functions.
 var hyper = {}
@@ -9,7 +24,8 @@ var hyper = {}
 // UI-related functions.
 hyper.UI = {}
 
-// UI setup.
+/*** UI setup ***/
+
 ;(function()
 {
 	var mWorkbenchWindow = null
@@ -149,7 +165,7 @@ hyper.UI = {}
 		if (files.length > 0)
 		{
 			var path = files[0].path
-			if (fileIsHTML(path))
+			if (FILE_UTIL.fileIsHTML(path))
 			{
 				hyper.SERVER.setAppPath(path)
 				hyper.addProject(path)
@@ -160,13 +176,6 @@ hyper.UI = {}
 				alert('Only HTML files (extension .html or .htm) can be used')
 			}
 		}
-	}
-	
-	function fileIsHTML(path)
-	{
-		var pos = path.lastIndexOf('.')
-		var extension = path.substring(pos).toLowerCase()
-		return (extension == '.html' || extension == '.htm')
 	}
 	
 	function createProjectEntry(path)
@@ -197,17 +206,30 @@ hyper.UI = {}
 			+ '</div>'
 		
 		// Get name of project, use title tag as first choise.
-		var data = hyper.FS.readFileSync(path, {encoding: 'utf8'})
+		try
+		{
+			var data = FS.readFileSync(path, {encoding: 'utf8'})
+		}
+		catch (err)
+		{
+			// Return on error, skipping rest of the code.
+			console.log('createProjectEntry failed: ' + err)
+			return
+		}
+		
 		var name = getTagContent(data, 'title')
 		if (!name)
 		{
 			name = getNameFromPath(path)
 		}
 		
+		// Escape backslashes in the path (needed on Windows).
+		var escapedPath = path.replace(/[\\]/g,'\\\\')
+		
 		// Replace fields in template.
-		html = html.replace('__PATH1__', path)
-		html = html.replace('__PATH2__', path)
-		html = html.replace('__PATH3__', path)
+		html = html.replace('__PATH1__', escapedPath)
+		html = html.replace('__PATH2__', escapedPath)
+		html = html.replace('__PATH3__', escapedPath)
 		html = html.replace('__NAME__', name)
 		
 		// Create element.
@@ -234,9 +256,9 @@ hyper.UI = {}
 	// Use full path as fallback.
 	function getNameFromPath(path)
 	{
-		var pos = path.lastIndexOf('/')
+		var pos = path.lastIndexOf(PATH.sep)
 		if (-1 === pos) { return path }
-		pos = path.lastIndexOf('/', pos - 1)
+		pos = path.lastIndexOf(PATH.sep, pos - 1)
 		if (-1 === pos) { return path }
 		return path.substring(pos + 1)
 	}
@@ -270,12 +292,7 @@ hyper.UI = {}
 		for (var i = projectList.length - 1; i > -1; --i)
 		{
 			var path = projectList[i]
-			try{
 			createProjectEntry(path)
-			}
-			catch(err){
-			console.log('Err in displayProjectList')
-			}
 		}
 	}
 
@@ -298,16 +315,16 @@ hyper.UI = {}
 	setupUI()
 })()
 
-// Server set up.
+/*** Server setup ***/
+
 // TODO: Remove hard coded port numbers below and
-// in reload.js.
+// in reloader-template.js.
+
 ;(function()
 {
 	var SERVER = require('./hyper-server.js')
-	var FS = require('fs')
 
-	hyper.SERVER = SERVER     
-	hyper.FS = FS
+	hyper.SERVER = SERVER
 
 	var mProjectListFile = './project-list.json'
 	var mProjectList = []
@@ -337,10 +354,10 @@ hyper.UI = {}
 	
 	hyper.runApp = function(path)
 	{
-		// Prepend base path if needed.
-		if (path.substring(0,1) != "/")
+		// Prepend base path if this is not an absolute path.
+		if (!FILE_UTIL.isPathAbsolute(path))
 		{
-			path = mApplicationBasePath + '/' + path
+			path = mApplicationBasePath + PATH.sep + path
 		}
 		
 		console.log('runApp: ' + path)
@@ -380,8 +397,30 @@ hyper.UI = {}
                 //console.log('error: ' + error);
             }
             
-            var command = 'nautilus "' + folderPath + '"'
-            console.log(exec(command, puts))
+            var isLinux = (OS.platform() === "linux")
+            var isMac = (OS.platform() === "darwin")
+            var isWindows = (OS.platform() === "win32")
+            
+            if (isLinux)
+            {
+				var command = 'nautilus "' + folderPath + '"'
+				exec(command, puts)
+			}
+			else if (isMac)
+			{
+				var command = 'open "' + folderPath + '"'
+				exec(command, puts)
+			}
+			else if (isWindows)
+			{
+				var command = 'explorer "' + folderPath + '"'
+				exec(command, puts)
+			}
+			else
+			{
+				console.log('@@@ openFolder: Unknown platform: ' + OS.platform())
+			}
+			
 /*
             var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
             var linux = vars.globals.localPlatform.indexOf("linux") >=0;
@@ -422,7 +461,7 @@ hyper.UI = {}
             }
             */
         }
-        catch(err) 
+        catch (err) 
         {
             console.log("ERROR in openFolder: " + err)
         }
@@ -443,14 +482,14 @@ hyper.UI = {}
 	
 	hyper.openFileFolder = function(path) 
 	{
-		// Prepend base path if needed.
-		if (path.substring(0,1) != "/")
+		// Prepend base path if this is not an absolute path.
+		if (!FILE_UTIL.isPathAbsolute(path))
 		{
-			path = mApplicationBasePath + '/' + path
+			path = mApplicationBasePath + PATH.sep + path
 		}
 		
 		// Drop filename part of path.
-		var pos = path.lastIndexOf('/')
+		var pos = path.lastIndexOf(PATH.sep)
 		var folderPath = path.substring(0, pos)
 		openFolder(folderPath)
     }

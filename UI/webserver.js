@@ -56,7 +56,7 @@ function CreateServerObject()
 		
 		// Strip any trailing slash from path.
 		var last = path.length - 1
-		if (path.charAt(last) === '/')
+		if ((path.charAt(last) === '/') || (path.charAt(last) === '\\'))
 		{
 			path = path.substr(0, last)
 		}
