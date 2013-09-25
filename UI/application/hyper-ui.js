@@ -2,6 +2,7 @@
 File: hyper-ui.js
 Description: HyperReload UI functionality.
 Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
 */
 
 // Code below is split into two parts, one for the UI 
@@ -223,13 +224,13 @@ hyper.UI = {}
 			name = getNameFromPath(path)
 		}
 		
-		// Escape backslashes in the path (needed on Windows).
+		// Escape any backslashes in the path (needed on Windows).
 		var escapedPath = path.replace(/[\\]/g,'\\\\')
 		
 		// Replace fields in template.
 		html = html.replace('__PATH1__', escapedPath)
 		html = html.replace('__PATH2__', escapedPath)
-		html = html.replace('__PATH3__', escapedPath)
+		html = html.replace('__PATH3__', path)
 		html = html.replace('__NAME__', name)
 		
 		// Create element.
@@ -282,8 +283,7 @@ hyper.UI = {}
 	hyper.UI.displayIpAddress = function(ip, port)
 	{
 		// document.querySelector('#ip-address').innerHTML = ip
-		document.querySelector('#connect-address').innerHTML = 
-			'http://' + ip + ':' + port
+		document.querySelector('#connect-address').innerHTML = ip + ':' + port
 		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
 	

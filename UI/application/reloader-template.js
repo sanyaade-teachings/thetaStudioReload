@@ -1,4 +1,5 @@
 // Load socket.io and open a connection to the server.
+// This code is dynamically inserted by the server in a script tag.
 ;(function(address, loadSocketIoFlag)
 {
 	var hyper = {}

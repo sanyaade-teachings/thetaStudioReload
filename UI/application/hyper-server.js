@@ -2,6 +2,7 @@
 File: hyper-server.js
 Description: HyperReload server functionality.
 Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
 */
 
 /*** Modules used ***/
@@ -50,13 +51,13 @@ function webServerHookFun(request, response, path)
 	if (path == '/')
 	{
 		//console.log('client connection request')
-		var page = FS.readFileSync('./connect.html', {encoding: 'utf8'})
+		var page = FS.readFileSync('./application/connect.html', {encoding: 'utf8'})
 		mWebServer.writeRespose(response, page, 'text/html')
 		return true
 	}
 	else if (path == '/reloader')
 	{
-		var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
+		var script = FS.readFileSync('./application/reloader-template.js', {encoding: 'utf8'})
 		script += '("' + mIpAddress + '", true)'
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
@@ -64,7 +65,7 @@ function webServerHookFun(request, response, path)
 	else if (FILE_UTIL.fileIsHTML(path))
 	{
 		// Here we insert the realoader script in all HTML files requested.
-		var script = FS.readFileSync('./reloader-template.js', {encoding: 'utf8'})
+		var script = FS.readFileSync('./application/reloader-template.js', {encoding: 'utf8'})
 		var scriptBegin = '<' + 'script' + '>\n'
 		var scriptBeginSrc = '<' + 'script src='
 		var scriptEnd = '</' + 'script' + '>\n'

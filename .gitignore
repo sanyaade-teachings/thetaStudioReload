@@ -23,3 +23,6 @@ local.properties
 UI/libffmpegsumo.so
 UI/nw
 UI/nw.pak
+
+# Mac files
+.DS_store

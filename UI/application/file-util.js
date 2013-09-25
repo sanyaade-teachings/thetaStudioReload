@@ -1,7 +1,8 @@
 /*
 File: file-util.js
-Description: File helper functions
+Description: File helper functions.
 Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
 */
 
 var PATH = require('path')

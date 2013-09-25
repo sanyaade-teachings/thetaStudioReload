@@ -1,23 +1,27 @@
 /*
-	A small web server used to service files.
-	You can change the root directory (base path)
-	while the server is running.
-	
-	@author Mikael Kindborg
-	
-	Full example:
-	
-		var webserver = require('./WebServer')
-		var port = 4042
-		var server = webserver.create()
-		server.setBasePath('/web')
-		server.start(port)
-		server.getIpAddress(function(address)
-		{
-			console.log(
-				'Web server running at:\n' +
-				'http://' + address + ':' + port)
-		})
+File: webserver.html
+Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
+
+Description:
+
+A small web server used to service files.
+You can change the root directory (base path)
+while the server is running.
+
+Full example:
+
+var webserver = require('./WebServer')
+var port = 4042
+var server = webserver.create()
+server.setBasePath('/web')
+server.start(port)
+server.getIpAddress(function(address)
+{
+	console.log(
+		'Web server running at:\n' +
+		'http://' + address + ':' + port)
+})
 */
 
 var HTTP = require('http')
