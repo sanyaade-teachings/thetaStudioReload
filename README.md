@@ -100,10 +100,10 @@ It is recommened to put the reloader script last in the body element.
 
 ## Roadmap
 
-Note that the HyperApp project is under development, with ongoing changes/updates. 
+Note that the HyperReload project is under development, with ongoing changes/updates. 
 Estimated stable release September 30, 2013.
 
-An Android client app is also under development (will be followed by additional platforms). Currently the Android client app is unstable.
+An Android client app is also under development (will be followed by additional platforms).
 
 <!--
 With the HyperApp mobile application (under development) you get additional functionlity:
