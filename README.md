@@ -6,11 +6,11 @@ HyperReload is a lightweight tool for rapid development of mobile apps in JavaSc
 
 Edit your HTML/CSS/JS on your desktop machine, save the edited file, and the changes are automatically reloaded on connected clients. This saves you from rebuild, deploy and restart your mobile application every time a code change is made. The result is a much faster workflow when coding HTML/CSS/JS.
 
-Any number of clients can connect. You can connect from any browser (desktop or mobile), or you can connect from a mobile WebView widget of a native app (this should work on all mobile platforms that supports a Web widget, Android, iOS, Windows Phone, Firefox OS, etc).
+Any number of clients can connect. You can connect from any browser (desktop or mobile), or you can connect from a mobile WebView widget of a native app (this should work on all mobile platforms that supports a Web widget, Android, iOS, Windows Phone, Firefox OS, Tizen, etc).
 
 ## How to get started
 
-At [http://hyperreload.com](hyperreload.com) you will find download packages and documentation on how to get started.
+Go to [hyperreload.com](http://hyperreload.com) to find download packages and a tutorial on how to get started.
 
 ## Building from source
 
