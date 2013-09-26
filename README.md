@@ -20,7 +20,7 @@ There is no actual build step, you can clone the source, then run using node-web
 
 ## Documentation and site structure
 
-[http://hyperreload.com](Documentation and downloads) are on [http://hyperreload.com](hyperreload.com).
+[Documentation and downloads](http://hyperreload.com) are on [hyperreload.com](http://hyperreload.com).
 
 Documentation will also be available in the "Documentation" window in HyperReload.
 
