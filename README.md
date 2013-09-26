@@ -58,14 +58,14 @@ Note: This application is written using node-webkit. For now, you need to instal
 
 Connect from a web browser by entering the URL displayed in the HyperApp UI. For example:
 
-    http://192.168.43.226:4042/connect
+    http://192.168.43.226:4042
     
 Connect from a WebView widget in a mobile app. For example, on Android you use code like this:
 
 	WebView mWebView = new WebView(this);
 	mWebView.getSettings().setJavaScriptEnabled(true);
 	setWebViewClient(new WebViewClient());
-    mWebView.loadUrl("http://192.168.43.226:4042/connect");
+    mWebView.loadUrl("http://192.168.43.226:4042");
 
 Make sure the WebView has JavaScript enabled, and that it has a WebViewClient (otherwise, URLs opened from within the WebView will be opened in en external browser, rather than in the WebView itself).
 

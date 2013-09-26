@@ -11,7 +11,7 @@ var WEBSERVER = require('./webserver')
 var SOCKETIO = require('socket.io')
 var FS = require('fs')
 var PATH = require('path')
-var FILE_UTIL = require('./file-util.js')
+var FILEUTIL = require('./fileutil.js')
 
 /*********************************/
 /***       Server code         ***/
@@ -28,6 +28,7 @@ var mIpAddress
 var mWebServerPort = 4042    
 var mSocketIoPort = 4043
 var mMessageCallback = null
+var mNumberOfConnectedClients = 0
 
 /*** Server functions ***/
 
@@ -62,7 +63,7 @@ function webServerHookFun(request, response, path)
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
-	else if (FILE_UTIL.fileIsHTML(path))
+	else if (FILEUTIL.fileIsHTML(path))
 	{
 		// Here we insert the realoader script in all HTML files requested.
 		var script = FS.readFileSync('./application/reloader-template.js', {encoding: 'utf8'})
@@ -149,8 +150,21 @@ function startServers()
 	// Handle socket connections.
 	mIO.sockets.on('connection', function(socket) 
 	{
-		console.log("Client connected")
+		++mNumberOfConnectedClients
+	
+		// Debug logging.
+		console.log('Client connected')
+		console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
 		
+		socket.on('disconnect', function ()
+		{
+			--mNumberOfConnectedClients
+			
+			// Debug logging.
+			console.log('Client disconnected')
+			console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
+        })
+    
 		socket.on('log', function(data)
 		{
 			displayLogMessage(data)
@@ -215,7 +229,15 @@ function setAppPath(appPath)
 function sendReload()
 {
 	console.log("sending reload")
-	mIO.sockets.emit('reload', {url: 'http://' + mIpAddress + ':4042/' + mAppFile})
+	mIO.sockets.emit('reload', {url: getCurrentAppFileURL()})
+}
+
+/**
+ * External.
+ */
+function getCurrentAppFileURL()
+{
+	return 'http://' + mIpAddress + ':4042/' + mAppFile
 }
 
 /**
@@ -236,6 +258,13 @@ function setMessageCallbackFun(fun)
 	mMessageCallback = fun
 }
 
+/**
+ * External.
+ */
+function getNumberOfConnectedClients()
+{
+	return mNumberOfConnectedClients
+}
 
 function displayLogMessage(message)
 {
@@ -281,7 +310,9 @@ function setTraverseNumDirectoryLevels(levels)
  */
 function fileSystemMonitor()
 {
-	var filesUpdated = fileSystemMonitorWorker(mBasePath, mTraverseNumDirecoryLevels)
+	var filesUpdated = fileSystemMonitorWorker(
+		mBasePath,
+		mTraverseNumDirecoryLevels)
 	if (filesUpdated)
 	{
 		sendReload()
@@ -361,8 +392,10 @@ exports.startServers = startServers
 exports.getWebServerIpAndPort = getWebServerIpAndPort
 exports.setAppPath = setAppPath
 exports.sendReload = sendReload
+exports.getCurrentAppFileURL = getCurrentAppFileURL
 exports.sendEvalJS = sendEvalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
+exports.getNumberOfConnectedClients = getNumberOfConnectedClients
 
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
 exports.fileSystemMonitor = fileSystemMonitor

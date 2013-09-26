@@ -15,7 +15,9 @@ Copyright (c) 2013 Mikael Kindborg
 var FS = require('fs')
 var PATH = require('path')
 var OS = require('os')
-var FILE_UTIL = require('./file-util.js')
+var GUI = require('nw.gui')
+var FILEUTIL = require('./fileutil.js')
+var SETTINGS = require('../settings.js')
 
 /*** Globals ***/
 
@@ -90,9 +92,9 @@ hyper.UI = {}
 			{
 				// Create new window.
 				mDocumentationWindow = window.open(
-					'https://github.com/divineprog/HyperReload', 
+					'hyper-documentation.html', 
 					'documentation',
-					'resizable=1,width=800,height=600')
+					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mDocumentationWindow.moveTo(50, 50)
 			}
 		})
@@ -166,7 +168,7 @@ hyper.UI = {}
 		if (files.length > 0)
 		{
 			var path = files[0].path
-			if (FILE_UTIL.fileIsHTML(path))
+			if (FILEUTIL.fileIsHTML(path))
 			{
 				hyper.SERVER.setAppPath(path)
 				hyper.addProject(path)
@@ -283,7 +285,8 @@ hyper.UI = {}
 	hyper.UI.displayIpAddress = function(ip, port)
 	{
 		// document.querySelector('#ip-address').innerHTML = ip
-		document.querySelector('#connect-address').innerHTML = ip + ':' + port
+		//document.querySelector('#connect-address-1').innerHTML = ip + ':' + port
+		document.querySelector('#connect-address-2').innerHTML = ip + ':' + port
 		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
 	
@@ -334,7 +337,8 @@ hyper.UI = {}
 	{
 		// Start server tasks.
 		SERVER.startServers()
-		SERVER.setTraverseNumDirectoryLevels(3)
+		SERVER.setTraverseNumDirectoryLevels(
+			SETTINGS.NumberOfDirecoryLevelsToTraverse)
 		SERVER.fileSystemMonitor()
 		
 		// Populate the UI.
@@ -355,7 +359,7 @@ hyper.UI = {}
 	hyper.runApp = function(path)
 	{
 		// Prepend base path if this is not an absolute path.
-		if (!FILE_UTIL.isPathAbsolute(path))
+		if (!FILEUTIL.isPathAbsolute(path))
 		{
 			path = mApplicationBasePath + PATH.sep + path
 		}
@@ -364,6 +368,11 @@ hyper.UI = {}
 		
 		SERVER.setAppPath(path)
 		SERVER.sendReload()
+		
+		if (SERVER.getNumberOfConnectedClients() < 1)
+		{
+			GUI.Shell.openExternal(SERVER.getCurrentAppFileURL())
+		}
 	}
 	
 	// TODO: Should saved apps belong to the UI, rather than to the server?
@@ -383,6 +392,53 @@ hyper.UI = {}
 		FS.writeFileSync(mProjectListFile, json, {encoding: 'utf8'})
 	}
 	
+	function openFolder(path) 
+	{
+		// Debug logging.
+		console.log('Open folder: ' + path)
+		
+		GUI.Shell.showItemInFolder(path)
+    }
+    
+	// TODO: Simplify, use updateProjectList instead.
+	hyper.addProject = function(path)
+	{
+		mProjectList.unshift(path)
+		saveProjectList()
+	}
+	
+	hyper.setProjectList = function(list)
+	{
+		mProjectList = list
+		saveProjectList()
+	}
+	
+	hyper.openFileFolder = function(path) 
+	{
+		// Prepend base path if this is not an absolute path.
+		if (!FILEUTIL.isPathAbsolute(path))
+		{
+			path = mApplicationBasePath + PATH.sep + path
+		}
+		
+		// Show the file in the folder.
+		openFolder(path)
+		
+		// TODO: New method used.
+		// Drop filename part of path.
+		/*var pos = path.lastIndexOf(PATH.sep)
+		var folderPath = path.substring(0, pos)
+		openFolder(folderPath)*/
+    }
+    
+	// Display Node.js version info. Not used.
+	//document.querySelector('#info').innerHTML = 'node.js ' + process.version
+	
+	setupServer()
+})()
+
+/* OLD CODE
+
 	// Check: https://github.com/jjrdn/node-open
 	function openFolder(folderPath) 
 	{
@@ -420,82 +476,51 @@ hyper.UI = {}
 			{
 				console.log('@@@ openFolder: Unknown platform: ' + OS.platform())
 			}
-			
-/*
-            var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
-            var linux = vars.globals.localPlatform.indexOf("linux") >=0;
-            if (darwin) {
-                var command =
-                    "open "
-                    + this.fixPathsUnix(vars.globals.rootWorkspacePath)
-                    + vars.globals.fileSeparator
-                    + this.fixPathsUnix(projectFolder)
-                    + "/LocalFiles"
-                    ;
-            } else if (linux) {
-                var commandStat = fs.statSync("/usr/bin/nautilus");
-                if(commandStat.isFile()) {
-                  var command =
-                      "nautilus "
-                      + this.fixPathsUnix(vars.globals.rootWorkspacePath)
-                      + vars.globals.fileSeparator
-                      + this.fixPathsUnix(projectFolder)
-                      + "/LocalFiles &"
-                      ;
-                } else {
-                  var command =
-                      "dolphin "
-                      + this.fixPathsUnix(vars.globals.rootWorkspacePath)
-                      + vars.globals.fileSeparator
-                      + this.fixPathsUnix(projectFolder)
-                      + "/LocalFiles &"
-                      ;
-                }
-            } else {
-                var command =
-                    "explorer \""
-                    + vars.globals.rootWorkspacePath
-                    + vars.globals.fileSeparator
-                    + projectFolder
-                    + "\\LocalFiles\"";
-            }
-            */
         }
         catch (err) 
         {
             console.log("ERROR in openFolder: " + err)
         }
     }
-    
-	// TODO: Simplify, use updateProjectList instead.
-	hyper.addProject = function(path)
-	{
-		mProjectList.unshift(path)
-		saveProjectList()
+
+        
+TODO: DELETE
+
+var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
+var linux = vars.globals.localPlatform.indexOf("linux") >=0;
+if (darwin) {
+	var command =
+		"open "
+		+ this.fixPathsUnix(vars.globals.rootWorkspacePath)
+		+ vars.globals.fileSeparator
+		+ this.fixPathsUnix(projectFolder)
+		+ "/LocalFiles"
+		;
+} else if (linux) {
+	var commandStat = fs.statSync("/usr/bin/nautilus");
+	if(commandStat.isFile()) {
+	  var command =
+		  "nautilus "
+		  + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+		  + vars.globals.fileSeparator
+		  + this.fixPathsUnix(projectFolder)
+		  + "/LocalFiles &"
+		  ;
+	} else {
+	  var command =
+		  "dolphin "
+		  + this.fixPathsUnix(vars.globals.rootWorkspacePath)
+		  + vars.globals.fileSeparator
+		  + this.fixPathsUnix(projectFolder)
+		  + "/LocalFiles &"
+		  ;
 	}
-	
-	hyper.setProjectList = function(list)
-	{
-		mProjectList = list
-		saveProjectList()
-	}
-	
-	hyper.openFileFolder = function(path) 
-	{
-		// Prepend base path if this is not an absolute path.
-		if (!FILE_UTIL.isPathAbsolute(path))
-		{
-			path = mApplicationBasePath + PATH.sep + path
-		}
-		
-		// Drop filename part of path.
-		var pos = path.lastIndexOf(PATH.sep)
-		var folderPath = path.substring(0, pos)
-		openFolder(folderPath)
-    }
-    
-	// Display Node.js version info. Not used.
-	//document.querySelector('#info').innerHTML = 'node.js ' + process.version
-	
-	setupServer()
-})()
+} else {
+	var command =
+		"explorer \""
+		+ vars.globals.rootWorkspacePath
+		+ vars.globals.fileSeparator
+		+ projectFolder
+		+ "\\LocalFiles\"";
+}
+*/
