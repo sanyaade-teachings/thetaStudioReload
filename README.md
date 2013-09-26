@@ -1,6 +1,6 @@
-# HyperApp
+# HyperReload
 
-HyperApp is a lightweight tool for rapid development of mobile apps in JavaScript.
+HyperReload is a lightweight tool for rapid development of mobile apps in JavaScript.
 
 ## What it does
 
@@ -8,6 +8,29 @@ Edit your HTML/CSS/JS on your desktop machine, save the edited file, and the cha
 
 Any number of clients can connect. You can connect from any browser (desktop or mobile), or you can connect from a mobile WebView widget of a native app (this should work on all mobile platforms that supports a Web widget, Android, iOS, Windows Phone, Firefox OS, etc).
 
+## How to get started
+
+At [http://hyperreload.com](hyperreload.com) you will find download packages and documentation on how to get started.
+
+## Building from source
+
+HyperReload uses [node-webkit](https://github.com/rogerwang/node-webkit) as its runtime (an amazing piece of software).
+
+There is no actual build step, you can clone the source, then run using node-webkit. The HyperReload runnable is in the UI directory.
+
+## Documentation and site structure
+
+[http://hyperreload.com](Documentation and downloads) are on [http://hyperreload.com](hyperreload.com).
+
+Documentation will also be available in the "Documentation" window in HyperReload.
+
+[Design documents and developer documentation](https://github.com/divineprog/HyperReload/wiki) is on the GitHub wiki (still in its infancy).
+
+The [issue tracker](https://github.com/divineprog/HyperReload/issues) is here on GitHub.
+
+An [experimental forum](https://github.com/divineprog/HyperReload-Forum/issues) is also here on GitHub. (Using the GitHub issue tracker, perhaps this is less than ideal, will look into creating a proper forum.)
+
+<!--
 ## Components
 
 HyperApp consists of two applications:
@@ -71,15 +94,14 @@ For the reload mechanism to work, you need to include a script in the main HTML 
 	</html>
 
 It is recommened to put the reloader script last in the body element.
+-->
 
 ## Roadmap
 
 Note that the HyperApp project is under development, with ongoing changes/updates. 
 Estimated stable release September 30, 2013.
 
-An Android client app is also under development (will be followed by additional platforms).
-
-The mobile client apps will include the Cordova API.
+An Android client app is also under development (will be followed by additional platforms). Currently the Android client app is unstable.
 
 <!--
 With the HyperApp mobile application (under development) you get additional functionlity:
