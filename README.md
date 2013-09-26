@@ -16,7 +16,7 @@ Go to [hyperreload.com](http://hyperreload.com) to find download packages and a 
 
 HyperReload uses [node-webkit](https://github.com/rogerwang/node-webkit) as its runtime (an amazing piece of software).
 
-There is no actual build step, you can clone the source, then run using node-webkit. The HyperReload runnable is in the UI directory.
+There is no actual build step, you can clone the source, then run using node-webkit. The HyperReload runnable files and node-webkit manifest file are in the UI directory.
 
 ## Documentation and site structure
 
@@ -28,7 +28,9 @@ Documentation will also be available in the "Documentation" window in HyperReloa
 
 The [issue tracker](https://github.com/divineprog/HyperReload/issues) is here on GitHub.
 
-An [experimental forum](https://github.com/divineprog/HyperReload-Forum/issues) is also here on GitHub. (Using the GitHub issue tracker, perhaps this is less than ideal, will look into creating a proper forum.)
+An [experimental forum](https://github.com/divineprog/HyperReload-Forum/issues) is also here on GitHub. You need to have a GItHub accound to post messages. 
+
+(Using the GitHub issue tracker as a forum is perhaps less than ideal, will look into creating a proper forum.)
 
 <!--
 ## Components
