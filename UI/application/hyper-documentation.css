@@ -54,8 +54,8 @@ a {
 }
 
 .box {
-	margin: 1em 0;
-	padding: 0.5em 1em;
+	margin: 0.5em 0em;
+	padding: 0.2em 1em;
 	/*border: 1px solid #000000;
 	-webkit-border-radius: 0.5em;
 	border-radius: 0.5em;*/

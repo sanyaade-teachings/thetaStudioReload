@@ -6,7 +6,7 @@
   "keywords": ["HyperReload", "mobile", "JavaScript"],
   "window": 
   {
-    "title": "HyperReload 0.1.1",
+    "title": "HyperReload 0.1.2",
     "toolbar": true,
     "frame": true,
     "width": 580,

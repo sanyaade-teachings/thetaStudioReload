@@ -92,12 +92,33 @@ button
 //          Welcome to HyperReload Workbench 
 // -----------------------------------------------------
 //
-// The Workbench has two parts. This part is a JavaScript editor
-// where you can select and evaluate code on connected devides.
-// Get started by selecting a line of the example code below, and 
-// then press the Eval button.
+// The Workbench has two parts. This part is a JavaScript 
+// editor where you can evaluate selected code on connected 
+// devices/browsers.
 //
+// The second part is the message panel below. Here log messages
+// from devices are displayed, and the result from evaluating
+// JavaScript code.
+//
+// Get started by selecting a line of the example code below, 
+// then press the "Eval on Devices" button. This will run the
+// selected code on any connected devices/browsers.
+//
+// The button "Eval in NodeWebkit" is an experimental feature
+// that lets you to evaluate code locally in HyperReload, which
+// runs on top of node-webkit. This gives you full interactive
+// access to node-webkit and to node.js, a potentially very
+// powerful feature. This can be used for experimenting with
+// node.js and node-webkit, and for running scripted tests
+// on connected devices.
+// -----------------------------------------------------
+
+// Send log message from connected devices/browsers. Use this
+// in your application code for debugging.
 hyper.log('Hello World')
+
+// Replace the browser content with the given HTML. What do you
+// think will happen if you evaluate this with "Eval in Node"?
 document.body.innerHTML = '<h1>Hello World</h1>'
 </textarea>
 </div>
@@ -107,10 +128,11 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 <div class="ui-layout-south">
 
 <div id="toolbar">
-	<input value="Eval" class="buttonEval" type="button" />
+	<input value="Eval on Devices" class="buttonEval" type="button" />
 	<input value="Undo" class="buttonUndo" type="button" />
 	<input value="Redo" class="buttonRedo" type="button" />
 	<input value="Clear Log" class="buttonClearLog" type="button" />
+	<input value="Eval in NodeWebkit" class="buttonEvalInNodeJs" type="button" />
 </div>
 
 <div id="resultarea">
@@ -152,7 +174,7 @@ $(function()
 	{
 		if (!mMainWindow)
 		{
-			showResult('Error: Could not find main window - report to developer')
+			showResult('ERR: Could not find main window - report to developer')
 			return
 		}
 		
@@ -164,6 +186,33 @@ $(function()
 		
 		var code = editor.getSelection()
 		mMainWindow.postMessage({ message: 'eval', code: code }, '*')
+	})
+	
+	$('input.buttonEvalInNodeJs').click(function() 
+	{
+		if (!mMainWindow)
+		{
+			showResult('ERR: Could not find main window - report to developer')
+			return
+		}
+		
+		if (!editor.somethingSelected())
+		{
+			showResult('Select some code to evaluate')
+			return
+		}
+		
+		try
+		{
+			var code = editor.getSelection()
+			var result = eval(code)
+			showResult('NODE: ' + result)
+		}
+		catch (err)
+		{
+			showResult('ERR: ' + err)
+		}
+		
 	})
 	
 	$('input.buttonUndo').click(function() 
