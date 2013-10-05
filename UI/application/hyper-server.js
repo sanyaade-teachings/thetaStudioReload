@@ -77,7 +77,9 @@ function webServerHookFun(request, response, path)
 			scriptBegin +
 			script + '("' + mIpAddress + '", false)' +
 			scriptEnd
-		var file = FS.readFileSync(mBasePath + mAppFile, {encoding: 'utf8'})
+		var filePath = mBasePath + path.substr(1)
+		console.log('Requested file: ' + filePath)
+		var file = FS.readFileSync(filePath, {encoding: 'utf8'})
 		file = insertReloaderScript(file, script)
 		mWebServer.writeRespose(response, file, 'text/html')
 		return true
@@ -225,17 +227,26 @@ function setAppPath(appPath)
 
 /**
  * External.
+ * Reloads the main HTML file of the current app.
  */
 function sendReload()
 {
-	console.log("sending reload")
-	mIO.sockets.emit('reload', {url: getCurrentAppFileURL()})
+	mIO.sockets.emit('reload', {url: getMainAppFileURL()})
+}
+
+/**
+ * External.
+ * Reloads the currently visible page of the browser.
+ */
+function sendReloadCurrentPage()
+{
+	mIO.sockets.emit('reloadCurrentPage', {})
 }
 
 /**
  * External.
  */
-function getCurrentAppFileURL()
+function getMainAppFileURL()
 {
 	return 'http://' + mIpAddress + ':4042/' + mAppFile
 }
@@ -315,7 +326,7 @@ function fileSystemMonitor()
 		mTraverseNumDirecoryLevels)
 	if (filesUpdated)
 	{
-		sendReload()
+		sendReloadCurrentPage()
 		setTimeout(fileSystemMonitor, 1000)
 	}
 	else
@@ -392,7 +403,8 @@ exports.startServers = startServers
 exports.getWebServerIpAndPort = getWebServerIpAndPort
 exports.setAppPath = setAppPath
 exports.sendReload = sendReload
-exports.getCurrentAppFileURL = getCurrentAppFileURL
+exports.sendReloadCurrentPage = sendReloadCurrentPage
+exports.getMainAppFileURL = getMainAppFileURL
 exports.sendEvalJS = sendEvalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
 exports.getNumberOfConnectedClients = getNumberOfConnectedClients

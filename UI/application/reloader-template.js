@@ -63,6 +63,11 @@
             socket.disconnect()
             window.location.replace(data.url)
         })
+        socket.on('reloadCurrentPage', function(data)
+        {
+            socket.disconnect()
+            window.location.reload(true)
+        })
         socket.on('evaljs', function(data)
         {
             try
@@ -72,7 +77,7 @@
             }
             catch (err)
             {
-                hyper.sendJsResult(err)
+                hyper.sendJsResult('JSErr: ' + err)
             } 
         })
         socket.on('connect', function()

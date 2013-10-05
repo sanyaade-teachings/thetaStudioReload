@@ -118,7 +118,7 @@ hyper.UI = {}
 	
 	function receiveMessage(event)
 	{
-		console.log('Main got : ' + event.data.message)
+		//console.log('Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
 			hyper.SERVER.sendEvalJS(event.data.code)
@@ -188,13 +188,13 @@ hyper.UI = {}
 			'<div class="ui-state-default ui-corner-all">'
 				+ '<button '
 				+	'type="button" '
-				+	'class="button-open btn btn-success" '
+				+	'class="button-open btn btn-default" '
 				+	'onclick="hyper.openFileFolder(\'__PATH1__\')">'
 				+	'Open'
 				+ '</button>'
 				+ '<button '
 				+	'type="button" '
-				+	'class="button-run btn btn-primary" '
+				+	'class="button-run btn btn-success" '
 				+	'onclick="hyper.runApp(\'__PATH2__\')">'
 				+	'Run'
 				+ '</button>'
@@ -371,7 +371,7 @@ hyper.UI = {}
 		
 		if (SERVER.getNumberOfConnectedClients() < 1)
 		{
-			GUI.Shell.openExternal(SERVER.getCurrentAppFileURL())
+			GUI.Shell.openExternal(SERVER.getMainAppFileURL())
 		}
 	}
 	

@@ -206,11 +206,11 @@ $(function()
 		{
 			var code = editor.getSelection()
 			var result = eval(code)
-			showResult('NODE: ' + result)
+			showResult('NODE-RES: ' + result)
 		}
 		catch (err)
 		{
-			showResult('ERR: ' + err)
+			showResult('NODE-ERR: ' + err)
 		}
 		
 	})
@@ -249,7 +249,13 @@ $(function()
 	{
 		result.setValue(res + '\n' + result.getValue()); 
 	}
-
+	
+	window.hyper = {}
+	window.hyper.log = function(message)
+	{
+		showResult('NODE-LOG: ' + message)
+	}
+	
 	//$('body').layout({ applyDefaultStyles: true })
 	$('body').layout(
 	{
@@ -271,8 +277,9 @@ $(function()
 		}
 		else if ('jsResult' == event.data.message)
 		{
-			showResult('JS: ' + event.data.result)
+			showResult('RES: ' + event.data.result)
 		}
+		// TODO: Add JSERR
 	}
 	
 	window.addEventListener('message', receiveMessage, false)
