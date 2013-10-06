@@ -121,7 +121,7 @@ hyper.UI = {}
 		//console.log('Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
-			hyper.SERVER.sendEvalJS(event.data.code)
+			hyper.SERVER.evalJS(event.data.code)
 		}
 	}
 	
@@ -195,7 +195,7 @@ hyper.UI = {}
 				+ '<button '
 				+	'type="button" '
 				+	'class="button-run btn btn-success" '
-				+	'onclick="hyper.runApp(\'__PATH2__\')">'
+				+	'onclick="hyper.runAppGuard(\'__PATH2__\')">'
 				+	'Run'
 				+ '</button>'
 				+ '<h4>__NAME__</h4>'
@@ -307,7 +307,7 @@ hyper.UI = {}
 			// TODO: Send string do JSON.stringify on msg.
 			if (mWorkbenchWindow)
 			{
-				mWorkbenchWindow.postMessage(JSON.stringify(msg), '*')
+				mWorkbenchWindow.postMessage(msg, '*')
 			}
 		})
 	}
@@ -336,6 +336,7 @@ hyper.UI = {}
 	var mProjectListFile = './project-list.json'
 	var mProjectList = []
 	var mApplicationBasePath = process.cwd()
+	var mRunAppGuardFlag = false
 
 	function setupServer()
 	{
@@ -359,7 +360,19 @@ hyper.UI = {}
 			hyper.UI.displayIpAddress(ip, port)
 		})
 	}
-	
+
+	// The Run button in the UI has been clicked.
+	// Clicking too fast can cause muliple windows
+	// to open. Guard against this case by a delay.
+	hyper.runAppGuard = function(path)
+	{
+		if (mRunAppGuardFlag) { return }
+		mRunAppGuardFlag = true
+		setTimeout(function() { mRunAppGuardFlag = false }, 500)
+		hyper.runApp(path)
+	}
+
+	// The Run button in the UI has been clicked.
 	hyper.runApp = function(path)
 	{
 		// Prepend base path if this is not an absolute path.
@@ -371,15 +384,24 @@ hyper.UI = {}
 		console.log('runApp: ' + path)
 		
 		SERVER.setAppPath(path)
-		SERVER.sendReload()
 		
 		if (SERVER.getNumberOfConnectedClients() < 1)
 		{
-			GUI.Shell.openExternal(SERVER.getMainAppFileURL())
+			// Open a local browser automatially if no clients are connected.
+			// This is done so that something will happen when you first try
+			// out Hyper by clicking the buttons in the user interface.
+			GUI.Shell.openExternal(
+				SERVER.getServerBaseURL() +
+				'#' + 
+				SERVER.getAppFileName())
+		}
+		else
+		{
+			// Otherwise, load the requested file on connected clients.
+			SERVER.runApp()
 		}
 	}
 	
-	// TODO: Should saved apps belong to the UI, rather than to the server?
 	function readProjectList()
 	{
 		if (FS.existsSync(mProjectListFile))
@@ -389,7 +411,6 @@ hyper.UI = {}
 		}
 	}
 
-	// TODO: Should saved apps belong to the UI, rather than to the server?
 	function saveProjectList()
 	{
 		var json = JSON.stringify(mProjectList)
@@ -428,7 +449,7 @@ hyper.UI = {}
 		// Show the file in the folder.
 		openFolder(path)
 		
-		// TODO: New method used.
+		// TODO: New method used. This is old code.
 		// Drop filename part of path.
 		/*var pos = path.lastIndexOf(PATH.sep)
 		var folderPath = path.substring(0, pos)
@@ -437,7 +458,7 @@ hyper.UI = {}
     
 	// Display Node.js version info. Not used.
 	//document.querySelector('#info').innerHTML = 'node.js ' + process.version
-	
+
 	setupServer()
 })()
 

@@ -45,8 +45,34 @@ function startWebServer(basePath, port, fun)
 
 /**
  * Internal.
+ *
+ * New version of webServerHookFun.
  */
 function webServerHookFun(request, response, path)
+{
+	// When the root is requested, we send the document with an
+	// iframe that will load application pages.
+	if (path == '/')
+	{
+		var page = FS.readFileSync('./application/hyper-client.html', {encoding: 'utf8'})
+		mWebServer.writeRespose(response, page, 'text/html')
+		return true
+	}
+	else
+	{
+		return false
+	}
+}
+
+/**
+ * Internal. Not used.
+ *
+ * This is the original version of the server code that
+ * inserts the reloader script on each HTML page requested.
+ * Currently the method of ddisplaying pages in an iframe
+ * is used. See webServerHookFun, which is the new version.
+ */
+function webServerHookFunOrig(request, response, path)
 {
 	//console.log('webServerHookFun path: ' + path)
 	if (path == '/')
@@ -91,7 +117,7 @@ function webServerHookFun(request, response, path)
 }
 
 /**
- * Internal.
+ * Internal. Not used.
  * 
  * Insert the script at the template tag, if no template tag is
  * found, insert at alternative locations in the document.
@@ -144,6 +170,7 @@ function insertReloaderScript(file, script)
  */
 function startServers()
 {
+	console.log('starServer')
 	//mIO = SOCKETIO.listen(mSocketIoPort, {log: false})
 	mIO = SOCKETIO.listen(mSocketIoPort)
 
@@ -167,12 +194,12 @@ function startServers()
 			console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
         })
     
-		socket.on('log', function(data)
+		socket.on('hyper.log', function(data)
 		{
 			displayLogMessage(data)
 		})
 		
-		socket.on('jsResult', function(data)
+		socket.on('hyper.result', function(data)
 		{
 			displayJsResult(data)
 		})
@@ -227,36 +254,53 @@ function setAppPath(appPath)
 
 /**
  * External.
+ * Return the name of the main HTML file of the application.
+ */
+function getAppFileName()
+{
+	return mAppFile
+}
+
+/**
+ * External.
+ */
+function getAppFileURL()
+{
+	return 'http://' + mIpAddress + ':' + mWebServerPort + '/' + mAppFile
+}
+
+/**
+ * External.
+ */
+function getServerBaseURL()
+{
+	return 'http://' + mIpAddress + ':' + mWebServerPort + '/'
+}
+
+/**
+ * External.
  * Reloads the main HTML file of the current app.
  */
-function sendReload()
+function runApp()
 {
-	mIO.sockets.emit('reload', {url: getMainAppFileURL()})
+	mIO.sockets.emit('hyper.run', {url: getAppFileURL()})
 }
 
 /**
  * External.
  * Reloads the currently visible page of the browser.
  */
-function sendReloadCurrentPage()
+function reloadApp()
 {
-	mIO.sockets.emit('reloadCurrentPage', {})
+	mIO.sockets.emit('hyper.reload', {})
 }
 
 /**
  * External.
  */
-function getMainAppFileURL()
+function evalJS(code)
 {
-	return 'http://' + mIpAddress + ':4042/' + mAppFile
-}
-
-/**
- * External.
- */
-function sendEvalJS(code)
-{
-	mIO.sockets.emit('evaljs', code)
+	mIO.sockets.emit('hyper.eval', code)
 }
 
 /**
@@ -326,7 +370,7 @@ function fileSystemMonitor()
 		mTraverseNumDirecoryLevels)
 	if (filesUpdated)
 	{
-		sendReloadCurrentPage()
+		reloadApp()
 		setTimeout(fileSystemMonitor, 1000)
 	}
 	else
@@ -402,12 +446,13 @@ for (var i in files)
 exports.startServers = startServers
 exports.getWebServerIpAndPort = getWebServerIpAndPort
 exports.setAppPath = setAppPath
-exports.sendReload = sendReload
-exports.sendReloadCurrentPage = sendReloadCurrentPage
-exports.getMainAppFileURL = getMainAppFileURL
-exports.sendEvalJS = sendEvalJS
+exports.getAppFileName = getAppFileName
+exports.getAppFileURL = getAppFileURL
+exports.getServerBaseURL = getServerBaseURL
+exports.runApp = runApp
+exports.reloadApp = reloadApp
+exports.evalJS = evalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
 exports.getNumberOfConnectedClients = getNumberOfConnectedClients
-
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
 exports.fileSystemMonitor = fileSystemMonitor
