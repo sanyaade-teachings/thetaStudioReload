@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=1">
-    <title>HyperApp Mobile</title>
+    <title>HyperReload Mobile</title>
     <link href="libs/bootstrap-v3.0.0.rc1-dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="libs/jquery/jquery-2.0.3.min.js"></script>
     <script src="libs/bootstrap-v3.0.0.rc1-dist/js/bootstrap.min.js"></script>
@@ -18,18 +18,17 @@
 <body>
 <div id="MainUI">
 	<div>
-		<h1>HyperApp</h1>
+		<h1>HyperReload</h1>
 	</div>
 	<div>
-		<p class="lead">Enter address found in the HyperApp Launchpad UI 
-		(e.g. 192.168.0.101) and press Connect.</p>
+		<p class="lead">Enter address found in the bpttom panel of the HyperReload Launchpad (e.g. 192.168.0.101) and press Connect.</p>
 	</div>
     <div>
 		<p>
         <input id="IpAddressField" class="form-control input-lg" value="" type="url" size="30"/>
         </p>
 		<p>
-        <button type="button" class="btn btn-lg btn-primary" onclick="DoConnect()" >Connect</button>
+        <button type="button" class="btn btn-lg btn-primary" onclick="DoConnect()">Connect</button>
 		</p>
     </div>
 </div>
@@ -38,7 +37,7 @@ function DoConnect()
 {
     var ip = document.getElementById("IpAddressField").value
     localStorage.setItem('RecentIpAddress', ip)
-    window.location.assign('http://' + ip + ':4042/connect')
+    window.location.assign('http://' + ip + ':4042')
 }
 
 function SetSavedIpAddress()

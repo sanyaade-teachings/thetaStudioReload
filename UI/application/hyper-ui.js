@@ -301,10 +301,14 @@ hyper.UI = {}
 
 	hyper.UI.setServerMessageFun = function()
 	{
-		// Server message callback.
+		// Set server message callback to forward message to the Workbench.
 		hyper.SERVER.setMessageCallbackFun(function(msg)
 		{
-			if (mWorkbenchWindow) { mWorkbenchWindow.postMessage(msg, '*') }
+			// TODO: Send string do JSON.stringify on msg.
+			if (mWorkbenchWindow)
+			{
+				mWorkbenchWindow.postMessage(JSON.stringify(msg), '*')
+			}
 		})
 	}
 	

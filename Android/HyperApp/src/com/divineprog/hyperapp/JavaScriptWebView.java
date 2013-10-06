@@ -31,9 +31,14 @@ public class JavaScriptWebView extends WebView
 
 		WebSettings settings = getSettings();
 		settings.setJavaScriptEnabled(true);
-		settings.setDomStorageEnabled(true);
 		settings.setGeolocationEnabled(true);
 		setVerticalScrollbarOverlay(true);
+
+		// This is needed for persistent DOM storage (localStorage).
+		settings.setDomStorageEnabled(true);
+		settings.setDatabaseEnabled(true);
+		settings.setDatabasePath(
+			"/data/data/" + getPackageName() + "/databases/");
 
 		setWebViewClient(new MyWebViewClient());
 		setWebChromeClient(new MyChromeClient());
