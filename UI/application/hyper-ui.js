@@ -102,14 +102,14 @@ hyper.UI = {}
 		// Reorder of project list by drag and drop.
 		$(function() 
 		{
-			$('#project-list').sortable(
+			/*$('#project-list').sortable(
 			{
 				stop: function() 
 				{
 					updateProjectList()
 				}
 			})
-			$('#project-list').disableSelection()
+			$('#project-list').disableSelection()*/
 		})
 		
 		// Message handler.
@@ -286,10 +286,16 @@ hyper.UI = {}
 	{
 		// document.querySelector('#ip-address').innerHTML = ip
 		//document.querySelector('#connect-address-1').innerHTML = ip + ':' + port
-		document.querySelector('#connect-address-2').innerHTML = ip + ':' + port
+		document.querySelector('#connect-address').innerHTML = ip + ':' + port
 		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
 	
+	hyper.UI.displayConnectedCounter = function()
+	{
+		document.querySelector('#connect-counter').innerHTML = 
+			hyper.SERVER.getNumberOfConnectedClients()
+	}
+
 	hyper.UI.displayProjectList = function(projectList)
 	{
 		for (var i = projectList.length - 1; i > -1; --i)
@@ -325,7 +331,7 @@ hyper.UI = {}
 /*** Server setup ***/
 
 // TODO: Remove hard coded port numbers below and
-// in reloader-template.js.
+// in hyper-reloader.js.
 
 ;(function()
 {
@@ -337,6 +343,8 @@ hyper.UI = {}
 	var mProjectList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
+	var mOpenExternalBrowser = true
+	var mConnectedCounterTimer = 0
 
 	function setupServer()
 	{
@@ -352,6 +360,9 @@ hyper.UI = {}
 		hyper.UI.displayProjectList(mProjectList)
 		hyper.UI.setServerMessageFun()
 		displayServerIpAddress()
+
+		SERVER.setConnenctedCallbackFun(clientConnectedCallback)
+		SERVER.setDisconnenctedCallbackFun(clientDisconnectedCallback)
 	}
 	
 	function displayServerIpAddress()
@@ -363,12 +374,11 @@ hyper.UI = {}
 
 	// The Run button in the UI has been clicked.
 	// Clicking too fast can cause muliple windows
-	// to open. Guard against this case by a delay.
+	// to open. Guard against this case.
 	hyper.runAppGuard = function(path)
 	{
 		if (mRunAppGuardFlag) { return }
 		mRunAppGuardFlag = true
-		setTimeout(function() { mRunAppGuardFlag = false }, 500)
 		hyper.runApp(path)
 	}
 
@@ -385,15 +395,19 @@ hyper.UI = {}
 		
 		SERVER.setAppPath(path)
 		
-		if (SERVER.getNumberOfConnectedClients() < 1)
+		if (mOpenExternalBrowser)
 		{
 			// Open a local browser automatially if no clients are connected.
 			// This is done so that something will happen when you first try
 			// out Hyper by clicking the buttons in the user interface.
+			GUI.Shell.openExternal(SERVER.getAppFileURL())
+
+			/* This was used with iframe loading (hyper-client.html)
 			GUI.Shell.openExternal(
 				SERVER.getServerBaseURL() +
 				'#' + 
 				SERVER.getAppFileName())
+			*/
 		}
 		else
 		{
@@ -402,6 +416,30 @@ hyper.UI = {}
 		}
 	}
 	
+	function clientConnectedCallback(numberOfConnectedClients)
+	{
+		mRunAppGuardFlag = false
+		mOpenExternalBrowser = false
+
+		clearTimeout(mConnectedCounterTimer)
+		mConnectedCounterTimer = setTimeout(function() {
+			hyper.UI.displayConnectedCounter() },
+			1000)
+	}
+
+	function clientDisconnectedCallback(numberOfConnectedClients)
+	{
+		if (0 == numberOfConnectedClients)
+		{
+			mOpenExternalBrowser = true
+		}
+
+		clearTimeout(mConnectedCounterTimer)
+		mConnectedCounterTimer = setTimeout(function() {
+			hyper.UI.displayConnectedCounter() },
+			1000)
+	}
+
 	function readProjectList()
 	{
 		if (FS.existsSync(mProjectListFile))

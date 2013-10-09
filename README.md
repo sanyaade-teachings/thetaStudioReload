@@ -22,7 +22,7 @@ There is no actual build step, you can clone the source, then run using node-web
 
 [Documentation and downloads](http://hyperreload.com) are on [hyperreload.com](http://hyperreload.com).
 
-Documentation will also be available in the "Documentation" window in HyperReload.
+Documentation is also available in the "Documentation" window in HyperReload.
 
 [Design documents and developer documentation](https://github.com/divineprog/HyperReload/wiki) is on the GitHub wiki (still in its infancy).
 
@@ -101,7 +101,12 @@ It is recommened to put the reloader script last in the body element.
 ## Roadmap
 
 Note that the HyperReload project is under development, with ongoing changes/updates. 
+
 Estimated stable release September 30, 2013.
+
+New releases are made continously.
+
+Downloads are available at [hyperreload.com](http://hyperreload.com).
 
 An Android client app is also under development (will be followed by additional platforms).
 
@@ -112,3 +117,5 @@ With the HyperApp mobile application (under development) you get additional func
 * Get console error messages displayed in the HyperApp UI (Android)
 * No need to build the application, just install from the app store (forthcoming)
 -->
+
+Copyright (c) 2013 Mikael Kindborg

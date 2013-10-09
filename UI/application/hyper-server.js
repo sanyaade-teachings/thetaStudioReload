@@ -29,6 +29,8 @@ var mWebServerPort = 4042
 var mSocketIoPort = 4043
 var mMessageCallback = null
 var mNumberOfConnectedClients = 0
+var mConnectedCallback = null
+var mDisconnectedCallback = null
 
 /*** Server functions ***/
 
@@ -46,9 +48,9 @@ function startWebServer(basePath, port, fun)
 /**
  * Internal.
  *
- * New version of webServerHookFun.
+ * Version of webserver hook function used for serving iframe version.
  */
-function webServerHookFun(request, response, path)
+function webServerHookFunForIframe(request, response, path)
 {
 	// When the root is requested, we send the document with an
 	// iframe that will load application pages.
@@ -65,83 +67,94 @@ function webServerHookFun(request, response, path)
 }
 
 /**
- * Internal. Not used.
+ * Internal.
  *
- * This is the original version of the server code that
- * inserts the reloader script on each HTML page requested.
- * Currently the method of ddisplaying pages in an iframe
- * is used. See webServerHookFun, which is the new version.
+ * Version of the webserver hook function that inserts the reloader 
+ * script on each HTML page requested.
  */
-function webServerHookFunOrig(request, response, path)
+function webServerHookFunForScriptInjection(request, response, path)
 {
 	//console.log('webServerHookFun path: ' + path)
 	if (path == '/')
 	{
-		//console.log('client connection request')
-		var page = FS.readFileSync('./application/connect.html', {encoding: 'utf8'})
-		mWebServer.writeRespose(response, page, 'text/html')
+		// If the root path is requested, send the connect page.
+		var file = FS.readFileSync('./application/hyper-connect.html', {encoding: 'utf8'})
+		file = insertReloaderScript(file)
+		mWebServer.writeRespose(response, file, 'text/html')
 		return true
 	}
-	else if (path == '/reloader')
+	else if (path == '/hyper.reloader')
 	{
-		var script = FS.readFileSync('./application/reloader-template.js', {encoding: 'utf8'})
-		script += '("' + mIpAddress + '", true)'
+		// Send reloader script.
+		var script = FS.readFileSync('./application/hyper-reloader.js', {encoding: 'utf8'})
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
 	else if (FILEUTIL.fileIsHTML(path))
 	{
-		// Here we insert the realoader script in all HTML files requested.
-		var script = FS.readFileSync('./application/reloader-template.js', {encoding: 'utf8'})
-		var scriptBegin = '<' + 'script' + '>\n'
-		var scriptBeginSrc = '<' + 'script src='
-		var scriptEnd = '</' + 'script' + '>\n'
-		script =
-			scriptBeginSrc +
-			'"http://' + mIpAddress + ':4043/socket.io/socket.io.js">' +
-			scriptEnd +
-			scriptBegin +
-			script + '("' + mIpAddress + '", false)' +
-			scriptEnd
+		// Insert reloader script into HTML page.
 		var filePath = mBasePath + path.substr(1)
-		console.log('Requested file: ' + filePath)
 		var file = FS.readFileSync(filePath, {encoding: 'utf8'})
-		file = insertReloaderScript(file, script)
+		file = insertReloaderScript(file)
 		mWebServer.writeRespose(response, file, 'text/html')
 		return true
 	}
 	else
 	{
+		// Use default processing for all other pages.
 		return false
 	}
 }
 
 /**
- * Internal. Not used.
+ * Internal.
+ * 
+ * Return script tags for reload functionality.
+ */
+function createReloaderScriptTags()
+{
+	return '' +
+		'<script src="http://' + mIpAddress + ':4043/socket.io/socket.io.js"></script>' +
+		'<script src="/hyper.reloader"></script>'
+}
+
+/**
+ * Internal.
  * 
  * Insert the script at the template tag, if no template tag is
  * found, insert at alternative locations in the document.
- * TODO: Experimental and non-general code, improve and clean up.
+ *
+ * It is desirable to have script tags inserted as early as possible,
+ * to enable hyper.log and error reportning during document loading.
+ *
+ * TODO: Experimentalcode, can be improved.
  */
-function insertReloaderScript(file, script)
+function insertReloaderScript(file)
 {
-	// Is there a template tag?
+	var script = createReloaderScriptTags()
+
+	// Is there a template tag? In that case, insert script there.
 	var hasTemplateTag = (-1 != file.indexOf('<!--hyper.reloader-->'))
 	if (hasTemplateTag)
 	{
 		return file.replace('<!--hyper.reloader-->', script)
 	}
 	
-	// Fallback: Insert after title tag.
-	// TODO: Rewrite to use regular expressions to capture more cases.
+	// Insert before title tag.
+	var pos = file.indexOf('<title>')
+	if (pos > -1)
+	{
+		return file.replace('<title>', script + '<title>')
+	}
+
+	// Insert after title tag.
 	var pos = file.indexOf('</title>')
 	if (pos > -1)
 	{
 		return file.replace('</title>', '</title>' + script)
 	}
 	
-	// Fallback: Insert last in head.
-	// TODO: Rewrite to use regular expressions to capture more cases.
+	// Insert last in head.
 	var pos = file.indexOf('</head>')
 	if (pos > -1)
 	{
@@ -156,8 +169,7 @@ function insertReloaderScript(file, script)
 		return file.replace('<body>', '<body>' + script)
 	}
 	
-	// Fallback: Insert last in body.
-	// TODO: Rewrite to use regular expressions to capture more cases.
+	// Insert last in body.
 	pos = file.indexOf('</body>')
 	if (pos > -1)
 	{
@@ -181,6 +193,11 @@ function startServers()
 	{
 		++mNumberOfConnectedClients
 	
+		if (mConnectedCallback)
+		{
+			mConnectedCallback(mNumberOfConnectedClients)
+		}
+
 		// Debug logging.
 		console.log('Client connected')
 		console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
@@ -188,6 +205,11 @@ function startServers()
 		socket.on('disconnect', function ()
 		{
 			--mNumberOfConnectedClients
+
+			if (mDisconnectedCallback)
+			{
+				mDisconnectedCallback(mNumberOfConnectedClients)
+			}
 			
 			// Debug logging.
 			console.log('Client disconnected')
@@ -223,7 +245,7 @@ function startServers()
 		mWebServer.getIpAddress(function(address) {
 			mIpAddress = address
 		})
-		mWebServer.setHookFun(webServerHookFun)
+		mWebServer.setHookFun(webServerHookFunForScriptInjection)
 	})
 }
 
@@ -311,6 +333,26 @@ function evalJS(code)
 function setMessageCallbackFun(fun)
 {
 	mMessageCallback = fun
+}
+
+/**
+ * External.
+ * 
+ * Callback form: fun(numberOfConnectedClients)
+ */
+function setConnenctedCallbackFun(fun)
+{
+	mConnectedCallback = fun
+}
+
+/**
+ * External.
+ * 
+ * Callback form: fun(numberOfConnectedClients)
+ */
+function setDisconnenctedCallbackFun(fun)
+{
+	mDisconnectedCallback = fun
 }
 
 /**
@@ -453,6 +495,8 @@ exports.runApp = runApp
 exports.reloadApp = reloadApp
 exports.evalJS = evalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
+exports.setConnenctedCallbackFun = setConnenctedCallbackFun
+exports.setDisconnenctedCallbackFun = setDisconnenctedCallbackFun
 exports.getNumberOfConnectedClients = getNumberOfConnectedClients
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
 exports.fileSystemMonitor = fileSystemMonitor

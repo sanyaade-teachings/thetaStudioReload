@@ -1,13 +1,14 @@
-// Load socket.io and open a connection to the server.
-// This code is dynamically inserted by the server in a script tag.
-;(function(address, loadSocketIoFlag)
+/*
+File: hyper-reloader.js
+Description: This code is loaded by the server 
+when the reloader script is requested.
+Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
+*/
+
+;window.hyper = (function(address)
 {
 	var hyper = {}
-	
-    if (!window.hyper)
-    {
-        window.hyper = hyper
-    }
     
     // Connection notifications.
 	hyper.isConnected = false
@@ -29,19 +30,19 @@
 	// Send result of evaluating JS to the UI.
     hyper.sendJsResult = function(result)
     {
-        hyper.IoSocket.emit('jsResult', result)
+        hyper.IoSocket.emit('hyper.result', result)
     }
     
     // Log to UI.
     hyper.log = function(message)
     {
-        hyper.IoSocket.emit('log', message)
+        hyper.IoSocket.emit('hyper.log', message)
     }
     
     // Called from native code.
     hyper.nativeConsoleMessageCallBack = function(message)
     {
-        hyper.IoSocket.emit('log', message)
+        hyper.log(message)
     }
     
     /*
@@ -51,24 +52,24 @@
         hyper.log(message)
     }
     */
-    
-    var url = 'http://' + address
+
+    var baseUrl = 'http://' + window.location.hostname
        
     function connect()
     {
-        var socket = io.connect(url + ':4043')
+        var socket = io.connect(baseUrl + ':4043')
         hyper.IoSocket = socket
-        socket.on('reload', function(data)
+        socket.on('hyper.run', function(data)
         {
             socket.disconnect()
             window.location.replace(data.url)
         })
-        socket.on('reloadCurrentPage', function(data)
+        socket.on('hyper.reload', function(data)
         {
             socket.disconnect()
             window.location.reload(true)
         })
-        socket.on('evaljs', function(data)
+        socket.on('hyper.eval', function(data)
         {
             try
             {
@@ -77,7 +78,7 @@
             }
             catch (err)
             {
-                hyper.sendJsResult('JSErr: ' + err)
+                hyper.sendJsResult('[JSERR] ' + err)
             } 
         })
         socket.on('connect', function()
@@ -90,27 +91,8 @@
         })
     }
     
-    // Load socket.io by inserting a script element.
-    // Call fun when loaded.
-    function loadSocketIoThen(fun)
-    {
-        var script = document.createElement('script')
-        //script.type = 'text/javascript' // Not needed by HTML5
-        script.src = url + ':4043/socket.io/socket.io.js'
-        script.onload = fun
-        document.body.appendChild(script)
-    }
-    
-    if (loadSocketIoFlag)
-    {
-		// Load socket.io, then connect.
-		loadSocketIoThen(connect)
-	}
-	else
-	{
-		// socket.io already loaded, connect directly.
-		connect()
-	}
+	// Initiate connection sequence.
+	connect()
 	
-    // Note: Arguments to this function block inserted by the server script.
-})
+    return hyper
+})()

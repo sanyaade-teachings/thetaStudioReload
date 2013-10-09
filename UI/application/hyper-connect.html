@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-connect.html
+Description: Loaded when making a root get request to
+open a connection from browser to server.
+Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
+-->
+<head>
+    <meta charset="utf-8">
+    <title>HyperReload Connect</title>
+	<script>
+	hyper.onConnected(function()
+	{
+	    document.getElementById('screen1').style.display = 'none'
+	    document.getElementById('screen2').style.display = 'block'
+	})
+	</script>
+	<style>
+	body
+	{
+	    font-family: sans-serif;
+	}
+	#screen2
+	{
+		display: none;
+	}
+	</style>
+</head>
+<body>
+	<div id="screen1">
+		<h1>Connecting...</h1>
+	</div>
+	<div id="screen2">
+		<h1>Connected</h1>
+		<h3>Click the Run button in the HyperReload UI to run an app.</h3>
+	</div>
+</body>
+</html>
