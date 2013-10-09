@@ -102,14 +102,14 @@ hyper.UI = {}
 		// Reorder of project list by drag and drop.
 		$(function() 
 		{
-			/*$('#project-list').sortable(
+			$('#project-list').sortable(
 			{
 				stop: function() 
 				{
 					updateProjectList()
 				}
 			})
-			$('#project-list').disableSelection()*/
+			$('#project-list').disableSelection()
 		})
 		
 		// Message handler.

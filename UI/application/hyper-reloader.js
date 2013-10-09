@@ -78,7 +78,7 @@ Copyright (c) 2013 Mikael Kindborg
             }
             catch (err)
             {
-                hyper.sendJsResult('[JSERR] ' + err)
+                hyper.sendJsResult('[ERR] ' + err)
             } 
         })
         socket.on('connect', function()
