@@ -256,8 +256,9 @@ function startServers()
 	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
 	{
 		mWebServer = server
-		mWebServer.getIpAddress(function(address) {
-			mIpAddress = address
+		mWebServer.getIpAddress(function(address)
+		{
+			mIpAddress = ensureIpAddress(address)
 		})
 		mWebServer.setHookFun(webServerHookFunForScriptInjection)
 	})
@@ -268,8 +269,9 @@ function startServers()
  */
 function getWebServerIpAndPort(fun)
 {
-	mWebServer.getIpAddress(function(address) {
-		fun(address, SETTINGS.WebServerPort)
+	mWebServer.getIpAddress(function(address)
+	{
+		fun(ensureIpAddress(address), SETTINGS.WebServerPort)
 	})
 }
 
@@ -377,6 +379,17 @@ function getNumberOfConnectedClients()
 	return mNumberOfConnectedClients
 }
 
+/**
+ * Internal.
+ */
+function ensureIpAddress(address)
+{
+	return address || '127.0.0.1'
+}
+
+/**
+ * Internal.
+ */
 function displayLogMessage(message)
 {
 	if (mMessageCallback)
@@ -385,6 +398,9 @@ function displayLogMessage(message)
 	}
 }
 
+/**
+ * Internal.
+ */
 function displayJsResult(result)
 {
 	if (mMessageCallback)

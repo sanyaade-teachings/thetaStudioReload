@@ -108,7 +108,7 @@ function CreateServerObject()
 		}
 		else
 		{
-			callbackFun('<ip-address-not-found>')
+			callbackFun(null)
 		}
 	}
     
