@@ -33,6 +33,7 @@ hyper.UI = {}
 {
 	var mWorkbenchWindow = null
 	var mDocumentationWindow = null
+	var mStoreWindow = null
 	
 	function setupUI()
 	{
@@ -59,8 +60,11 @@ hyper.UI = {}
 	
 	function setUIActions()
 	{
+		var button = null
+
 		// Workbench button action.
-		$('#button-workbench').click(function()
+		button = $('#button-workbench')
+		button && button.click(function()
 		{
 			if (mWorkbenchWindow && !mWorkbenchWindow.closed)
 			{
@@ -81,7 +85,8 @@ hyper.UI = {}
 		})
 		
 		// Documentation button action.
-		$('#button-documentation').click(function()
+		button = $('#button-documentation')
+		button && button.click(function()
 		{
 			if (mDocumentationWindow && !mDocumentationWindow.closed)
 			{
@@ -96,6 +101,26 @@ hyper.UI = {}
 					'documentation',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mDocumentationWindow.moveTo(50, 50)
+			}
+		})
+
+		// Store button action.
+		button = $('#button-store')
+		button && button.click(function()
+		{
+			if (mStoreWindow && !mStoreWindow.closed)
+			{
+				// Bring existing window to front.
+				mStoreWindow.focus()
+			}
+			else
+			{
+				// Create new window.
+				mStoreWindow = window.open(
+					'../documentation/hyper-store.html', 
+					'store',
+					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
+				mStoreWindow.moveTo(50, 50)
 			}
 		})
 		

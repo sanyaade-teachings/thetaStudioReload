@@ -29,3 +29,6 @@ UI/nw.pak
 
 # HyperReload project list file
 project-list.json
+
+# Mac node-webkit binary
+UI/HyperReload.app/

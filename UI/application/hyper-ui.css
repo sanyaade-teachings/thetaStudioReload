@@ -14,16 +14,27 @@ body
 #panel-top
 {
 	position: absolute;
-	left: 0;
-	top: 0;
+	left: 0px;
+	top: 0px;
+	right: 0px;
 	margin-top: 4px;
-	width: 100%;
 	height: 36px;
 }
 
 #panel-tool-menu
 {
 	width: 100%;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+#button-workbench, #button-documentation, #button-store
+{
+	/* If you remove the store button, change width to 50%. */
+	width: 33%;
+	height: 36px;
+	font-size: 18px;
+	/*font-weight: bold;*/
 }
 
 #panel-middle
@@ -53,14 +64,6 @@ body
 
 #panel-bottom div span
 {
-	font-weight: bold;
-}
-
-#button-workbench, #button-documentation
-{
-	width: 50%;
-	height: 36px;
-	font-size: 18px;
 	font-weight: bold;
 }
 

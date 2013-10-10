@@ -229,6 +229,14 @@ function startServers()
 		
 		socket.on('hyper.result', function(data)
 		{
+			//console.log('data result type: ' + (typeof data))
+			//console.log('data result : ' + data)
+			
+			// Functions cause a cloning error.
+			if (typeof data == 'function')
+			{
+				data = typeof data
+			}
 			displayJsResult(data)
 		})
 		

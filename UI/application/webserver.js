@@ -82,8 +82,15 @@ function CreateServerObject()
 	 */
 	self.start = function(port)
 	{
-		var server = HTTP.createServer(HandleRequest)
-		server.listen(port)
+		try
+		{
+			var server = HTTP.createServer(HandleRequest)
+			server.listen(port)
+		}
+		catch (error)
+		{
+			console.log('Could not start webserver: ' + error)
+		}
 	}
 
 	/**
