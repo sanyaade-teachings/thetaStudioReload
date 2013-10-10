@@ -6,7 +6,7 @@ Author: Mikael Kindborg
 Copyright (c) 2013 Mikael Kindborg
 */
 
-;window.hyper = (function(address)
+;window.hyper = (function(socketIoPort)
 {
 	var hyper = {}
     
@@ -57,7 +57,7 @@ Copyright (c) 2013 Mikael Kindborg
        
     function connect()
     {
-        var socket = io.connect(baseUrl + ':4043')
+        var socket = io.connect(baseUrl + ':' + socketIoPort)
         hyper.IoSocket = socket
         socket.on('hyper.run', function(data)
         {
@@ -95,4 +95,4 @@ Copyright (c) 2013 Mikael Kindborg
 	connect()
 	
     return hyper
-})()
+})(__SOCKET_IO_PORT_INSERTED_BY_SERVER__)

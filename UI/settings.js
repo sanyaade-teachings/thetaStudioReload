@@ -7,3 +7,7 @@
 // To scan files in the top-level directory only, set
 // this value to 1. Default value is 3.
 exports.NumberOfDirecoryLevelsToTraverse = 3
+
+// Port numbers.
+exports.WebServerPort = 4042
+exports.SocketIoPort = 4043

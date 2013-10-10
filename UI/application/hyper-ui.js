@@ -92,7 +92,7 @@ hyper.UI = {}
 			{
 				// Create new window.
 				mDocumentationWindow = window.open(
-					'hyper-documentation.html', 
+					'../documentation/hyper-documentation.html', 
 					'documentation',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mDocumentationWindow.moveTo(50, 50)
@@ -114,6 +114,11 @@ hyper.UI = {}
 		
 		// Message handler.
 		window.addEventListener('message', receiveMessage, false)
+
+		// Display of file monitor counter.
+		setInterval(function() {
+			hyper.UI.displayNumberOfMonitoredFiles() },
+			1500)
 	}
 	
 	function receiveMessage(event)
@@ -296,6 +301,12 @@ hyper.UI = {}
 			hyper.SERVER.getNumberOfConnectedClients()
 	}
 
+	hyper.UI.displayNumberOfMonitoredFiles = function()
+	{
+		document.querySelector('#files-counter').innerHTML = 
+			hyper.SERVER.getNumberOfMonitoredFiles()
+	}
+
 	hyper.UI.displayProjectList = function(projectList)
 	{
 		for (var i = projectList.length - 1; i > -1; --i)
@@ -340,6 +351,7 @@ hyper.UI = {}
 	hyper.SERVER = SERVER
 
 	var mProjectListFile = './project-list.json'
+	var mProjectListTemplateFile = './application/project-list-template.json'
 	var mProjectList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
@@ -442,11 +454,19 @@ hyper.UI = {}
 
 	function readProjectList()
 	{
+		// Create project file from template if it does not exist.
+		if (!FS.existsSync(mProjectListFile))
+		{
+			var data = FS.readFileSync(mProjectListTemplateFile, {encoding: 'utf8'})
+			FS.writeFileSync(mProjectListFile, data, {encoding: 'utf8'})
+		}
+
+		// Read project file.
 		if (FS.existsSync(mProjectListFile))
 		{
 			var json = FS.readFileSync(mProjectListFile, {encoding: 'utf8'})
 			mProjectList = JSON.parse(json)
-		}
+		}	
 	}
 
 	function saveProjectList()

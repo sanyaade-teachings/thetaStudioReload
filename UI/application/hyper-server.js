@@ -12,6 +12,7 @@ var SOCKETIO = require('socket.io')
 var FS = require('fs')
 var PATH = require('path')
 var FILEUTIL = require('./fileutil.js')
+var SETTINGS = require('../settings.js')
 
 /*********************************/
 /***       Server code         ***/
@@ -25,8 +26,6 @@ var mBasePath
 var mAppPath
 var mAppFile
 var mIpAddress
-var mWebServerPort = 4042    
-var mSocketIoPort = 4043
 var mMessageCallback = null
 var mNumberOfConnectedClients = 0
 var mConnectedCallback = null
@@ -46,6 +45,8 @@ function startWebServer(basePath, port, fun)
 }
 
 /**
+ * NOT USED.
+ *
  * Internal.
  *
  * Version of webserver hook function used for serving iframe version.
@@ -87,6 +88,9 @@ function webServerHookFunForScriptInjection(request, response, path)
 	{
 		// Send reloader script.
 		var script = FS.readFileSync('./application/hyper-reloader.js', {encoding: 'utf8'})
+		script = script.replace(
+			'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
+			SETTINGS.SocketIoPort)
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
@@ -114,7 +118,9 @@ function webServerHookFunForScriptInjection(request, response, path)
 function createReloaderScriptTags()
 {
 	return '' +
-		'<script src="http://' + mIpAddress + ':4043/socket.io/socket.io.js"></script>' +
+		'<script src="http://' + mIpAddress + 
+		':' + SETTINGS.SocketIoPort + 
+		'/socket.io/socket.io.js"></script>' +
 		'<script src="/hyper.reloader"></script>'
 }
 
@@ -183,8 +189,8 @@ function insertReloaderScript(file)
 function startServers()
 {
 	console.log('starServer')
-	//mIO = SOCKETIO.listen(mSocketIoPort, {log: false})
-	mIO = SOCKETIO.listen(mSocketIoPort)
+	//mIO = SOCKETIO.listen(SETTINGS.SocketIoPort, {log: false})
+	mIO = SOCKETIO.listen(SETTINGS.SocketIoPort)
 
 	mIO.set('log level', 1)
 	
@@ -239,7 +245,7 @@ function startServers()
 	})
 
 	// Start web server.
-	startWebServer(mBasePath, mWebServerPort, function(server)
+	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
 	{
 		mWebServer = server
 		mWebServer.getIpAddress(function(address) {
@@ -255,7 +261,7 @@ function startServers()
 function getWebServerIpAndPort(fun)
 {
 	mWebServer.getIpAddress(function(address) {
-		fun(address, mWebServerPort)
+		fun(address, SETTINGS.WebServerPort)
 	})
 }
 
@@ -288,7 +294,7 @@ function getAppFileName()
  */
 function getAppFileURL()
 {
-	return 'http://' + mIpAddress + ':' + mWebServerPort + '/' + mAppFile
+	return 'http://' + mIpAddress + ':' + SETTINGS.WebServerPort + '/' + mAppFile
 }
 
 /**
@@ -296,7 +302,7 @@ function getAppFileURL()
  */
 function getServerBaseURL()
 {
-	return 'http://' + mIpAddress + ':' + mWebServerPort + '/'
+	return 'http://' + mIpAddress + ':' + SETTINGS.WebServerPort + '/'
 }
 
 /**
@@ -391,6 +397,8 @@ function displayJsResult(result)
 
 var mLastReloadTime = Date.now()
 var mTraverseNumDirecoryLevels = 0
+var mFileCounter = 0
+var mNumberOfMonitoredFiles = 0
 
 /*** File traversal functions ***/
 
@@ -405,8 +413,17 @@ function setTraverseNumDirectoryLevels(levels)
 /**
  * External.
  */
+function getNumberOfMonitoredFiles()
+{
+	return mNumberOfMonitoredFiles
+}
+
+/**
+ * External.
+ */
 function fileSystemMonitor()
 {
+	mFileCounter = 0
 	var filesUpdated = fileSystemMonitorWorker(
 		mBasePath,
 		mTraverseNumDirecoryLevels)
@@ -417,6 +434,7 @@ function fileSystemMonitor()
 	}
 	else
 	{
+		mNumberOfMonitoredFiles = mFileCounter
 		setTimeout(fileSystemMonitor, 500)
 	}
 }
@@ -445,6 +463,12 @@ function fileSystemMonitorWorker(path, level)
 			{
 				var stat = FS.statSync(path + files[i])
 				var t = stat.mtime.getTime()
+
+				if (stat.isFile())
+				{
+					++mFileCounter
+				}
+
 				//console.log('Checking file: ' + files[i] + ': ' + stat.mtime)
 				if (stat.isFile() && t > mLastReloadTime)
 				{
@@ -461,7 +485,7 @@ function fileSystemMonitorWorker(path, level)
 					if (changed) { return true }
 				}
 			}
-			catch(err2)
+			catch (err2)
 			{
 				console.log('***** ERROR2 fileSystemMonitorWorker ****** ' + err2)
 			}
@@ -499,4 +523,5 @@ exports.setConnenctedCallbackFun = setConnenctedCallbackFun
 exports.setDisconnenctedCallbackFun = setDisconnenctedCallbackFun
 exports.getNumberOfConnectedClients = getNumberOfConnectedClients
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
+exports.getNumberOfMonitoredFiles = getNumberOfMonitoredFiles
 exports.fileSystemMonitor = fileSystemMonitor
