@@ -39,6 +39,7 @@ hyper.UI = {}
 	{
 		styleUI()
 		setUIActions()
+		setWindowActions()
 		setUpFileDrop()
 	}
 	
@@ -146,6 +147,15 @@ hyper.UI = {}
 			1500)
 	}
 	
+	function setWindowActions()
+	{
+		// Listen to main window's close event
+        GUI.Window.get().on('close', function()
+        {
+    		GUI.App.quit()
+		})
+	}
+
 	function receiveMessage(event)
 	{
 		//console.log('Main got : ' + event.data.message)

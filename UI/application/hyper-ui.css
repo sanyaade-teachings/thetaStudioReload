@@ -23,7 +23,10 @@ body
 
 #panel-tool-menu
 {
-	width: 100%;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	right: 0px;
 	margin-left: 4px;
 	margin-right: 4px;
 }
@@ -31,7 +34,7 @@ body
 #button-workbench, #button-documentation, #button-store
 {
 	/* If you remove the store button, change width to 50%. */
-	width: 33%;
+	width: 33.33%;
 	height: 36px;
 	font-size: 18px;
 	/*font-weight: bold;*/
