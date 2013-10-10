@@ -28,9 +28,7 @@ Documentation is also available in the "Documentation" window in HyperReload.
 
 The [issue tracker](https://github.com/divineprog/HyperReload/issues) is here on GitHub.
 
-An [experimental forum](https://github.com/divineprog/HyperReload-Forum/issues) is also here on GitHub. You need to have a GItHub accound to post messages. 
-
-(Using the GitHub issue tracker as a forum is perhaps less than ideal, will look into creating a proper forum.)
+An [experimental forum](https://github.com/divineprog/HyperReload-Forum/issues) is also here on GitHub. You need to have a GitHub accound to post messages. (Using the GitHub issue tracker as a forum is perhaps less than ideal, will look into creating a proper forum.)
 
 <!--
 ## Components
@@ -91,7 +89,6 @@ For the reload mechanism to work, you need to include a script in the main HTML 
 	</head>
 	<body>
         <h1>Hello World</h1>
-	    <script src="/reloader"></script>
 	</body>
 	</html>
 
@@ -100,9 +97,7 @@ It is recommened to put the reloader script last in the body element.
 
 ## Roadmap
 
-Note that the HyperReload project is under development, with ongoing changes/updates. 
-
-Estimated stable release September 30, 2013.
+HyperReload is under development, with ongoing changes/updates. 
 
 New releases are made continously.
 
@@ -118,4 +113,20 @@ With the HyperApp mobile application (under development) you get additional func
 * No need to build the application, just install from the app store (forthcoming)
 -->
 
+## License
+
 Copyright (c) 2013 Mikael Kindborg
+
+The [No License](http://choosealicense.com/no-license/) applies.
+
+You are free to use HyperReload at work and at home. You are free to modify the program to fit your own needs.
+
+Parts of the code may be released under the MIT license upon request.
+
+Commercial licenses are available upon request.
+
+## Contact
+
+Email: mikael.kindborg@gmail.com, mikael.kindborg@evothings.com
+
+[EvoThings](http://evothings.com) are a seasoned bunch of developers who enjoy connecting phones to other things. We love to improve, refurbish, evolve and augment buildings, vehicles and gadgets, and make them smarter.
