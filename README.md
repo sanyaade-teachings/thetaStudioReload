@@ -119,7 +119,7 @@ Copyright (c) 2013 Mikael Kindborg
 
 The [No License](http://choosealicense.com/no-license/) applies.
 
-You are free to use HyperReload at work and at home. You are free to modify the program to fit your own needs.
+You are free to use HyperReload at work and at home. You are free to modify the program to fit your own needs, and share with friends.
 
 Parts of the code may be released under the MIT license upon request.
 
