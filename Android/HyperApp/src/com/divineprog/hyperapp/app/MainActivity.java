@@ -1,5 +1,12 @@
 package com.divineprog.hyperapp.app;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import com.divineprog.hyperapp.app.R;
 import com.divineprog.hyperapp.Input;
 import com.divineprog.hyperapp.InputActivity;
@@ -12,6 +19,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
 
 public class MainActivity
     extends InputActivity
@@ -29,6 +37,9 @@ public class MainActivity
         mWebView = new JavaScriptWebView(this);
         mWebView.setConsoleListener(this);
         mWebView.loadUrl(mHomePageUrl);
+        mWebView.addJavascriptInterface(
+        		new JavaScriptInterface(),
+        		"hyper");
         //mWebView.loadUrl("http://192.168.43.226:4042");
         setContentView(mWebView);
         createInputListener();
@@ -91,14 +102,78 @@ public class MainActivity
     @Override
     public void onConsoleMessage(ConsoleMessage message)
     {
-        int pos = message.sourceId().lastIndexOf("/");
-        String file = message.sourceId().substring(pos + 1);
+    		String file = "";
+    		if (null != message.sourceId())
+    		{
+	        int pos = message.sourceId().lastIndexOf("/");
+	        if (pos > 1)
+	        {
+	        		file = message.sourceId().substring(pos + 1);
+	        }
+	        else
+	        {
+	        		file = message.sourceId();
+	        }
+    		}
+    		
         String msg =
-            message.message() + " [" + file + ":" +  message.lineNumber() + "]";
+            message.message() + 
+            " [" + file + ":" +  message.lineNumber() + "]";
+        
+        Log.i("@@@", msg);
+        
         mWebView.callJS(
             "try{hyperapp.nativeConsoleMessageCallBack('"
             + msg
             + "')}catch(err){}");
-        Log.i("@@@", msg);
+    }
+    
+    public static String[] getLocalIpAddresses()
+    {
+        try
+        {
+            List<String> ipaddresses = new ArrayList<String>();
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements())
+            {
+                NetworkInterface interf = interfaces.nextElement();
+                Enumeration<InetAddress> adresses = interf.getInetAddresses();
+                while (adresses.hasMoreElements())
+                {
+                    InetAddress address = adresses.nextElement();
+                    if (!address.isLoopbackAddress() && address.isSiteLocalAddress())
+                    {
+                        ipaddresses.add(address.getHostAddress().toString());
+                    }
+                }
+            }
+            
+            if (ipaddresses.size() > 0)
+            {
+                return ipaddresses.toArray(new String[1]);
+            }
+        }
+        catch (SocketException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static class JavaScriptInterface
+    {
+        @JavascriptInterface
+        public String getLocalIpAddress()
+        {
+        		String[] addresses = getLocalIpAddresses();
+        		if (null != addresses)
+        		{
+        			return addresses[0];
+        		}
+        		else
+        		{
+        			return null;
+        		}
+        }
     }
 }

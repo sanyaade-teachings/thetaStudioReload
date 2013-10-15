@@ -9,6 +9,7 @@ import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -32,13 +33,16 @@ public class JavaScriptWebView extends WebView
 		WebSettings settings = getSettings();
 		settings.setJavaScriptEnabled(true);
 		settings.setGeolocationEnabled(true);
+		settings.setBuiltInZoomControls(true);
 		setVerticalScrollbarOverlay(true);
 
 		// This is needed for persistent DOM storage (localStorage).
 		settings.setDomStorageEnabled(true);
 		settings.setDatabaseEnabled(true);
 		settings.setDatabasePath(
-			"/data/data/" + getPackageName() + "/databases/");
+			"/data/data/" + 
+			context.getPackageName() +
+			"/databases/");
 
 		setWebViewClient(new MyWebViewClient());
 		setWebChromeClient(new MyChromeClient());
@@ -72,6 +76,18 @@ public class JavaScriptWebView extends WebView
      */
     class MyWebViewClient extends WebViewClient
     {
+	    @Override
+	    public void onScaleChanged(
+    		WebView view, 
+    		float oldScale, 
+    		float newScale)
+	    {
+	    	// Make text to reflow to WebView width.
+	        view.getSettings().setLayoutAlgorithm(
+	                LayoutAlgorithm.NARROW_COLUMNS);
+	        view.invalidate();
+	        super.onScaleChanged(view, oldScale, newScale);
+	    }
     }
 
 	class MyChromeClient extends WebChromeClient

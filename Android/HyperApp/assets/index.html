@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=1">
+    <meta name="viewport" content="width=device-width,initial-scale=2,user-scalable=1">
     <title>HyperReload Mobile</title>
     <link href="libs/bootstrap-v3.0.0.rc1-dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="libs/jquery/jquery-2.0.3.min.js"></script>
@@ -25,19 +25,63 @@
 	</div>
     <div>
 		<p>
-        <input id="IpAddressField" class="form-control input-lg" value="" type="url" size="30"/>
+        	<input id="IpAddressField" class="form-control input-lg" value="" type="url" size="30"/>
         </p>
 		<p>
-        <button type="button" class="btn btn-lg btn-primary" onclick="DoConnect()">Connect</button>
+        	<button type="button" class="btn btn-lg btn-primary" onclick="DoConnect()">Connect</button>
+		</p>
+		<p>
+        	<button type="button" class="btn btn-lg btn-primary" onclick="DoScan()">Scan</button>
 		</p>
     </div>
 </div>
 <script>
+
+var SubNetAddress = 0
+
+function DoScan()
+{
+	alert(hyper.getLocalIpAddress())
+}
+
 function DoConnect()
 {
     var ip = document.getElementById("IpAddressField").value
     localStorage.setItem('RecentIpAddress', ip)
-    window.location.assign('http://' + ip + ':4042')
+    var url = ParseIpAddress(ip)
+    if (!url)
+    {
+    	alert('Malformed URL: ' + url)
+    }
+    else
+    {    
+    	alert('Connecting to: ' + url)
+    	window.location.assign(url)
+    }
+}
+
+function ParseIpAddress(ip)
+{
+	var url = ip.trim()
+    if (!url.match('^https?://[A-Z0-9\.]*.*$'))
+    {
+    	// Add protocol.
+    	url = 'http://' + url
+    }
+    
+    if (!url.match('^https?://[A-Z0-9\.]*:[0-9]*$'))
+    {
+    	// Add port
+    	url = url + ':4042'
+    }
+    
+    if (!url.match('^https?://[A-Z0-9\.]*:[0-9]*$'))
+    {
+    	// Wrong format.
+    	return null
+    }
+    
+	return url
 }
 
 function SetSavedIpAddress()
