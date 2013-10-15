@@ -399,7 +399,7 @@ hyper.UI = {}
 	hyper.SERVER = SERVER
 
 	var mProjectListFile = './project-list.json'
-	var mProjectListTemplateFile = './application/project-list-template.json'
+	// Not used: var mProjectListTemplateFile = './application/project-list-template.json'
 	var mProjectList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
@@ -502,12 +502,14 @@ hyper.UI = {}
 
 	function readProjectList()
 	{
+		/* Not used:
 		// Create project file from template if it does not exist.
 		if (!FS.existsSync(mProjectListFile))
 		{
 			var data = FS.readFileSync(mProjectListTemplateFile, {encoding: 'utf8'})
 			FS.writeFileSync(mProjectListFile, data, {encoding: 'utf8'})
 		}
+		*/
 
 		// Read project file.
 		if (FS.existsSync(mProjectListFile))
