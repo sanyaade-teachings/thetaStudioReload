@@ -75,11 +75,18 @@ hyper.UI = {}
 			else
 			{
 				// Create new window.
+				/*mWorkbenchWindow = GUI.Window.open('hyper-workbench.html', {
+					//position: 'mouse',
+					width: 901,
+					height: 600,
+					focus: true
+				})*/
 				mWorkbenchWindow = window.open(
 					'hyper-workbench.html', 
 					'workbench',
 					'resizable=1,width=800,height=600')
 				mWorkbenchWindow.moveTo(50, 50)
+				mWorkbenchWindow.focus()
 				// Establish contact. Not needed/used.
 				mWorkbenchWindow.postMessage({ message: 'hello' }, '*')
 			}
@@ -97,11 +104,16 @@ hyper.UI = {}
 			else
 			{
 				// Create new window.
+				// Note: The documentation is not part of the
+				// HyperReload GitHub repo. This code assumes
+				// that ../documentation/index.html exists.
+				// TODO: The window parameters do not take effect.
 				mDocumentationWindow = window.open(
-					'../documentation/hyper-documentation.html', 
+					'../documentation/index.html', 
 					'documentation',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
-				mDocumentationWindow.moveTo(50, 50)
+				mDocumentationWindow.moveTo(75, 75)
+				mDocumentationWindow.focus()
 			}
 		})
 
@@ -121,7 +133,8 @@ hyper.UI = {}
 					'../documentation/hyper-store.html', 
 					'store',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
-				mStoreWindow.moveTo(50, 50)
+				mStoreWindow.moveTo(100, 100)
+				mStoreWindow.focus()
 			}
 		})
 		

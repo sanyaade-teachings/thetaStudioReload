@@ -33,8 +33,8 @@ body
 
 #button-workbench, #button-documentation, #button-store
 {
-	/* If you remove the store button, change width to 50%. */
-	width: 33.33%;
+	/* If you remove the store button, change width from 33.33% to 50%. */
+	width: 50%;
 	height: 36px;
 	font-size: 18px;
 	/*font-weight: bold;*/
