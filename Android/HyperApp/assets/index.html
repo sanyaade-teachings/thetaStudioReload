@@ -7,6 +7,7 @@
     <link href="libs/bootstrap-v3.0.0.rc1-dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="libs/jquery/jquery-2.0.3.min.js"></script>
     <script src="libs/bootstrap-v3.0.0.rc1-dist/js/bootstrap.min.js"></script>
+    <script src="hyper-net.js"></script>
     <style>
     body
     {
@@ -30,19 +31,54 @@
 		<p>
         	<button type="button" class="btn btn-lg btn-primary" onclick="DoConnect()">Connect</button>
 		</p>
+		<!-- 
 		<p>
-        	<button type="button" class="btn btn-lg btn-primary" onclick="DoScan()">Scan</button>
-		</p>
+        	<button id="ScanButton" type="button" class="btn btn-lg btn-primary" onclick="DoScan()">Scan</button>
+		</p>  
+		-->
     </div>
 </div>
 <script>
-
-var SubNetAddress = 0
+/*
+var ScanInProgress = false
+var FoundIpAddress = null
 
 function DoScan()
 {
-	alert(hyper.getLocalIpAddress())
+	if (ScanInProgress) { return }
+	
+	if (FoundIpAddress)
+	{
+		var url = 'http://' + FoundIpAddress.join('.') + ':4042'
+    	alert('Connecting to: ' + url)
+    	window.location.assign(url)
+		return
+	}
+	
+	ScanInProgress = true
+	FoundIpAddress = null
+	
+	hyper.net.scan(
+		4042,
+		'hyper.reloader',
+		function(ipAddress, data)
+		{
+			$('#ScanButton').html('Connect to: ' + ipAddress.join('.'))
+			ScanInProgress = false
+			FoundIpAddress = ipAddress
+		},
+		function()
+		{
+			$('#ScanButton').html('Server not found')
+			ScanInProgress = false
+			FoundIpAddress = null
+		},
+		function(ipAddress)
+		{
+			$('#ScanButton').html('Scanning: ' + ipAddress.join('.'))
+		})
 }
+*/
 
 function DoConnect()
 {
@@ -54,7 +90,7 @@ function DoConnect()
     	alert('Malformed URL: ' + url)
     }
     else
-    {    
+    {
     	alert('Connecting to: ' + url)
     	window.location.assign(url)
     }

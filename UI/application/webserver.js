@@ -183,7 +183,7 @@ function CreateServerObject()
 			{
 				'Content-Length': data.length,
 				'Content-type': contentType,
-				//'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Origin': '*',
 				'Pragma': 'no-cache',
 				'Cache-Control': 'no-cache',
 				'Expires': '-1'
