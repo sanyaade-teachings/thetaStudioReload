@@ -80,7 +80,7 @@ function webServerHookFunForScriptInjection(request, response, path)
 	{
 		// If the root path is requested, send the connect page.
 		var file = FS.readFileSync('./application/hyper-connect.html', {encoding: 'utf8'})
-		file = insertReloaderScript(file)
+		file = insertReloaderScript(file, request)
 		mWebServer.writeRespose(response, file, 'text/html')
 		return true
 	}
@@ -99,7 +99,7 @@ function webServerHookFunForScriptInjection(request, response, path)
 		// Insert reloader script into HTML page.
 		var filePath = mBasePath + path.substr(1)
 		var file = FS.readFileSync(filePath, {encoding: 'utf8'})
-		file = insertReloaderScript(file)
+		file = insertReloaderScript(file, request)
 		mWebServer.writeRespose(response, file, 'text/html')
 		return true
 	}
@@ -115,10 +115,10 @@ function webServerHookFunForScriptInjection(request, response, path)
  * 
  * Return script tags for reload functionality.
  */
-function createReloaderScriptTags()
+function createReloaderScriptTags(address)
 {
 	return '' +
-		'<script src="http://' + mIpAddress + 
+		'<script src="http://' + address + 
 		':' + SETTINGS.SocketIoPort + 
 		'/socket.io/socket.io.js"></script>' +
 		'<script src="/hyper.reloader"></script>'
@@ -132,12 +132,13 @@ function createReloaderScriptTags()
  *
  * It is desirable to have script tags inserted as early as possible,
  * to enable hyper.log and error reportning during document loading.
- *
- * TODO: Experimentalcode, can be improved.
  */
-function insertReloaderScript(file)
+function insertReloaderScript(file, request)
 {
-	var script = createReloaderScriptTags()
+	var host = request.headers.host
+	var address = host.substr(0, host.indexOf(':'))
+	console.log('address ' + address)
+	var script = createReloaderScriptTags(address)
 
 	// Is there a template tag? In that case, insert script there.
 	var hasTemplateTag = (-1 != file.indexOf('<!--hyper.reloader-->'))

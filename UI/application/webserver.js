@@ -102,14 +102,54 @@ function CreateServerObject()
 	self.getIpAddress = function(callbackFun)
 	{
 		var addresses = GetIpAddresses()
-		if (addresses.length > 0)
+		
+		// No address found.
+		if (addresses.length == 0) { callbackFun(null); return }
+		
+		// One address found.
+		if (addresses.length > 0)  { callbackFun(addresses[0]); return }
+		
+		// Found multiple ip, select the most "suitable" one.
+		// Score system:
+		// 1 127.0.0.1
+		// 2 10.x.y.x
+		// 3 192.168.x.y
+		// 4 not one of the above
+		var bestIp = 0
+		var bestScore = 0
+		for (var i = 0; i < addresses.length; ++i)
 		{
-			callbackFun(addresses[0])
+			var address = addresses[i]
+			var score
+			if (address.indexOf('127.0.0.1') == 0) 
+			{
+				score = 1
+			}
+			else 
+			if (address.indexOf('10.') == 0) 
+			{
+				score = 2
+			}
+			else 
+			if (address.indexOf('192.168.') == 0) 
+			{
+				score = 3
+			}
+			else
+			{
+				// Found a highest score address, use it.
+				bestIp = i
+				break 
+			}
+			
+			if (score > bestScore)
+			{
+				bestScore = score
+				bestIp = i
+			}
 		}
-		else
-		{
-			callbackFun(null)
-		}
+		
+		callbackFun(addresses[bestIp])
 	}
     
     self.writeRespose = WriteResponse
