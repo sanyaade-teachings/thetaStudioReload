@@ -47,7 +47,7 @@ function CreateServerObject()
 
 	// The current base directory. Must NOT end with a slash.
 	var mBasePath = ''
-    
+
     // Hook function allows to trap URL.
     var mHookFun = null
 
@@ -57,14 +57,14 @@ function CreateServerObject()
 	self.setBasePath = function(path)
 	{
 		if (!path) { return }
-		
+
 		// Strip any trailing slash from path.
 		var last = path.length - 1
 		if ((path.charAt(last) === '/') || (path.charAt(last) === '\\'))
 		{
 			path = path.substr(0, last)
 		}
-		
+
 		mBasePath = path
 	}
 
@@ -102,13 +102,13 @@ function CreateServerObject()
 	self.getIpAddress = function(callbackFun)
 	{
 		var addresses = GetIpAddresses()
-		
+
 		// No address found.
 		if (addresses.length == 0) { callbackFun(null); return }
-		
+
 		// One address found.
 		if (addresses.length > 0)  { callbackFun(addresses[0]); return }
-		
+
 		// Found multiple ip, select the most "suitable" one.
 		// Score system:
 		// 1 127.0.0.1
@@ -121,17 +121,17 @@ function CreateServerObject()
 		{
 			var address = addresses[i]
 			var score
-			if (address.indexOf('127.0.0.1') == 0) 
+			if (address.indexOf('127.0.0.1') == 0)
 			{
 				score = 1
 			}
-			else 
-			if (address.indexOf('10.') == 0) 
+			else
+			if (address.indexOf('10.') == 0)
 			{
 				score = 2
 			}
-			else 
-			if (address.indexOf('192.168.') == 0) 
+			else
+			if (address.indexOf('192.168.') == 0)
 			{
 				score = 3
 			}
@@ -139,19 +139,19 @@ function CreateServerObject()
 			{
 				// Found a highest score address, use it.
 				bestIp = i
-				break 
+				break
 			}
-			
+
 			if (score > bestScore)
 			{
 				bestScore = score
 				bestIp = i
 			}
 		}
-		
+
 		callbackFun(addresses[bestIp])
 	}
-    
+
     self.writeRespose = WriteResponse
 
 	// Old debug print.
@@ -161,6 +161,7 @@ function CreateServerObject()
 	// Handler for web server requests.
 	function HandleRequest(request, response)
 	{
+		//console.log(request)
 		//request.setEncoding('utf8')
 		//console.log('HandleRequest url: ' + request.url)
 		var path = unescape(URL.parse(request.url).pathname)
@@ -181,7 +182,7 @@ function CreateServerObject()
 			FileNotFoundResponse(path, response)
 			return
 		}
-		
+
 		if (file.isDirectory())
 		{
 			// Get default page 'index.html'.
@@ -204,7 +205,7 @@ function CreateServerObject()
 			FileNotFoundResponse(path, response)
 			return
 		}
-		
+
 		// Write file data to reponse object.
 		WriteFileResponse(mBasePath + path, response)
 	}
@@ -227,7 +228,7 @@ function CreateServerObject()
 				'Pragma': 'no-cache',
 				'Cache-Control': 'no-cache',
 				'Expires': '-1'
-			});
+			})
 		response.write(data)
 		response.end()
 	}
@@ -238,7 +239,7 @@ function CreateServerObject()
 		response.writeHead(404)
 		response.end('File Not Found: ' + path)
 	}
-	
+
 	return self;
 };
 

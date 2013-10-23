@@ -70,7 +70,7 @@ function webServerHookFunForIframe(request, response, path)
 /**
  * Internal.
  *
- * Version of the webserver hook function that inserts the reloader 
+ * Version of the webserver hook function that inserts the reloader
  * script on each HTML page requested.
  */
 function webServerHookFunForScriptInjection(request, response, path)
@@ -87,10 +87,31 @@ function webServerHookFunForScriptInjection(request, response, path)
 	else if (path == '/hyper.reloader')
 	{
 		// Send reloader script.
-		var script = FS.readFileSync('./application/hyper-reloader.js', {encoding: 'utf8'})
+		var script = FS.readFileSync(
+			'./application/hyper-reloader.js',
+			{encoding: 'utf8'})
 		script = script.replace(
 			'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
 			SETTINGS.SocketIoPort)
+		mWebServer.writeRespose(response, script, 'application/javascript')
+		return true
+	}
+	else if (path == '/cordova.js' ||
+		path == '/cordova_plugins.js' ||
+		path.indexOf('/plugins/') == 0)
+	{
+
+		// iOS is default.
+		var platformPath = './application/cordova-support/platforms/ios/www'
+
+		// Check for Android.
+		if (request['headers']['user-agent'].indexOf('Android') > 0)
+		{
+			platformPath = './application/cordova-support/platforms/android/assets/www'
+		}
+		console.log('path1: ' + path)
+		console.log('path2: ' + platformPath + path)
+		var script = FS.readFileSync(platformPath + path, {encoding: 'utf8'})
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
@@ -112,21 +133,21 @@ function webServerHookFunForScriptInjection(request, response, path)
 
 /**
  * Internal.
- * 
+ *
  * Return script tags for reload functionality.
  */
 function createReloaderScriptTags(address)
 {
 	return '' +
-		'<script src="http://' + address + 
-		':' + SETTINGS.SocketIoPort + 
+		'<script src="http://' + address +
+		':' + SETTINGS.SocketIoPort +
 		'/socket.io/socket.io.js"></script>' +
 		'<script src="/hyper.reloader"></script>'
 }
 
 /**
  * Internal.
- * 
+ *
  * Insert the script at the template tag, if no template tag is
  * found, insert at alternative locations in the document.
  *
@@ -137,7 +158,7 @@ function insertReloaderScript(file, request)
 {
 	var host = request.headers.host
 	var address = host.substr(0, host.indexOf(':'))
-	console.log('address ' + address)
+	//console.log('address ' + address)
 	var script = createReloaderScriptTags(address)
 
 	// Is there a template tag? In that case, insert script there.
@@ -146,7 +167,7 @@ function insertReloaderScript(file, request)
 	{
 		return file.replace('<!--hyper.reloader-->', script)
 	}
-	
+
 	// Insert before title tag.
 	var pos = file.indexOf('<title>')
 	if (pos > -1)
@@ -160,14 +181,14 @@ function insertReloaderScript(file, request)
 	{
 		return file.replace('</title>', '</title>' + script)
 	}
-	
+
 	// Insert last in head.
 	var pos = file.indexOf('</head>')
 	if (pos > -1)
 	{
 		return file.replace('</head>', script + '</head>')
 	}
-	
+
 	// Fallback: Insert first in body.
 	// TODO: Rewrite to use regular expressions to capture more cases.
 	pos = file.indexOf('<body>')
@@ -175,7 +196,7 @@ function insertReloaderScript(file, request)
 	{
 		return file.replace('<body>', '<body>' + script)
 	}
-	
+
 	// Insert last in body.
 	pos = file.indexOf('</body>')
 	if (pos > -1)
@@ -194,21 +215,21 @@ function startServers()
 	mIO = SOCKETIO.listen(SETTINGS.SocketIoPort)
 
 	mIO.set('log level', 1)
-	
+
 	// Handle socket connections.
-	mIO.sockets.on('connection', function(socket) 
+	mIO.sockets.on('connection', function(socket)
 	{
 		++mNumberOfConnectedClients
-	
+
 		if (mConnectedCallback)
 		{
 			mConnectedCallback(mNumberOfConnectedClients)
 		}
 
 		// Debug logging.
-		console.log('Client connected')
-		console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
-		
+		//console.log('Client connected')
+		//console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
+
 		socket.on('disconnect', function ()
 		{
 			--mNumberOfConnectedClients
@@ -217,22 +238,22 @@ function startServers()
 			{
 				mDisconnectedCallback(mNumberOfConnectedClients)
 			}
-			
+
 			// Debug logging.
-			console.log('Client disconnected')
-			console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
+			//console.log('Client disconnected')
+			//console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
         })
-    
+
 		socket.on('hyper.log', function(data)
 		{
 			displayLogMessage(data)
 		})
-		
+
 		socket.on('hyper.result', function(data)
 		{
 			//console.log('data result type: ' + (typeof data))
 			//console.log('data result : ' + data)
-			
+
 			// Functions cause a cloning error.
 			if (typeof data == 'function')
 			{
@@ -240,7 +261,7 @@ function startServers()
 			}
 			displayJsResult(data)
 		})
-		
+
 		// Closure that holds socket connection.
 		/*(function(socket)
 		{
@@ -344,7 +365,7 @@ function evalJS(code)
 
 /**
  * External.
- * 
+ *
  * Callback form: fun(object)
  */
 function setMessageCallbackFun(fun)
@@ -354,7 +375,7 @@ function setMessageCallbackFun(fun)
 
 /**
  * External.
- * 
+ *
  * Callback form: fun(numberOfConnectedClients)
  */
 function setConnenctedCallbackFun(fun)
@@ -364,7 +385,7 @@ function setConnenctedCallbackFun(fun)
 
 /**
  * External.
- * 
+ *
  * Callback form: fun(numberOfConnectedClients)
  */
 function setDisconnenctedCallbackFun(fun)
@@ -480,7 +501,7 @@ function fileSystemMonitorWorker(path, level)
 			console.log(path + files[i])
 		}
 		return false*/
-		
+
 		var files = FS.readdirSync(path)
 		for (var i in files)
 		{
@@ -497,7 +518,7 @@ function fileSystemMonitorWorker(path, level)
 				//console.log('Checking file: ' + files[i] + ': ' + stat.mtime)
 				if (stat.isFile() && t > mLastReloadTime)
 				{
-					console.log('***** File has changed ***** ' + files[i])
+					//console.log('***** File has changed ***** ' + files[i])
 					mLastReloadTime = Date.now()
 					return true
 				}
