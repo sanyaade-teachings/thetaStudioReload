@@ -20,19 +20,13 @@ local.properties
 .project
 
 # node-webkit binaries
-UI/libffmpegsumo.so
-UI/nw
-UI/nw.pak
+libffmpegsumo.so
+nw
+nw.pak
+HyperReload.app
 
 # Mac files
 .DS_store
 
 # HyperReload project list file
 project-list.json
-
-# package.json is not under version control
-# to allow modifications
-package.json
-
-# Mac node-webkit binary
-UI/HyperReload.app/
