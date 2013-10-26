@@ -88,7 +88,7 @@ hyper.UI = {}
 				mWorkbenchWindow.moveTo(50, 50)
 				mWorkbenchWindow.focus()
 				// Establish contact. Not needed/used.
-				mWorkbenchWindow.postMessage({ message: 'hello' }, '*')
+				mWorkbenchWindow.postMessage({ message: 'hyper.hello' }, '*')
 			}
 		})
 

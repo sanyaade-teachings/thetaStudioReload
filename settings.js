@@ -21,3 +21,7 @@ exports.SocketIoPort = 4043
 // must ensure you include the correct Cordova JS
 // files in your project.
 exports.ServeCordovaJsFiles = true
+
+// Font settings for the Workbench editors.
+exports.WorkbenchFontFamily = 'monospace'
+exports.WorkbenchFontSize = '18px'

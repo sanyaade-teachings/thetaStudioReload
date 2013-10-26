@@ -34,57 +34,75 @@ Copyright (c) 2013 Mikael Kindborg
 <script src="libs/codemirror-3.15/mode/javascript/javascript.js"></script>
 
 <style>
-.CodeMirror 
+.CodeMirror
 {
-    font-family: monospace;
-    font-size: 18px;
-    height: 100%;
+	font-family: monospace;
+	font-size: 18px;
+	height: 100%;
 }
 
-.ui-layout-pane 
+.ui-layout-pane
 {
-    background: #FFF; 
-    border: 1px solid #BBB;
-    padding: 0px; 
-    overflow: auto;
-} 
-
-#toolbar 
-{
-    color: #111111;
-    background-color: rgb(200,200,200);
-    border: 1px solid #BBB;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-color: #BBB;
-    padding: 5px 5px 5px 5px; 
-    font-size: 0.8em; 
-    font-family: Sans-serif;
+	background: #FFF;
+	border: 1px solid #BBB;
+	padding: 0px;
+	overflow: auto;
 }
 
-#codearea 
+#toolbar
 {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    padding: 0px; 
+	color: #111111;
+	background-color: rgb(200,200,200);
+	border: 1px solid #BBB;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #BBB;
+	padding: 5px 5px 5px 5px;
+	font-size: 0.8em;
+	font-family: Sans-serif;
 }
 
-#resultarea 
+#code-area
 {
-    position: absolute;
-    left: 0px;
-    top: 2.5em;
-    right: 0px;
-    bottom: 0px;
-    padding: 0px; 
+/*
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px;
+	*/
 }
 
-button 
+#result-area
 {
-    line-height: normal;
+/*
+	position: absolute;
+	left: 100px;
+	top: 2.5em;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px;
+*/
+	padding: 0px;
+	margin: 0px;
+}
+
+#result-editor
+{
+/*
+	position: absolute;
+	left: 100px;
+	top: 2.5em;
+	right: 0px;
+	bottom: 0px;
+	padding: 0px;
+*/
+}
+
+button
+{
+	line-height: normal;
 }
 </style>
 </head>
@@ -92,17 +110,17 @@ button
 <body>
 
 <div class="ui-layout-center">
-    
+
 <div id="code-area">
 <textarea id="code-editor">
-// Select a snippet of code, then click the "Eval" button. 
+// Select a snippet of code, then click the "Eval" button.
 // This will run the connected devices/browsers.
 
 // Compute a value, the return value is shown in the
 // result panel.
 1 + 2
 
-// Send log message from connected devices/browsers. 
+// Send log message from connected devices/browsers.
 // Use this in your code for debugging.
 hyper.log('Hello World')
 
@@ -112,9 +130,9 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 // Now try this.
 counter = 1
 display = function() {
-    document.body.innerHTML =
-        '<h1>Counter: ' + counter + '</h1>'
-    ++counter
+	document.body.innerHTML =
+		'<h1>Counter: ' + counter + '</h1>'
+	++counter
 }
 timer = setInterval(function() { display() }, 500)
 
@@ -131,18 +149,18 @@ clearInterval(timer)
 <!--
 <textarea id="code-editor">
 // -----------------------------------------------------
-//          Welcome to HyperReload Workbench 
+//			Welcome to HyperReload Workbench
 // -----------------------------------------------------
 //
-// The Workbench has two parts. This part is a JavaScript 
-// editor where you can evaluate selected code on connected 
+// The Workbench has two parts. This part is a JavaScript
+// editor where you can evaluate selected code on connected
 // devices/browsers.
 //
 // The second part is the message panel below. Here log messages
 // from devices are displayed, and the result from evaluating
 // JavaScript code.
 //
-// Get started by selecting a line of the example code below, 
+// Get started by selecting a line of the example code below,
 // then press the "Eval on Devices" button. This will run the
 // selected code on any connected devices/browsers.
 //
@@ -169,174 +187,183 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 </div> <!-- center -->
 
 <div class="ui-layout-south">
+
 <!--
 <div id="toolbar">
-    <input value="Eval on Devices" class="buttonEval" type="button" />
-    <input value="Undo" class="buttonUndo" type="button" />
-    <input value="Redo" class="buttonRedo" type="button" />
-    <input value="Clear Log" class="buttonClearLog" type="button" />
-    <input value="Eval in NodeWebkit" class="buttonEvalInNodeJs" type="button" />
+	<input value="Eval on Devices" class="buttonEval" type="button" />
+	<input value="Undo" class="buttonUndo" type="button" />
+	<input value="Redo" class="buttonRedo" type="button" />
+	<input value="Clear Log" class="buttonClearLog" type="button" />
+	<input value="Eval in NodeWebkit" class="buttonEvalInNodeJs" type="button" />
 </div>
 -->
-<div id="toolbar">
-    <button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
-    <button id="button-undo" type="button" class="btn btn-warning">Undo</button>
-    <button id="button-redo" type="button" class="btn btn-primary">Redo</button>
-    <button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
+<div id="toolbar" class="header-footer">
+	<button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
+	<button id="button-undo" type="button" class="btn btn-warning">Undo</button>
+	<button id="button-redo" type="button" class="btn btn-primary">Redo</button>
+	<button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
 </div>
 
-<div id="result-area">
-<textarea id="result-editor" >
+<div id="result-area" class="ui-layout-content">
+<textarea id="result-editor">
 (Log messages and eval results are displayed here)
 </textarea>
 </div>
 
 </div> <!-- south -->
 
-
 <script>
-</script>
-
-<script>
-$(function() 
+$(function()
 {
-    // Main application window
-    var mMainWindow = window.opener
-    
-    // Editor component.
-    var mEditor = CodeMirror.fromTextArea(document.getElementById('code-editor'), 
-    {
-        mode: 'javascript',
-        indentUnit: 4,
-        autoMatchParens: true,
-        lineNumbers: true,
-        matchBrackets: true,
-        continueComments: 'Enter',
-        extraKeys: {'Ctrl-Q': 'toggleComment'}
-    })
+	// Main application window
+	var mMainWindow = window.opener
 
-    // Result/log component.
-    var mResult = CodeMirror.fromTextArea(document.getElementById('result-editor'), 
-    {
-    })
+	// Editor component.
+	var mEditor = CodeMirror.fromTextArea(document.getElementById('code-editor'),
+	{
+		mode: 'javascript',
+		indentUnit: 4,
+		autoMatchParens: true,
+		lineNumbers: true,
+		matchBrackets: true,
+		continueComments: 'Enter',
+		extraKeys: {'Ctrl-Q': 'toggleComment'}
+	})
 
-    $('#button-eval').click(function() 
-    {
-        if (!mMainWindow)
-        {
-            showResult('ERR: Could not find main window - report to developer')
-            return
-        }
-        
-        if (!mEditor.somethingSelected())
-        {
-            showResult('Select some code to evaluate')
-            return
-        }
-        
-        var code = mEditor.getSelection()
-        mMainWindow.postMessage({ message: 'eval', code: code }, '*')
-    })
+	// Result/log component.
+	var mResult = CodeMirror.fromTextArea(document.getElementById('result-editor'),
+	{
+	})
 
-    /*
-    // Evaluate in node-webkit. Not used.
-    $('#button-eval-node').click(function() 
-    {
-        if (!mMainWindow)
-        {
-            showResult('ERR: Could not find main window - report to developer')
-            return
-        }
-        
-        if (!mEditor.somethingSelected())
-        {
-            showResult('Select some code to evaluate')
-            return
-        }
-        
-        try
-        {
-            var code = mEditor.getSelection()
-            var result = eval(code)
-            showResult('NODE-RES: ' + result)
-        }
-        catch (err)
-        {
-            showResult('NODE-ERR: ' + err)
-        }
-    })
-    */
+	$('#button-eval').click(function()
+	{
+		if (!mMainWindow)
+		{
+			showResult('ERR: Could not find main window - report to developer')
+			return
+		}
 
-    $('#button-undo').click(function() 
-    {
-        mEditor.undo()
-    })
+		if (!mEditor.somethingSelected())
+		{
+			showResult('Select some code to evaluate')
+			return
+		}
 
-    $('#button-redo').click(function() 
-    {
-        mEditor.redo()
-    })
-    
-    $('#button-clear-log').click(function() 
-    {
-        mResult.setValue('')
-    })
+		var code = mEditor.getSelection()
+		mMainWindow.postMessage({ message: 'eval', code: code }, '*')
+	})
 
-    /*
-    $('input.buttonEvalInBrowser').click(function() 
-    {
-        try 
-        {
-            var code = mEditor.selection()
-            var res = eval(code)
-            showResult(res);
-        }
-        catch (error) 
-        {
-             showResult('Error: ' + error)
-        }
-    });
-    */
-    
-    function showResult(res)
-    {
-        mResult.setValue(res + '\n' + mResult.getValue()); 
-    }
-    
-    window.hyper = {}
-    window.hyper.log = function(message)
-    {
-        showResult('NODE-LOG: ' + message)
-    }
-    
-    //$('body').layout({ applyDefaultStyles: true })
-    $('body').layout(
-    {
-        south: { size: 300 },
-        //center: { maskContents: true },
-        fxName: 'none'
-    })
-    
-    function receiveMessage(event)
-    {
-        //console.log('Workbench got : ' + event.data.message)
-        if ('hello' == event.data.message)
-        {
-            mMainWindow = event.source
-        }
-        else if ('log' == event.data.message)
-        {
-            showResult('LOG: ' + event.data.logMessage)
-        }
-        else if ('jsResult' == event.data.message)
-        {
-            showResult('RES: ' + event.data.result)
-        }
-        // TODO: Add JSERR
-    }
-    
-    window.addEventListener('message', receiveMessage, false)
+	/*
+	// Evaluate in node-webkit. Not used.
+	$('#button-eval-node').click(function()
+	{
+		if (!mMainWindow)
+		{
+			showResult('ERR: Could not find main window - report to developer')
+			return
+		}
+
+		if (!mEditor.somethingSelected())
+		{
+			showResult('Select some code to evaluate')
+			return
+		}
+
+		try
+		{
+			var code = mEditor.getSelection()
+			var result = eval(code)
+			showResult('NODE-RES: ' + result)
+		}
+		catch (err)
+		{
+			showResult('NODE-ERR: ' + err)
+		}
+	})
+	*/
+
+	$('#button-undo').click(function()
+	{
+		mEditor.undo()
+	})
+
+	$('#button-redo').click(function()
+	{
+		mEditor.redo()
+	})
+
+	$('#button-clear-log').click(function()
+	{
+		mResult.setValue('')
+	})
+
+	/*
+	$('input.buttonEvalInBrowser').click(function()
+	{
+		try
+		{
+			var code = mEditor.selection()
+			var res = eval(code)
+			showResult(res);
+		}
+		catch (error)
+		{
+			 showResult('Error: ' + error)
+		}
+	});
+	*/
+
+	function showResult(res)
+	{
+		mResult.setValue(res + '\n' + mResult.getValue());
+	}
+
+	window.hyper = {}
+	window.hyper.log = function(message)
+	{
+		showResult('NODE-LOG: ' + message)
+	}
+
+	//$('body').layout({ applyDefaultStyles: true })
+	$('body').layout(
+	{
+		south: { size: 300 },
+		//center: { maskContents: true },
+		fxName: 'none'
+	})
+
+	function receiveMessage(event)
+	{
+		//console.log('Workbench got : ' + event.data.message)
+		if ('hyper.hello' == event.data.message)
+		{
+			mMainWindow = event.source
+		}
+		else if ('hyper.log' == event.data.message)
+		{
+			showResult('LOG: ' + event.data.logMessage)
+		}
+		else if ('hyper.result' == event.data.message)
+		{
+			showResult('RES: ' + event.data.result)
+		}
+	}
+
+	window.addEventListener('message', receiveMessage, false)
 })
 </script>
+
+<script>
+	// Define exports before including settings.
+	var exports = exports || {}
+</script>
+<script src="../settings.js"></script>
+<script>
+	// Set fonts based on the settings.
+	setTimeout(function() {
+		$('.CodeMirror').css('font-family', exports.WorkbenchFontFamily)
+		$('.CodeMirror').css('font-size', exports.WorkbenchFontSize) }, 1)
+</script>
+
 </body>
 </html>

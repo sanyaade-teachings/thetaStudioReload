@@ -168,13 +168,6 @@ function insertReloaderScript(file, request)
 		return file.replace('<!--hyper.reloader-->', script)
 	}
 
-	// Insert before title tag.
-	var pos = file.indexOf('<title>')
-	if (pos > -1)
-	{
-		return file.replace('<title>', script + '<title>')
-	}
-
 	// Insert after title tag.
 	var pos = file.indexOf('</title>')
 	if (pos > -1)
@@ -416,7 +409,7 @@ function displayLogMessage(message)
 {
 	if (mMessageCallback)
 	{
-		mMessageCallback({ message: 'log', logMessage: message })
+		mMessageCallback({ message: 'hyper.log', logMessage: message })
 	}
 }
 
@@ -427,7 +420,7 @@ function displayJsResult(result)
 {
 	if (mMessageCallback)
 	{
-		mMessageCallback({ message: 'jsResult', result: result })
+		mMessageCallback({ message: 'hyper.result', result: result })
 	}
 }
 
