@@ -16,13 +16,11 @@ Go to [hyperreload.com](http://hyperreload.com) to find download packages and a 
 
 HyperReload uses [node-webkit](https://github.com/rogerwang/node-webkit) as its runtime (an amazing piece of software).
 
-There is no actual build step, you can clone the source, then run using node-webkit. The HyperReload runnable files and node-webkit manifest file are in the UI directory.
+There is no need to do an actual build, you can clone the source, then run using node-webkit. Just place node-webkit executable files in the same folder as package.json and launch node-webkit.
 
 ## Documentation and site structure
 
 [Documentation and downloads](http://hyperreload.com) are on [hyperreload.com](http://hyperreload.com).
-
-Documentation is also available in the "Documentation" window in HyperReload.
 
 [Design documents and developer documentation](https://github.com/divineprog/HyperReload/wiki) is on the GitHub wiki (still in its infancy).
 
@@ -41,14 +39,14 @@ HyperApp consists of two applications:
 You need to include this code in your main HTML application file to enable the automatic reload functionality:
 
     <script src="/reloader"></script>
-    
+
 This will load code that listens to reload events from the HyperApp UI.
 
 ## Getting started
 
 ### 1. Run the HyperApp UI desktop application
 
-Run the HyperApp UI program on your desktop machine. This will start a local web server and listen for file updates, notifying clients when files are saved. 
+Run the HyperApp UI program on your desktop machine. This will start a local web server and listen for file updates, notifying clients when files are saved.
 
 Note: This application is written using node-webkit. For now, you need to install node-webkit manually, and launch the application. See the UI/runme Linux script for an example opf how to luanch the application.
 
@@ -57,7 +55,7 @@ Note: This application is written using node-webkit. For now, you need to instal
 Connect from a web browser by entering the URL displayed in the HyperApp UI. For example:
 
     http://192.168.43.226:4042
-    
+
 Connect from a WebView widget in a mobile app. For example, on Android you use code like this:
 
 	WebView mWebView = new WebView(this);
@@ -69,9 +67,9 @@ Make sure the WebView has JavaScript enabled, and that it has a WebViewClient (o
 
 ### 3. Enter the path of the mobile app main HTML file
 
-When connected, enter the path to the main HTML file of your project in the HyperApp UI. 
+When connected, enter the path to the main HTML file of your project in the HyperApp UI.
 
-Then press the **Run** button, and the app will be loaded onto the connected device(s). 
+Then press the **Run** button, and the app will be loaded onto the connected device(s).
 
 When editing and saving files in the project, the app will be automatically reloaded on the connected client(s). (Note that directory traversal is currently limited to two levels, this will be configurable in the UI, for now, update this manually in UI/index.html if you need deeper traversal.)
 
@@ -97,13 +95,11 @@ It is recommened to put the reloader script last in the body element.
 
 ## Roadmap
 
-HyperReload is under development, with ongoing changes/updates. 
+HyperReload is under development, with ongoing changes/updates.
 
 New releases are made continously.
 
 Downloads are available at [hyperreload.com](http://hyperreload.com).
-
-An Android client app is also under development (will be followed by additional platforms).
 
 <!--
 With the HyperApp mobile application (under development) you get additional functionlity:
@@ -113,20 +109,43 @@ With the HyperApp mobile application (under development) you get additional func
 * No need to build the application, just install from the app store (forthcoming)
 -->
 
+## Credits
+
+HyperReload is based on several truly wonderful open-source projects, including:
+
+* [node-webkit](https://github.com/rogerwang/node-webkit)
+* [Node.js](http://nodejs.org/)
+* [CodeMirror](http://codemirror.net/)
+* [jQuery](http://jquery.com/)
+* [Apache Cordova](http://cordova.apache.org/)
+
+For a full listing of software used by HyperReload, see folder "license".
+
 ## License
 
-Copyright (c) 2013 Mikael Kindborg
+HyperReload is both and open-source project and a product. You are welcome to contribute to the project and use HyperReload source code for your own projects, but you may not copy or distribute the HyperReload software product.
 
-The [No License](http://choosealicense.com/no-license/) applies.
+Licensing information:
 
-You are free to use HyperReload at work and at home. You are free to modify the program to fit your own needs, and share with friends.
+	Copyright (c) 2013 Mikael Kindborg
 
-Parts of the code may be released under the MIT license upon request.
+	You are free to use HyperReload at work and at home. You are free to
+	modify the program to fit your own needs, and share with friends.
+
+	You are NOT allowed to sell or distribute the HyperReload product package.
+
+	The HyperReload source code files are licensed under the MIT license.
+
+	The HyperReload software product, including the user interface design
+	and user documentation, is NOT subject to the MIT license, and may NOT
+	be sold, published, distributed, or sublicensed.
+
+See the folder "license" for full licensing information, including licenses for software used by HyperReload.
 
 Commercial licenses are available upon request.
 
 ## Contact
 
-Email: mikael.kindborg@gmail.com, mikael.kindborg@evothings.com
+Email: mikael@kindborg.com, mikael.kindborg@evothings.com
 
 [EvoThings](http://evothings.com) are a seasoned bunch of developers who enjoy connecting phones to other things. We love to improve, refurbish, evolve and augment buildings, vehicles and gadgets, and make them smarter.
