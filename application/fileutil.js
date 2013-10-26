@@ -12,7 +12,7 @@ exports.isPathAbsolute = function(path)
 	// Check for Linux/OS X and Windows.
 	return (path[0] === PATH.sep) || (path[1] === ':')
 }
-	
+
 exports.fileIsHTML = function(path)
 {
 	var pos = path.lastIndexOf('.')

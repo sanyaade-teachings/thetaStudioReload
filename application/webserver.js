@@ -48,8 +48,8 @@ function CreateServerObject()
 	// The current base directory. Must NOT end with a slash.
 	var mBasePath = ''
 
-    // Hook function allows to trap URL.
-    var mHookFun = null
+	// Hook function allows to trap URL.
+	var mHookFun = null
 
 	/**
 	 * Set the current base path. Path must NOT end with a slash.
@@ -70,7 +70,7 @@ function CreateServerObject()
 
 	/**
 	 * Set the hook function.
-     * Form: fun(request, response, unescapedUrlPath)
+	 * Form: fun(request, response, unescapedUrlPath)
 	 */
 	self.setHookFun = function(fun)
 	{
@@ -96,8 +96,8 @@ function CreateServerObject()
 	/**
 	 * Get the public IP address of the machine.
 	 * webserver.getIpAddress(function (address) {
-	 *   // Do something with address.
-	 *   })
+	 *	 // Do something with address.
+	 *	 })
 	 */
 	self.getIpAddress = function(callbackFun)
 	{
@@ -152,7 +152,7 @@ function CreateServerObject()
 		callbackFun(addresses[bestIp])
 	}
 
-    self.writeRespose = WriteResponse
+	self.writeRespose = WriteResponse
 
 	// Old debug print.
 	//var data = FS.readFileSync('/HackathonDemos/BasicWebUI/LocalFiles/index.html')
@@ -165,11 +165,11 @@ function CreateServerObject()
 		//request.setEncoding('utf8')
 		//console.log('HandleRequest url: ' + request.url)
 		var path = unescape(URL.parse(request.url).pathname)
-        if (null != mHookFun)
-        {
-            // If the hook function returns true it processed the request.
-            if (mHookFun(request, response, path)) { return }
-        }
+		if (null != mHookFun)
+		{
+			// If the hook function returns true it processed the request.
+			if (mHookFun(request, response, path)) { return }
+		}
 		ServeFile(path, response)
 	}
 
