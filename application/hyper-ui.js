@@ -5,7 +5,7 @@ Author: Mikael Kindborg
 Copyright (c) 2013 Mikael Kindborg
 */
 
-// Code below is split into two parts, one for the UI 
+// Code below is split into two parts, one for the UI
 // and one for ther server. This is to prepare for an
 // eventual headless version of HyperReload. Code currently
 // contains serveral dependencies, however.
@@ -34,7 +34,7 @@ hyper.UI = {}
 	var mWorkbenchWindow = null
 	var mDocumentationWindow = null
 	var mStoreWindow = null
-	
+
 	function setupUI()
 	{
 		styleUI()
@@ -42,23 +42,23 @@ hyper.UI = {}
 		setWindowActions()
 		setUpFileDrop()
 	}
-	
+
 	function styleUI()
 	{
 		// Apply jQuery UI button style.
 		//$('button').button()
-		
+
 		// Set layout properties.
 		/*
 		$('body').layout(
-		{ 
+		{
 			west: { size: 400 },
 			center: { maskContents: true },
 			fxName: 'none'
 		})
 		*/
 	}
-	
+
 	function setUIActions()
 	{
 		var button = null
@@ -82,7 +82,7 @@ hyper.UI = {}
 					focus: true
 				})*/
 				mWorkbenchWindow = window.open(
-					'hyper-workbench.html', 
+					'hyper-workbench.html',
 					'workbench',
 					'resizable=1,width=800,height=600')
 				mWorkbenchWindow.moveTo(50, 50)
@@ -91,7 +91,7 @@ hyper.UI = {}
 				mWorkbenchWindow.postMessage({ message: 'hello' }, '*')
 			}
 		})
-		
+
 		// Documentation button action.
 		button = $('#button-documentation')
 		button && button.click(function()
@@ -109,7 +109,7 @@ hyper.UI = {}
 				// that ../documentation/index.html exists.
 				// TODO: The window parameters do not take effect.
 				mDocumentationWindow = window.open(
-					'../documentation/index.html', 
+					'../documentation/index.html',
 					'documentation',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mDocumentationWindow.moveTo(75, 75)
@@ -130,27 +130,27 @@ hyper.UI = {}
 			{
 				// Create new window.
 				mStoreWindow = window.open(
-					'../documentation/hyper-store.html', 
+					'../documentation/hyper-store.html',
 					'store',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mStoreWindow.moveTo(100, 100)
 				mStoreWindow.focus()
 			}
 		})
-		
+
 		// Reorder of project list by drag and drop.
-		$(function() 
+		$(function()
 		{
 			$('#project-list').sortable(
 			{
-				stop: function() 
+				stop: function()
 				{
 					updateProjectList()
 				}
 			})
 			$('#project-list').disableSelection()
 		})
-		
+
 		// Message handler.
 		window.addEventListener('message', receiveMessage, false)
 
@@ -159,13 +159,13 @@ hyper.UI = {}
 			hyper.UI.displayNumberOfMonitoredFiles() },
 			1500)
 	}
-	
+
 	function setWindowActions()
 	{
 		// Listen to main window's close event
-        GUI.Window.get().on('close', function()
-        {
-    		GUI.App.quit()
+		GUI.Window.get().on('close', function()
+		{
+			GUI.App.quit()
 		})
 	}
 
@@ -177,11 +177,11 @@ hyper.UI = {}
 			hyper.SERVER.evalJS(event.data.code)
 		}
 	}
-	
+
 	function setUpFileDrop()
 	{
 		var originalDropTaget = null
-		
+
 		// Block change page on drop.
 		window.ondragover = function(e) { e.preventDefault(); return false }
 		window.ondragend = function(e) { e.preventDefault(); return false }
@@ -189,19 +189,19 @@ hyper.UI = {}
 
 		// Set up drop handling using a drop target overlay area.
 		var dropTarget = $('#panel-page')
-		dropTarget.on('dragenter', function(e) 
+		dropTarget.on('dragenter', function(e)
 		{
 			e.stopPropagation()
 			e.preventDefault()
 			$('#drag-overlay').show();
 		})
-		$('#drag-overlay').on('dragleave dragend', function(e) 
+		$('#drag-overlay').on('dragleave dragend', function(e)
 		{
 			e.stopPropagation()
 			e.preventDefault()
 			$('#drag-overlay').hide();
 		})
-		$('#drag-overlay').on('drop', function(e) 
+		$('#drag-overlay').on('drop', function(e)
 		{
 			e.stopPropagation()
 			e.preventDefault()
@@ -209,15 +209,15 @@ hyper.UI = {}
 			handleFileDrop(e.originalEvent.dataTransfer.files)
 		})
 	}
-	
+
 	function handleFileDrop(files)
 	{
 		// Debug print.
-		/*for (var i = 0; i < files.length; ++i) 
+		/*for (var i = 0; i < files.length; ++i)
 		{
 			console.log(files[i].path);
 		}*/
-		
+
 		if (files.length > 0)
 		{
 			var path = files[0].path
@@ -233,11 +233,11 @@ hyper.UI = {}
 			}
 		}
 	}
-	
+
 	function createProjectEntry(path)
 	{
 		// Template for project items.
-		var html = 
+		var html =
 			'<div class="ui-state-default ui-corner-all">'
 				+ '<button '
 				+	'type="button" '
@@ -260,7 +260,7 @@ hyper.UI = {}
 				+	'&times;'
 				+ '</button>'
 			+ '</div>'
-		
+
 		// Get name of project, use title tag as first choise.
 		try
 		{
@@ -272,30 +272,30 @@ hyper.UI = {}
 			console.log('createProjectEntry failed: ' + err)
 			return
 		}
-		
+
 		var name = getTagContent(data, 'title')
 		if (!name)
 		{
 			name = getNameFromPath(path)
 		}
-		
+
 		// Escape any backslashes in the path (needed on Windows).
 		var escapedPath = path.replace(/[\\]/g,'\\\\')
-		
+
 		// Replace fields in template.
 		html = html.replace('__PATH1__', escapedPath)
 		html = html.replace('__PATH2__', escapedPath)
 		html = html.replace('__PATH3__', path)
 		html = html.replace('__NAME__', name)
-		
+
 		// Create element.
 		var element = $(html)
 		//console.log(html)
-		
+
 		// Insert element first in list.
 		$('#project-list').prepend(element)
 	}
-	
+
 	function getTagContent(data, tag)
 	{
 		var tagStart = '<' + tag + '>'
@@ -306,7 +306,7 @@ hyper.UI = {}
 		if (-1 === pos2) { return null }
 		return data.substring(pos1 + tagStart.length, pos2)
 	}
-	
+
 	// Use last part of path as name.
 	// E.g. '/home/apps/HelloWorld/index.html' -> 'HelloWorld/index.html'
 	// Use full path as fallback.
@@ -318,7 +318,7 @@ hyper.UI = {}
 		if (-1 === pos) { return path }
 		return path.substring(pos + 1)
 	}
-	
+
 	// Project list has been reordered/changed, save new list.
 	function updateProjectList()
 	{
@@ -334,7 +334,7 @@ hyper.UI = {}
 		})
 		hyper.setProjectList(projects)
 	}
-	
+
 	hyper.UI.displayIpAddress = function(ip, port)
 	{
 		// document.querySelector('#ip-address').innerHTML = ip
@@ -342,16 +342,16 @@ hyper.UI = {}
 		document.querySelector('#connect-address').innerHTML = ip + ':' + port
 		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
-	
+
 	hyper.UI.displayConnectedCounter = function()
 	{
-		document.querySelector('#connect-counter').innerHTML = 
+		document.querySelector('#connect-counter').innerHTML =
 			hyper.SERVER.getNumberOfConnectedClients()
 	}
 
 	hyper.UI.displayNumberOfMonitoredFiles = function()
 	{
-		document.querySelector('#files-counter').innerHTML = 
+		document.querySelector('#files-counter').innerHTML =
 			hyper.SERVER.getNumberOfMonitoredFiles()
 	}
 
@@ -376,14 +376,14 @@ hyper.UI = {}
 			}
 		})
 	}
-	
+
 	hyper.UI.deleteEntry = function(obj)
 	{
 		console.log($(obj).parent())
 		$(obj).parent().remove()
 		updateProjectList()
 	}
-	
+
 	setupUI()
 })()
 
@@ -413,7 +413,7 @@ hyper.UI = {}
 		SERVER.setTraverseNumDirectoryLevels(
 			SETTINGS.NumberOfDirecoryLevelsToTraverse)
 		SERVER.fileSystemMonitor()
-		
+
 		// Populate the UI.
 		// TODO: Consider moving these calls to a function in hyper.UI.
 		readProjectList()
@@ -424,7 +424,7 @@ hyper.UI = {}
 		SERVER.setConnenctedCallbackFun(clientConnectedCallback)
 		SERVER.setDisconnenctedCallbackFun(clientDisconnectedCallback)
 	}
-	
+
 	function displayServerIpAddress()
 	{
 		SERVER.getWebServerIpAndPort(function(ip, port) {
@@ -450,11 +450,11 @@ hyper.UI = {}
 		{
 			path = mApplicationBasePath + PATH.sep + path
 		}
-		
+
 		console.log('runApp: ' + path)
-		
+
 		SERVER.setAppPath(path)
-		
+
 		if (mOpenExternalBrowser)
 		{
 			// Open a local browser automatially if no clients are connected.
@@ -465,7 +465,7 @@ hyper.UI = {}
 			/* This was used with iframe loading (hyper-client.html)
 			GUI.Shell.openExternal(
 				SERVER.getServerBaseURL() +
-				'#' + 
+				'#' +
 				SERVER.getAppFileName())
 			*/
 		}
@@ -475,7 +475,7 @@ hyper.UI = {}
 			SERVER.runApp()
 		}
 	}
-	
+
 	function clientConnectedCallback(numberOfConnectedClients)
 	{
 		mRunAppGuardFlag = false
@@ -516,7 +516,7 @@ hyper.UI = {}
 		{
 			var json = FS.readFileSync(mProjectListFile, {encoding: 'utf8'})
 			mProjectList = JSON.parse(json)
-		}	
+		}
 	}
 
 	function saveProjectList()
@@ -524,46 +524,46 @@ hyper.UI = {}
 		var json = JSON.stringify(mProjectList)
 		FS.writeFileSync(mProjectListFile, json, {encoding: 'utf8'})
 	}
-	
-	function openFolder(path) 
+
+	function openFolder(path)
 	{
 		// Debug logging.
 		console.log('Open folder: ' + path)
-		
+
 		GUI.Shell.showItemInFolder(path)
-    }
-    
+	}
+
 	// TODO: Simplify, use updateProjectList instead.
 	hyper.addProject = function(path)
 	{
 		mProjectList.unshift(path)
 		saveProjectList()
 	}
-	
+
 	hyper.setProjectList = function(list)
 	{
 		mProjectList = list
 		saveProjectList()
 	}
-	
-	hyper.openFileFolder = function(path) 
+
+	hyper.openFileFolder = function(path)
 	{
 		// Prepend base path if this is not an absolute path.
 		if (!FILEUTIL.isPathAbsolute(path))
 		{
 			path = mApplicationBasePath + PATH.sep + path
 		}
-		
+
 		// Show the file in the folder.
 		openFolder(path)
-		
+
 		// TODO: New method used. This is old code.
 		// Drop filename part of path.
 		/*var pos = path.lastIndexOf(PATH.sep)
 		var folderPath = path.substring(0, pos)
 		openFolder(folderPath)*/
-    }
-    
+	}
+
 	// Display Node.js version info. Not used.
 	//document.querySelector('#info').innerHTML = 'node.js ' + process.version
 
@@ -573,25 +573,25 @@ hyper.UI = {}
 /* OLD CODE
 
 	// Check: https://github.com/jjrdn/node-open
-	function openFolder(folderPath) 
+	function openFolder(folderPath)
 	{
-        try 
-        {
-            var exec = require('child_process').exec;
+		try
+		{
+			var exec = require('child_process').exec;
 
-            function puts(error, stdout, stderr) 
-            {
-                //console.log('stdout: ' + stdout);
-                //console.log('stderr: ' + stderr);
-                //console.log('error: ' + error);
-            }
-            
-            var isLinux = (OS.platform() === "linux")
-            var isMac = (OS.platform() === "darwin")
-            var isWindows = (OS.platform() === "win32")
-            
-            if (isLinux)
-            {
+			function puts(error, stdout, stderr)
+			{
+				//console.log('stdout: ' + stdout);
+				//console.log('stderr: ' + stderr);
+				//console.log('error: ' + error);
+			}
+
+			var isLinux = (OS.platform() === "linux")
+			var isMac = (OS.platform() === "darwin")
+			var isWindows = (OS.platform() === "win32")
+
+			if (isLinux)
+			{
 				var command = 'nautilus "' + folderPath + '"'
 				exec(command, puts)
 			}
@@ -609,14 +609,14 @@ hyper.UI = {}
 			{
 				console.log('@@@ openFolder: Unknown platform: ' + OS.platform())
 			}
-        }
-        catch (err) 
-        {
-            console.log("ERROR in openFolder: " + err)
-        }
-    }
+		}
+		catch (err)
+		{
+			console.log("ERROR in openFolder: " + err)
+		}
+	}
 
-        
+
 TODO: DELETE
 
 var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;

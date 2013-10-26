@@ -11,3 +11,13 @@ exports.NumberOfDirecoryLevelsToTraverse = 3
 // Port numbers.
 exports.WebServerPort = 4042
 exports.SocketIoPort = 4043
+
+// If this setting is true, the Hyper server will
+// serve Cordova JS files for the correct platform,
+// based on user-agent information in the request.
+// Files served as in folder application/libs-cordova
+// Supported platforms are Android and iOS.
+// Set to false to turn this feature off. You then
+// must ensure you include the correct Cordova JS
+// files in your project.
+exports.ServeCordovaJsFiles = true

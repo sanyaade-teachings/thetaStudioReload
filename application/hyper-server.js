@@ -15,7 +15,7 @@ var FILEUTIL = require('./fileutil.js')
 var SETTINGS = require('../settings.js')
 
 /*********************************/
-/***       Server code         ***/
+/***	   Server code		   ***/
 /*********************************/
 
 /*** Server variables ***/
@@ -38,10 +38,10 @@ var mDisconnectedCallback = null
  */
 function startWebServer(basePath, port, fun)
 {
-    var server = WEBSERVER.create()
-    server.setBasePath(basePath)
-    server.start(port)
-    fun(server)
+	var server = WEBSERVER.create()
+	server.setBasePath(basePath)
+	server.start(port)
+	fun(server)
 }
 
 /**
@@ -96,18 +96,18 @@ function webServerHookFunForScriptInjection(request, response, path)
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
-	else if (path == '/cordova.js' ||
+	else if (SETTINGS.ServeCordovaJsFiles &&
+		(path == '/cordova.js' ||
 		path == '/cordova_plugins.js' ||
-		path.indexOf('/plugins/') == 0)
+		path.indexOf('/plugins/') == 0))
 	{
-
-		// iOS is default.
-		var platformPath = './application/cordova-support/platforms/ios/www'
+		// iOS is default platform.
+		var platformPath = './application/libs-cordova/ios'
 
 		// Check for Android.
 		if (request['headers']['user-agent'].indexOf('Android') > 0)
 		{
-			platformPath = './application/cordova-support/platforms/android/assets/www'
+			platformPath = './application/libs-cordova/android'
 		}
 		console.log('path1: ' + path)
 		console.log('path2: ' + platformPath + path)
@@ -242,7 +242,7 @@ function startServers()
 			// Debug logging.
 			//console.log('Client disconnected')
 			//console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
-        })
+		})
 
 		socket.on('hyper.log', function(data)
 		{
@@ -552,7 +552,7 @@ for (var i in files)
 }*/
 
 /*********************************/
-/***      Module exports       ***/
+/***	  Module exports	   ***/
 /*********************************/
 
 exports.startServers = startServers
