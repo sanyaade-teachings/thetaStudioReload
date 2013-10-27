@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-ui-open.html
+Description: Main application file. Defines the UI and starts the server.
+Author: Mikael Kindborg
+Copyright (c) 2013 Mikael Kindborg
+-->
+<head>
+	<meta charset="utf-8">
+
+    <link href="../libs/bootstrap-3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="../libs/jquery/jquery-2.0.3.min.js"></script>
+    <script src="../libs/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+
+    <style>
+	body
+	{
+		margin: 10px;
+		background-color: rgb(255,255,255);
+		font-family: sans-serif;
+	}
+	.hyper-page-group
+	{
+		margin-bottom: 10px;
+	}
+	.panel-body
+	{
+		font-size: 120%;
+	}
+    </style>
+</head>
+<body>
+	<div class="hyper-page">
+		<div class="hyper-page-group">
+			<input id="path-to-main-html-file" class="form-control input-lg" placeholder="Enter the full name of the main HTML file of your app" value="" type="text"/>
+		</div>
+
+		<div class="hyper-page-group btn-group btn-group-justified">
+			<a id="button-run" type="button" class="btn btn-lg btn-success">Run App</a>
+			<a id="button-workbench" type="button" class="btn btn-lg btn-warning">Open Workbench</a>
+		</div>
+
+		<div class="panel panel-primary">
+  			<div class="panel-heading"><h3 class="panel-title">Server Info</h3></div>
+  			<div class="panel-body">
+    			Connect URL: <b><span id="connect-address">[Server not running]</span></b><br/>
+    			Clients: <b><span id="connect-counter">0</span></b><br/>
+				Files: <b><span id="files-counter">0</span></b>
+  			</div>
+		</div>
+
+		<div class="panel panel-primary">
+  			<div class="panel-heading"><h3 class="panel-title">Quick Start</h3></div>
+  			<div class="panel-body">
+    			<p>HyperOpen is a tool to let you quickly reload applications when saving changes to files in the currently running project.</p>
+    			<p>Enter the full path and name of the main HTML file of your project, then click the <b>Run</b> button to open the file in the desktop browser.</p>
+    			<p>Connect from a mobile web browser using the connect URL displayed in the Server Info panel. Then click <b>Run</b>. Mobile devices must be on the same WiFi network as this computer to be able connect!</p>
+				<p>Editing and saving a file in the running project will automatically reload it!</p>
+  			</div>
+		</div>
+	</div> <!-- page -->
+
+	<script src="hyper-ui-open.js"></script>
+</body>
+</html>

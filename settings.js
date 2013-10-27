@@ -25,3 +25,7 @@ exports.ServeCordovaJsFiles = true
 // Font settings for the Workbench editors.
 exports.WorkbenchFontFamily = 'monospace'
 exports.WorkbenchFontSize = '18px'
+
+// URL to download update script from.
+// Comment out to disable automatic updates.
+exports.UpdateURL = 'http://hyperreload.com/update.js'

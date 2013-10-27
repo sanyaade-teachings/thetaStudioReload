@@ -16,8 +16,8 @@ var FS = require('fs')
 var PATH = require('path')
 var OS = require('os')
 var GUI = require('nw.gui')
-var FILEUTIL = require('./fileutil.js')
-var SETTINGS = require('../settings.js')
+var FILEUTIL = require('../server/fileutil.js')
+var SETTINGS = require('../../settings.js')
 
 /*** Globals ***/
 
@@ -109,7 +109,7 @@ hyper.UI = {}
 				// that ../documentation/index.html exists.
 				// TODO: The window parameters do not take effect.
 				mDocumentationWindow = window.open(
-					'../documentation/index.html',
+					'../../documentation/index.html',
 					'documentation',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mDocumentationWindow.moveTo(75, 75)
@@ -130,7 +130,7 @@ hyper.UI = {}
 			{
 				// Create new window.
 				mStoreWindow = window.open(
-					'../documentation/hyper-store.html',
+					'../../documentation/hyper-store.html',
 					'store',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mStoreWindow.moveTo(100, 100)
@@ -389,12 +389,9 @@ hyper.UI = {}
 
 /*** Server setup ***/
 
-// TODO: Remove hard coded port numbers below and
-// in hyper-reloader.js.
-
 ;(function()
 {
-	var SERVER = require('./hyper-server.js')
+	var SERVER = require('../server/hyper-server.js')
 
 	hyper.SERVER = SERVER
 

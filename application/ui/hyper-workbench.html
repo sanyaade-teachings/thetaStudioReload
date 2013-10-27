@@ -12,26 +12,26 @@ Copyright (c) 2013 Mikael Kindborg
 <title>JavaScript Workbench</title>
 
 
-<link href="libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
-<link href="libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
+<link href="../libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
+<link href="../libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
 
-<!-- <link rel="stylesheet" href="libs/jquery/themes/sunny/jquery-ui.min.css" /> -->
-<link rel="stylesheet" href="libs/jquery/layout-default-latest.css" />
+<!-- <link rel="stylesheet" href="../libs/jquery/themes/sunny/jquery-ui.min.css" /> -->
+<link rel="stylesheet" href="../libs/jquery/layout-default-latest.css" />
 
-<script src="libs/jquery/jquery-2.0.3.min.js"></script>
+<script src="../libs/jquery/jquery-2.0.3.min.js"></script>
 
-<script src="libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
-<script src="libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
+<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
+<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
 
 <!-- <script src="libs/jquery/jquery-ui-1.10.3.custom.min.js"></script> -->
-<script src="libs/jquery/jquery.layout-latest.min.js"></script>
+<script src="../libs/jquery/jquery.layout-latest.min.js"></script>
 
-<link rel="stylesheet" href="libs/codemirror-3.15/lib/codemirror.css">
-<script src="libs/codemirror-3.15/lib/codemirror.js"></script>
-<script src="libs/codemirror-3.15/addon/edit/matchbrackets.js"></script>
-<script src="libs/codemirror-3.15/addon/edit/continuecomment.js"></script>
-<script src="libs/codemirror-3.15/addon/comment/comment.js"></script>
-<script src="libs/codemirror-3.15/mode/javascript/javascript.js"></script>
+<link rel="stylesheet" href="../libs/codemirror-3.15/lib/codemirror.css">
+<script src="../libs/codemirror-3.15/lib/codemirror.js"></script>
+<script src="../libs/codemirror-3.15/addon/edit/matchbrackets.js"></script>
+<script src="../libs/codemirror-3.15/addon/edit/continuecomment.js"></script>
+<script src="../libs/codemirror-3.15/addon/comment/comment.js"></script>
+<script src="../libs/codemirror-3.15/mode/javascript/javascript.js"></script>
 
 <style>
 .CodeMirror
@@ -188,20 +188,13 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 
 <div class="ui-layout-south">
 
-<!--
-<div id="toolbar">
-	<input value="Eval on Devices" class="buttonEval" type="button" />
-	<input value="Undo" class="buttonUndo" type="button" />
-	<input value="Redo" class="buttonRedo" type="button" />
-	<input value="Clear Log" class="buttonClearLog" type="button" />
-	<input value="Eval in NodeWebkit" class="buttonEvalInNodeJs" type="button" />
-</div>
--->
 <div id="toolbar" class="header-footer">
 	<button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
 	<button id="button-undo" type="button" class="btn btn-warning">Undo</button>
 	<button id="button-redo" type="button" class="btn btn-primary">Redo</button>
 	<button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
+	<button id="button-clear-editor" type="button" class="btn btn-danger">Clear Editor</button>
+	<button id="button-eval-node" type="button" class="btn btn-danger">Node Eval</button>
 </div>
 
 <div id="result-area" class="ui-layout-content">
@@ -253,7 +246,6 @@ $(function()
 		mMainWindow.postMessage({ message: 'eval', code: code }, '*')
 	})
 
-	/*
 	// Evaluate in node-webkit. Not used.
 	$('#button-eval-node').click(function()
 	{
@@ -272,15 +264,15 @@ $(function()
 		try
 		{
 			var code = mEditor.getSelection()
+			// TODO: Add runtime error handling.
 			var result = eval(code)
-			showResult('NODE-RES: ' + result)
+			showResult('NODE: ' + result)
 		}
 		catch (err)
 		{
-			showResult('NODE-ERR: ' + err)
+			showResult('NODE: ' + err)
 		}
 	})
-	*/
 
 	$('#button-undo').click(function()
 	{
@@ -295,6 +287,11 @@ $(function()
 	$('#button-clear-log').click(function()
 	{
 		mResult.setValue('')
+	})
+
+	$('#button-clear-editor').click(function()
+	{
+		mEditor.setValue('\n\n\n\n\n\n\n\n\n')
 	})
 
 	/*
@@ -319,9 +316,49 @@ $(function()
 	}
 
 	window.hyper = {}
+
 	window.hyper.log = function(message)
 	{
-		showResult('NODE-LOG: ' + message)
+		showResult('NODE: ' + message)
+	}
+
+	window.hyper.inspect = function(obj)
+	{
+		window.hyper.log('Object inspect:\n' +
+			window.hyper.objectToString(obj, [], '  '))
+	}
+
+	window.hyper.objectToString = function (obj, visited, level)
+	{
+		// Check for circular structures.
+		for (var i = 0; i < visited.length; ++i)
+		{
+			if (visited[i] === obj) { return level + '<circular reference>\n' }
+		}
+		visited.push(obj)
+
+		if (!level) { level = '' }
+
+		var s = ''
+
+		for (prop in obj)
+		{
+			if (obj.hasOwnProperty(prop))
+			{
+				var value = obj[prop]
+				if (typeof value === 'object')
+				{
+					s += level + prop + ':\n' +
+						window.hyper.objectToString(value, visited, level + '  ')
+				}
+				else
+				{
+					s += level + prop + ': ' + value + '\n'
+				}
+			}
+		}
+
+		return s
 	}
 
 	//$('body').layout({ applyDefaultStyles: true })
