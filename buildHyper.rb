@@ -1,29 +1,38 @@
-# Build a distribution package of HyperReload.
-# Note that paths must be defined in a file
-# named "buildPlugin.rb".
-# Author: Mikael Kindborg
+#######################################################
+# Build a distribution package of HyperReload.        #
+#                                                     #
+# Note that paths must be defined in a file           #
+# named "buildPlugin.rb".                             #
+#                                                     #
+# This script is experimental and undocumented,       #
+# and is not needed to run HyperReload. The easiest   #
+# way to run Hyper is by downloading node-webkit,     #
+# see instructions in the README.md file.             #
+#                                                     #
+# Author: Mikael Kindborg                             #
+#######################################################
 
 require "fileutils"
 require "pathname"
 
-######################################################
-#			   BUILD PROCESS OVERVIEW				 #
-######################################################
+#######################################################
+#               BUILD PROCESS OVERVIEW                #
+#######################################################
 
-# Copy files from the HyperReload/UI repository into a
-# folder named HyperReload <version>/UI
+# Copy files from the HyperOpen repository into the
+# destination folder named <dist>_<version>
 #
-# Do some processing of the files in UI.
+# Do some processing of the files.
 #
 # Create directories for binary dists and copy
-# the code in UI there and also copy node-webkit
+# the code there and also copy node-webkit
 # binary files there.
 #
 # Zip distribution directories.
 
-######################################################
-#				 VARIABLES AND PATHS				 #
-######################################################
+#######################################################
+#                 GLOBAL VARIABLES                    #
+#######################################################
 
 def version
 	$VersionString
@@ -31,9 +40,9 @@ end
 
 load "buildPlugin.rb"
 
-######################################################
-#				   BUILD FUNCTIONS					 #
-######################################################
+#######################################################
+#                  BUILD FUNCTIONS                    #
+#######################################################
 
 def buildCreateDistDir
 	fileDelete(pathDist)
@@ -185,9 +194,9 @@ def buildDist
 	puts "Build done"
 end
 
-######################################################
-#					 FILE HELPERS					 #
-######################################################
+#######################################################
+#                    FILE HELPERS                     #
+#######################################################
 
 def fileReadContent(filePath)
 	# File.open(filePath, "rb") { |f| f.read.force_encoding("UTF-8") }
@@ -230,9 +239,9 @@ def fileSubstString(path, fromString, toString)
 	fileSaveContent(path, content)
 end
 
-######################################################
-#				 START BUILD PROCESS				 #
-######################################################
+#######################################################
+#                 START BUILD PROCESS                 #
+#######################################################
 
 if (ARGV.size == 1)
 	$VersionString = ARGV[0]
