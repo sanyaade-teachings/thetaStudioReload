@@ -1,5 +1,7 @@
 # HyperReload License
 
+HyperReload is Copyright (c) 2013 Mikael Kindborg
+
 The HyperReload source code is licensed under the Apache license:
 
     Copyright (c) 2013 Mikael Kindborg <mikael@kindborg.com>
