@@ -109,7 +109,7 @@ hyper.UI = {}
 				// that ../documentation/index.html exists.
 				// TODO: The window parameters do not take effect.
 				mDocumentationWindow = window.open(
-					'../../documentation/index.html',
+					'../../documentation/documentation.html',
 					'documentation',
 					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
 				mDocumentationWindow.moveTo(75, 75)
