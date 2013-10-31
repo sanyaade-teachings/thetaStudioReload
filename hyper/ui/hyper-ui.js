@@ -395,7 +395,7 @@ hyper.UI = {}
 
 	hyper.SERVER = SERVER
 
-	var mProjectListFile = '../settings/project-list.json'
+	var mProjectListFile = './hyper/settings/project-list.json'
 	var mProjectList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
@@ -565,6 +565,32 @@ hyper.UI = {}
 
 	setupServer()
 })()
+
+/*
+1What I found easier than downloading, installing, and finding Icon Composer was using the command-line tool iconutil.
+
+    Put your png files of each size into a folder. The folder must have the extension .iconset
+
+    Enter this command into the Terminal window:
+
+    iconutil -c icns <iconset filename>
+
+    where <iconset filename> is the path to the folder containing the set of pngs.
+    The output .icns file is written to the same location as the folder.
+
+You must have the following set of pngs:
+
+icon_16x16.png
+icon_16x16@2x.png
+icon_32x32.png
+icon_32x32@2x.png
+icon_128x128.png
+icon_128x128@2x.png
+icon_256x256.png
+icon_256x256@2x.png
+icon_512x512.png
+icon_512x512@2x.png
+*/
 
 /* OLD CODE
 

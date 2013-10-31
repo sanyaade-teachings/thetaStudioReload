@@ -106,14 +106,14 @@ end
 def buildDistBinaryLinux32
 	buildDistBinaryLinux(
 		pathDistSource,
-		pathDist + distPackageName + "_Linux_32_" + version + "/",
+		distPackageLinux32,
 		pathNodeWebkitLinux32)
 end
 
 def buildDistBinaryLinux64
 	buildDistBinaryLinux(
 		pathDistSource,
-		pathDist + distPackageName + "_Linux_64_" + version + "/",
+		distPackageLinux64,
 		pathNodeWebkitLinux64)
 end
 
@@ -134,14 +134,15 @@ def buildDistBinaryLinux(sourcePath, targetPath, sourceBin)
 		targetPath + "libffmpegsumo.so")
 	FileUtils.copy_entry(
 		sourceBin + "credits.html",
-		targetPath + distPackageName + "license/node-webkit-credits.html")
+		targetPath + "hyper/license/node-webkit-credits.html")
 end
 
 def buildDistBinaryMac
 
 	sourcePath = pathDistSource
-	targetPath = pathDist + distPackageName + "_Mac_" + version + "/"
+	targetPath = distPackageMac
 	sourceBin = pathNodeWebkitMac
+	appPath = targetPath + distPackageName + ".app"
 
 	# Copy JavaScript/HTML files.
 	FileUtils.copy_entry(sourcePath, targetPath)
@@ -149,16 +150,36 @@ def buildDistBinaryMac
 	# Copy files.
 	FileUtils.copy_entry(
 		sourceBin + "node-webkit.app",
-		targetPath + distPackageName + ".app")
+		appPath)
 	FileUtils.copy_entry(
 		sourceBin + "credits.html",
-		targetPath + distPackageName + "license/node-webkit-credits.html")
+		targetPath + "hyper/license/node-webkit-credits.html")
+
+	# Patch Info.plist.
+	# TODO: Add icon patch.
+	infoPlistPath = appPath + "/Contents/Info.plist"
+	info = fileReadContent(infoPlistPath)
+	#puts(info)
+	info = macPatchValue(info, "CFBundleName", distPackageName)
+	info = macPatchValue(info, "CFBundleShortVersionString", version)
+	info = macPatchValue(info, "CFBundleVersion", distCopyright)
+	#puts(info)
+	fileSaveContent(infoPlistPath, info)
+end
+
+# This is a hack.
+def macPatchValue(info, key, newValue)
+	index1 = info.index("<key>" + key + "</key>", 0)
+	index1 = info.index("<string>", index1)
+	index1 = index1 + 7
+	index2 = info.index("</string>", index1)
+	info = info[0..index1] + newValue + info[index2..-1]
 end
 
 def buildDistBinaryWin
 
 	sourcePath = pathDistSource
-	targetPath = pathDist + distPackageName + "_Win_" + version + "/"
+	targetPath = distPackageWin
 	sourceBin = pathNodeWebkitWin
 
 	# Copy JavaScript/HTML files.
@@ -185,21 +206,26 @@ def buildDistBinaryWin
 		targetPath + "libGLESv2.dll")
 	FileUtils.copy_entry(
 		sourceBin + "credits.html",
-		targetPath + distPackageName + "license/node-webkit-credits.html")
+		targetPath + "hyper/license/node-webkit-credits.html")
 end
 
 def buildZippedBinaries
-
+	zipPackage(distPackageLinux32)
+	zipPackage(distPackageLinux64)
+	zipPackage(distPackageMac)
+	zipPackage(distPackageWin)
 end
 
 # Build distribution package.
-def buildDist
+def buildDist zipFlag
 	puts "Building " + distPackageName + " version " + version
 	buildCreateDistDir
 	buildCopyHyperToDistDir
 	buildPostProcess
 	buildDistBinaries
-	buildZippedBinaries
+	if zipFlag == "zip" then
+		buildZippedBinaries
+	end
 	puts "Build done"
 end
 
@@ -248,16 +274,61 @@ def fileSubstString(path, fromString, toString)
 	fileSaveContent(path, content)
 end
 
+# Helper function to run shell commands.
+def sh(cmd)
+	# TODO: Remove the extra shell. Class Process could be used.
+	$stderr.puts cmd
+	if (!system(cmd)) then
+		error "Command failed: '#{$?}'"
+	end
+end
+
+def zip(source, dest)
+	command = "zip -r " + dest + " " + source
+	sh(command)
+end
+
+def zipPackage(distPackage)
+	zipName = distPackage + "__ZIP__"
+	zipName = zipName.gsub("/__ZIP__", ".zip")
+	zip(distPackage, zipName)
+end
+
+
+#######################################################
+#                  PATH NAME SHORTCUTS                #
+#######################################################
+
+def distPackageLinux32
+	pathDist + distPackageName + "_Linux_32_" + version + "/"
+end
+
+def distPackageLinux64
+	pathDist + distPackageName + "_Linux_64_" + version + "/"
+end
+
+def distPackageMac
+	pathDist + distPackageName + "_Mac_" + version + "/"
+end
+
+def distPackageWin
+	pathDist + distPackageName + "_Win_" + version + "/"
+end
+
 #######################################################
 #                 START BUILD PROCESS                 #
 #######################################################
 
 if (ARGV.size == 1)
 	$VersionString = ARGV[0]
-	buildDist
+	buildDist "nozip"
+elsif (ARGV.size == 2 and ARGV[1] == "zip")
+	$VersionString = ARGV[0]
+	buildDist "zip"
 else
 	puts "Usage:"
-	puts "	ruby build.rb <version>"
+	puts "	ruby build.rb <version> [zip]"
 	puts "Example:"
 	puts "	ruby build.rb 0.1.0"
+	puts "	ruby build.rb 0.1.0 zip"
 end

@@ -5,6 +5,12 @@ def distPackageName
 	"HyperReload"
 end
 
+def distCopyright
+	"Copyright (c) 2013 Mikael Kindborg"
+end
+
+#puts distCopyright
+
 def root
 	"../../"
 end
@@ -26,7 +32,7 @@ end
 
 # Source file for package.json.
 def pathSourcePackageJson
-	"./package-template.json"
+	root + "HyperReload/hyper/build/package-template.json"
 end
 
 # Source of main demo apps.
