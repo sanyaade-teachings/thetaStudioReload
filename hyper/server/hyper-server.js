@@ -12,7 +12,7 @@ var SOCKETIO = require('socket.io')
 var FS = require('fs')
 var PATH = require('path')
 var FILEUTIL = require('./fileutil.js')
-var SETTINGS = require('../../settings.js')
+var SETTINGS = require('../settings/settings.js')
 
 /*********************************/
 /***	   Server code		   ***/
@@ -57,7 +57,7 @@ function webServerHookFunForIframe(request, response, path)
 	// iframe that will load application pages.
 	if (path == '/')
 	{
-		var page = FS.readFileSync('./application/server/hyper-client.html', {encoding: 'utf8'})
+		var page = FS.readFileSync('./hyper/server/hyper-client.html', {encoding: 'utf8'})
 		mWebServer.writeRespose(response, page, 'text/html')
 		return true
 	}
@@ -79,7 +79,7 @@ function webServerHookFunForScriptInjection(request, response, path)
 	if (path == '/')
 	{
 		// If the root path is requested, send the connect page.
-		var file = FS.readFileSync('./application/server/hyper-connect.html', {encoding: 'utf8'})
+		var file = FS.readFileSync('./hyper/server/hyper-connect.html', {encoding: 'utf8'})
 		file = insertReloaderScript(file, request)
 		mWebServer.writeRespose(response, file, 'text/html')
 		return true
@@ -88,7 +88,7 @@ function webServerHookFunForScriptInjection(request, response, path)
 	{
 		// Send reloader script.
 		var script = FS.readFileSync(
-			'./application/server/hyper-reloader.js',
+			'./hyper/server/hyper-reloader.js',
 			{encoding: 'utf8'})
 		script = script.replace(
 			'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
@@ -102,12 +102,12 @@ function webServerHookFunForScriptInjection(request, response, path)
 		path.indexOf('/plugins/') == 0))
 	{
 		// iOS is default platform.
-		var platformPath = './application/libs-cordova/ios'
+		var platformPath = './hyper/libs-cordova/ios'
 
 		// Check for Android.
 		if (request['headers']['user-agent'].indexOf('Android') > 0)
 		{
-			platformPath = './application/libs-cordova/android'
+			platformPath = './hyper/libs-cordova/android'
 		}
 		console.log('path1: ' + path)
 		console.log('path2: ' + platformPath + path)

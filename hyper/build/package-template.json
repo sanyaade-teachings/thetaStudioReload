@@ -9,8 +9,8 @@
     "title": "HyperReload __VERSION__",
     "toolbar": false,
     "frame": true,
-    "width": 580,
-    "height": 600,
+    "width": 600,
+    "height": 660,
     "position": "mouse"
   }
 }

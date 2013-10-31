@@ -5,9 +5,13 @@ def distPackageName
 	"HyperReload"
 end
 
+def root
+	"../../"
+end
+
 # Destination folder for distribution packages.
 def pathDist
-	"../../" + distPackageName + "_" + version + "/"
+	root + distPackageName + "_" + version + "/"
 end
 
 # Destination temporary folder for application code.
@@ -17,7 +21,7 @@ end
 
 # Source of main HyperReload application code.
 def pathSourceHyper
-	"../../HyperReload/"
+	root + "HyperReload/"
 end
 
 # Source file for package.json.
@@ -27,7 +31,7 @@ end
 
 # Source of main demo apps.
 def pathSourceDemo
-	"../../HyperReload/demo/"
+	root + "HyperReload/demo/"
 end
 
 # Source of initial project list.
@@ -41,19 +45,19 @@ def pathSourceDoc
 end
 
 def pathNodeWebkitLinux32
-	"../../node-webkit-bin/node-webkit-v0.8.0-linux-ia32/"
+	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-linux-ia32/"
 end
 
 def pathNodeWebkitLinux64
-	"../../node-webkit-bin/node-webkit-v0.8.0-linux-x64/"
+	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-linux-x64/"
 end
 
 def pathNodeWebkitWin
-	"../../node-webkit-bin/node-webkit-v0.8.0-win-ia32/"
+	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-win-ia32/"
 end
 
 def pathNodeWebkitMac
-	"../../node-webkit-bin/node-webkit-v0.8.0-osx-ia32/"
+	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-osx-ia32/"
 end
 
 def buildPostProcess

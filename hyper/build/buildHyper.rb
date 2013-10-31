@@ -132,6 +132,9 @@ def buildDistBinaryLinux(sourcePath, targetPath, sourceBin)
 	FileUtils.copy_entry(
 		sourceBin + "libffmpegsumo.so",
 		targetPath + "libffmpegsumo.so")
+	FileUtils.copy_entry(
+		sourceBin + "credits.html",
+		targetPath + distPackageName + "license/node-webkit-credits.html")
 end
 
 def buildDistBinaryMac
@@ -147,6 +150,9 @@ def buildDistBinaryMac
 	FileUtils.copy_entry(
 		sourceBin + "node-webkit.app",
 		targetPath + distPackageName + ".app")
+	FileUtils.copy_entry(
+		sourceBin + "credits.html",
+		targetPath + distPackageName + "license/node-webkit-credits.html")
 end
 
 def buildDistBinaryWin
@@ -177,6 +183,9 @@ def buildDistBinaryWin
 	FileUtils.copy_entry(
 		sourceBin + "libGLESv2.dll",
 		targetPath + "libGLESv2.dll")
+	FileUtils.copy_entry(
+		sourceBin + "credits.html",
+		targetPath + distPackageName + "license/node-webkit-credits.html")
 end
 
 def buildZippedBinaries

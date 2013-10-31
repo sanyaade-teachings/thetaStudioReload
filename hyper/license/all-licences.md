@@ -30,7 +30,7 @@ See file LICENSE.md
 
 	For a complete listing of licenses for software used by node-webkit, see file:
 
-	node-webkit-license.html
+	node-webkit-credits.html
 
 ## Apache Cordova license
 

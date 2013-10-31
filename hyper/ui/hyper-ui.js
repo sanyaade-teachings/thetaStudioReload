@@ -17,7 +17,7 @@ var PATH = require('path')
 var OS = require('os')
 var GUI = require('nw.gui')
 var FILEUTIL = require('../server/fileutil.js')
-var SETTINGS = require('../../settings.js')
+var SETTINGS = require('../settings/settings.js')
 
 /*** Globals ***/
 
@@ -395,8 +395,7 @@ hyper.UI = {}
 
 	hyper.SERVER = SERVER
 
-	var mProjectListFile = './project-list.json'
-	// Not used: var mProjectListTemplateFile = './application/project-list-template.json'
+	var mProjectListFile = '../settings/project-list.json'
 	var mProjectList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
