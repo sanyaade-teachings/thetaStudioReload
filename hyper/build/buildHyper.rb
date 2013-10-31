@@ -34,6 +34,8 @@ require "pathname"
 #                 GLOBAL VARIABLES                    #
 #######################################################
 
+$VersionString = 'UndefinedVersion'
+
 def version
 	$VersionString
 end
@@ -53,8 +55,8 @@ def buildCopyHyperToDistDir
 	puts "Copying Hyper to dist dir"
 
 	FileUtils.copy_entry(
-		pathSourceHyper + "application/",
-		pathDistSource + "application/")
+		pathSourceHyper + "hyper/",
+		pathDistSource + "hyper/")
 	FileUtils.copy_entry(
 		pathSourceDoc,
 		pathDistSource + "documentation/")
@@ -63,18 +65,15 @@ def buildCopyHyperToDistDir
 		pathDistSource + "demo/")
 	FileUtils.copy_entry(
 		pathSourceProjectList,
-		pathDistSource + "project-list.json")
-	FileUtils.copy_entry(
-		pathSourceHyper + "settings.js",
-		pathDistSource + "settings.js")
+		pathDistSource + "hyper/settings/project-list.json")
 	FileUtils.copy_entry(
 		pathSourceHyper + "node_modules/",
 		pathDistSource + "node_modules/")
 
 	# Copy license file.
 	FileUtils.copy_entry(
-		pathSourceHyper + "license/",
-		pathDistSource + "license/")
+		pathSourceHyper + "LICENSE.md",
+		pathDistSource + "LICENSE.md")
 
 	# Create package.json for this version.
 	content = fileReadContent(pathSourcePackageJson)
@@ -181,6 +180,7 @@ def buildDistBinaryWin
 end
 
 def buildZippedBinaries
+
 end
 
 # Build distribution package.

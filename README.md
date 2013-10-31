@@ -100,13 +100,15 @@ For a full listing of software used by HyperReload, see folder "license".
 
 HyperReload is Copyright (c) 2013 Mikael Kindborg
 
-The HyperReload source code is licensed under the Apache license. You are welcome to contribute to the project and use the HyperReload source code for your own projects.
+The source code in the HyperReload repository is licensed under the Apache license. You are welcome to contribute to the project and use the source code with your own projects.
 
-See the folder "license" for full licensing information, including licenses for software used by HyperReload.
+See the folder "hyper/license" for full licensing information, including licenses for software used by HyperReload.
 
-The [HyperReload software product](http://hyperreload.com) contains tutorials and other material that are not open source. You are free to use HyperReload at work and at home, and modify it for your own needs and share with friends, but you may not sell, publish, or distribute the HyperReload software product.
+## Relation to the HyperReload software product
 
-Commercial licenses of HyperReload and support and development services are available upon request.
+The [HyperReload software product](http://hyperreload.com) contains tutorials and other material that are not open source, and the downloadable package (which includes the full source code) is released under a proprietary license. You are free to use HyperReload at work and at home, and modify it for your own needs and share with friends, but you may not sell, publish, or distribute the HyperReload software product.
+
+Commercial licenses for HyperReload and support and development services are available upon request.
 
 ## Contact
 

@@ -1,5 +1,5 @@
 {
-  "main": "application/ui/hyper-ui.html",
+  "main": "hyper/ui/hyper-ui.html",
   "name": "HyperReload",
   "description": "HTML/JS mobile live-coding development tool",
   "version": "0.2.0",

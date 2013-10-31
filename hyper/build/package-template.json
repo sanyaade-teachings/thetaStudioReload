@@ -1,10 +1,10 @@
 {
-  "main": "application/hyper-ui.html",
+  "main": "hyper/ui/hyper-ui.html",
   "name": "HyperReload",
   "description": "HTML/JS mobile live-coding development tool",
   "version": "__VERSION__",
   "keywords": ["HyperReload", "mobile", "JavaScript"],
-  "window": 
+  "window":
   {
     "title": "HyperReload __VERSION__",
     "toolbar": false,

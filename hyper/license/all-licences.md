@@ -1,32 +1,12 @@
-# License information
+# Licenses for software included with HyperReload
 
-License for HyperReload and licences for software used by HyperReload.
+This file contains licenses for software included with HyperReload.
 
 ## HyperReload license
 
-HyperReload is Copyright (c) 2013 Mikael Kindborg
+See file LICENSE.md
 
-The HyperReload source code is licensed under the Apache license:
-
-    Copyright (c) 2013 Mikael Kindborg <mikael@kindborg.com>
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
-For licenses for software used by HyperReload, see files in the license folder.
-
-## Licenses for software used by HyperReload
-
-### node-webkit license
+## node-webkit license
 
 	Copyright (c) 2012 Intel Corp
 	Copyright (c) 2012 The Chromium Authors
@@ -52,13 +32,13 @@ For licenses for software used by HyperReload, see files in the license folder.
 
 	node-webkit-license.html
 
-### Apache Cordova license
+## Apache Cordova license
 
 	See file:
 
 	Cordova-license.md
 
-### org.chrome.sockets Cordova plugin license
+## org.chrome.sockets Cordova plugin license
 
 	// Copyright (c) 2012 The Chromium Authors. All rights reserved.
 	//
@@ -88,7 +68,7 @@ For licenses for software used by HyperReload, see files in the license folder.
 	// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 	// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### CodeMirror license
+## CodeMirror license
 
 	Copyright (C) 2013 by Marijn Haverbeke <marijnh@gmail.com> and others
 
@@ -110,7 +90,7 @@ For licenses for software used by HyperReload, see files in the license folder.
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 	THE SOFTWARE.
 
-### jQuery and jQuery UI license
+## jQuery and jQuery UI license
 
 	Copyright 2013 jQuery Foundation and other contributors
 	http://jquery.com/
@@ -134,7 +114,7 @@ For licenses for software used by HyperReload, see files in the license folder.
 	OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### jQuery UI Bootstrap license
+## jQuery UI Bootstrap license
 
 	The MIT License (MIT)
 
@@ -164,7 +144,7 @@ For licenses for software used by HyperReload, see files in the license folder.
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 	THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Bootstrap license
+## Bootstrap license
 
 	Copyright 2013 Twitter, Inc under the Apache 2.0 license.
 
@@ -345,7 +325,7 @@ For licenses for software used by HyperReload, see files in the license folder.
 
 	   END OF TERMS AND CONDITIONS
 
-### socket.io license
+## socket.io license
 
 	(The MIT License)
 
@@ -370,7 +350,7 @@ For licenses for software used by HyperReload, see files in the license folder.
 	TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### unzip license
+## unzip license
 
 	(The MIT License)
 
@@ -395,7 +375,7 @@ For licenses for software used by HyperReload, see files in the license folder.
 	OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### jQuery UI Layout Plugin license
+## jQuery UI Layout Plugin license
 
 								UI Layout
 				 The Ultimate Page Layout Plugin for jQuery
