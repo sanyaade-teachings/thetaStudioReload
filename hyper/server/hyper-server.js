@@ -51,6 +51,7 @@ function startWebServer(basePath, port, fun)
  *
  * Version of webserver hook function used for serving iframe version.
  */
+/*
 function webServerHookFunForIframe(request, response, path)
 {
 	// When the root is requested, we send the document with an
@@ -66,6 +67,7 @@ function webServerHookFunForIframe(request, response, path)
 		return false
 	}
 }
+*/
 
 /**
  * Internal.
@@ -79,22 +81,34 @@ function webServerHookFunForScriptInjection(request, response, path)
 	if (path == '/')
 	{
 		// If the root path is requested, send the connect page.
-		var file = FS.readFileSync('./hyper/server/hyper-connect.html', {encoding: 'utf8'})
-		file = insertReloaderScript(file, request)
-		mWebServer.writeRespose(response, file, 'text/html')
-		return true
+		var file = FILEUTIL.readFileSync('./hyper/server/hyper-connect.html')
+		if (file)
+		{
+			file = insertReloaderScript(file, request)
+			mWebServer.writeRespose(response, file, 'text/html')
+			return true
+		}
+		else
+		{
+			return false
+		}
 	}
 	else if (path == '/hyper.reloader')
 	{
 		// Send reloader script.
-		var script = FS.readFileSync(
-			'./hyper/server/hyper-reloader.js',
-			{encoding: 'utf8'})
-		script = script.replace(
-			'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
-			SETTINGS.SocketIoPort)
-		mWebServer.writeRespose(response, script, 'application/javascript')
-		return true
+		var script = FILEUTIL.readFileSync('./hyper/server/hyper-reloader.js')
+		if (script)
+		{
+			script = script.replace(
+				'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
+				SETTINGS.SocketIoPort)
+			mWebServer.writeRespose(response, script, 'application/javascript')
+			return true
+		}
+		else
+		{
+			return false
+		}
 	}
 	else if (SETTINGS.ServeCordovaJsFiles &&
 		(path == '/cordova.js' ||
@@ -109,20 +123,34 @@ function webServerHookFunForScriptInjection(request, response, path)
 		{
 			platformPath = './hyper/libs-cordova/android'
 		}
-		console.log('path1: ' + path)
-		console.log('path2: ' + platformPath + path)
-		var script = FS.readFileSync(platformPath + path, {encoding: 'utf8'})
-		mWebServer.writeRespose(response, script, 'application/javascript')
-		return true
+		//console.log('path1: ' + path)
+		//console.log('path2: ' + platformPath + path)
+		var script = FILEUTIL.readFileSync(platformPath + path)
+		if (script)
+		{
+			mWebServer.writeRespose(response, script, 'application/javascript')
+			return true
+		}
+		else
+		{
+			return false
+		}
 	}
-	else if (FILEUTIL.fileIsHTML(path))
+	else if (mBasePath && FILEUTIL.fileIsHTML(path))
 	{
 		// Insert reloader script into HTML page.
 		var filePath = mBasePath + path.substr(1)
-		var file = FS.readFileSync(filePath, {encoding: 'utf8'})
-		file = insertReloaderScript(file, request)
-		mWebServer.writeRespose(response, file, 'text/html')
-		return true
+		var file = FILEUTIL.readFileSync(filePath)
+		if (file)
+		{
+			file = insertReloaderScript(file, request)
+			mWebServer.writeRespose(response, file, 'text/html')
+			return true
+		}
+		else
+		{
+			return false
+		}
 	}
 	else
 	{
@@ -203,16 +231,31 @@ function insertReloaderScript(file, request)
  */
 function startServers()
 {
-	console.log('Starting server')
+	console.log('Starting servers')
+
+	// Start socket.io server.
+	// TODO: Move to a separate function for clarity.
+
 	//mIO = SOCKETIO.listen(SETTINGS.SocketIoPort, {log: false})
 	mIO = SOCKETIO.listen(SETTINGS.SocketIoPort)
 
 	mIO.set('log level', 1)
+	mIO.set('close timeout', 60 * 60 * 24)
+	mIO.set('transports', ['xhr-polling'])
 
 	// Handle socket connections.
 	mIO.sockets.on('connection', function(socket)
 	{
 		++mNumberOfConnectedClients
+
+		console.log('socket.id: ' + socket.id)
+		for (var prop in socket)
+		{
+    		if (socket.hasOwnProperty(prop))
+    		{
+        		//console.log('  ' + prop)
+    		}
+		}
 
 		if (mConnectedCallback)
 		{
@@ -268,6 +311,7 @@ function startServers()
 	})
 
 	// Start web server.
+
 	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
 	{
 		mWebServer = server
@@ -336,6 +380,9 @@ function getServerBaseURL()
  */
 function runApp()
 {
+	// Hack!
+	//mNumberOfConnectedClients = 0
+
 	mIO.sockets.emit('hyper.run', {url: getAppFileURL()})
 }
 
@@ -345,6 +392,9 @@ function runApp()
  */
 function reloadApp()
 {
+	// Hack!
+	//mNumberOfConnectedClients = 0
+
 	mIO.sockets.emit('hyper.reload', {})
 }
 

@@ -60,7 +60,9 @@ Copyright (c) 2013 Mikael Kindborg
 
 	function connect()
 	{
-		var socket = io.connect(baseUrl + ':' + socketIoPort)
+		var socket = io.connect(
+			baseUrl + ':' + socketIoPort,
+			{ 'sync disconnect on unload': true })
 		hyper.IoSocket = socket
 		socket.on('hyper.run', function(data)
 		{

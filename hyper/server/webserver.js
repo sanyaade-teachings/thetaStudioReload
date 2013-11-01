@@ -154,6 +154,11 @@ function CreateServerObject()
 
 	self.writeRespose = WriteResponse
 
+	self.writeResponsePageNotFound = function(response)
+	{
+		FileNotFoundResponse('base path not set', response)
+	}
+
 	// Old debug print.
 	//var data = FS.readFileSync('/HackathonDemos/BasicWebUI/LocalFiles/index.html')
 	//console.log(data)

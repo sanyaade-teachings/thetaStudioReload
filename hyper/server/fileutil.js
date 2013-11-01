@@ -7,6 +7,19 @@ Copyright (c) 2013 Mikael Kindborg
 
 var PATH = require('path')
 var HTTP = require('http')
+var FS = require('fs')
+
+exports.readFileSync = function(path, options)
+{
+	try
+	{
+		return FS.readFileSync(path, options || {encoding: 'utf8'})
+	}
+	catch (err)
+	{
+		return null
+	}
+}
 
 exports.isPathAbsolute = function(path)
 {

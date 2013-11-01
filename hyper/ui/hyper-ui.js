@@ -262,11 +262,8 @@ hyper.UI = {}
 			+ '</div>'
 
 		// Get name of project, use title tag as first choise.
-		try
-		{
-			var data = FS.readFileSync(path, {encoding: 'utf8'})
-		}
-		catch (err)
+		var data = FILEUTIL.readFileSync(path)
+		if (!data)
 		{
 			// Return on error, skipping rest of the code.
 			console.log('createProjectEntry failed: ' + err)
@@ -485,7 +482,7 @@ hyper.UI = {}
 
 	function clientDisconnectedCallback(numberOfConnectedClients)
 	{
-		if (0 == numberOfConnectedClients)
+		if (0 >= numberOfConnectedClients)
 		{
 			mOpenExternalBrowser = true
 		}
@@ -510,7 +507,14 @@ hyper.UI = {}
 		// Read project file.
 		if (FS.existsSync(mProjectListFile))
 		{
-			var json = FS.readFileSync(mProjectListFile, {encoding: 'utf8'})
+			var json = FILEUTIL.readFileSync(mProjectListFile)
+
+			// Replace slashes with backslashes on Windows.
+			if (process.platform === 'win32')
+			{
+				json = json.replace(/[\/]/g,'\\\\')
+			}
+
 			mProjectList = JSON.parse(json)
 		}
 	}
