@@ -27,9 +27,8 @@ var mAppPath
 var mAppFile
 var mIpAddress
 var mMessageCallback = null
-var mNumberOfConnectedClients = 0
-var mConnectedCallback = null
-var mDisconnectedCallback = null
+var mClientConnectedCallback = null
+var mReloadCallback = null
 
 /*** Server functions ***/
 
@@ -242,42 +241,27 @@ function startServers()
 	mIO.set('log level', 1)
 	mIO.set('close timeout', 60 * 60 * 24)
 	mIO.set('transports', ['xhr-polling'])
+	mIO.set('browser client minification', true)
+	mIO.set('polling duration', 5)
 
 	// Handle socket connections.
 	mIO.sockets.on('connection', function(socket)
 	{
-		++mNumberOfConnectedClients
-
-		console.log('socket.id: ' + socket.id)
-		for (var prop in socket)
-		{
-    		if (socket.hasOwnProperty(prop))
-    		{
-        		//console.log('  ' + prop)
-    		}
-		}
-
-		if (mConnectedCallback)
-		{
-			mConnectedCallback(mNumberOfConnectedClients)
-		}
-
 		// Debug logging.
-		//console.log('Client connected')
-		//console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
+		console.log('Client connected')
 
 		socket.on('disconnect', function ()
 		{
-			--mNumberOfConnectedClients
-
-			if (mDisconnectedCallback)
-			{
-				mDisconnectedCallback(mNumberOfConnectedClients)
-			}
-
 			// Debug logging.
-			//console.log('Client disconnected')
-			//console.log('mNumberOfConnectedClients: ' + mNumberOfConnectedClients)
+			console.log('Client disconnected')
+		})
+
+		socket.on('hyper.client-connected', function(data)
+		{
+			// Debug logging.
+			console.log('hyper.client-connected')
+
+			mClientConnectedCallback && mClientConnectedCallback()
 		})
 
 		socket.on('hyper.log', function(data)
@@ -380,9 +364,6 @@ function getServerBaseURL()
  */
 function runApp()
 {
-	// Hack!
-	//mNumberOfConnectedClients = 0
-
 	mIO.sockets.emit('hyper.run', {url: getAppFileURL()})
 }
 
@@ -392,10 +373,8 @@ function runApp()
  */
 function reloadApp()
 {
-	// Hack!
-	//mNumberOfConnectedClients = 0
-
 	mIO.sockets.emit('hyper.reload', {})
+	mReloadCallback && mReloadCallback()
 }
 
 /**
@@ -419,29 +398,21 @@ function setMessageCallbackFun(fun)
 /**
  * External.
  *
- * Callback form: fun(numberOfConnectedClients)
+ * Callback form: fun()
  */
-function setConnenctedCallbackFun(fun)
+function setClientConnenctedCallbackFun(fun)
 {
-	mConnectedCallback = fun
+	mClientConnectedCallback = fun
 }
 
 /**
  * External.
  *
- * Callback form: fun(numberOfConnectedClients)
+ * Callback form: fun()
  */
-function setDisconnenctedCallbackFun(fun)
+function setReloadCallbackFun(fun)
 {
-	mDisconnectedCallback = fun
-}
-
-/**
- * External.
- */
-function getNumberOfConnectedClients()
-{
-	return mNumberOfConnectedClients
+	mReloadCallback = fun
 }
 
 /**
@@ -608,9 +579,8 @@ exports.runApp = runApp
 exports.reloadApp = reloadApp
 exports.evalJS = evalJS
 exports.setMessageCallbackFun = setMessageCallbackFun
-exports.setConnenctedCallbackFun = setConnenctedCallbackFun
-exports.setDisconnenctedCallbackFun = setDisconnenctedCallbackFun
-exports.getNumberOfConnectedClients = getNumberOfConnectedClients
+exports.setClientConnenctedCallbackFun = setClientConnenctedCallbackFun
+exports.setReloadCallbackFun = setReloadCallbackFun
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
 exports.getNumberOfMonitoredFiles = getNumberOfMonitoredFiles
 exports.fileSystemMonitor = fileSystemMonitor

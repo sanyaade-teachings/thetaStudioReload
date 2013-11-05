@@ -340,10 +340,9 @@ hyper.UI = {}
 		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
 
-	hyper.UI.displayConnectedCounter = function()
+	hyper.UI.setConnectedCounter = function(value)
 	{
-		document.querySelector('#connect-counter').innerHTML =
-			hyper.SERVER.getNumberOfConnectedClients()
+		document.querySelector('#connect-counter').innerHTML = value
 	}
 
 	hyper.UI.displayNumberOfMonitoredFiles = function()
@@ -396,7 +395,7 @@ hyper.UI = {}
 	var mProjectList = []
 	var mApplicationBasePath = process.cwd()
 	var mRunAppGuardFlag = false
-	var mOpenExternalBrowser = true
+	var mNumberOfConnectedClients = 0
 	var mConnectedCounterTimer = 0
 
 	function setupServer()
@@ -414,8 +413,8 @@ hyper.UI = {}
 		hyper.UI.setServerMessageFun()
 		displayServerIpAddress()
 
-		SERVER.setConnenctedCallbackFun(clientConnectedCallback)
-		SERVER.setDisconnenctedCallbackFun(clientDisconnectedCallback)
+		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
+		SERVER.setReloadCallbackFun(reloadCallback)
 	}
 
 	function displayServerIpAddress()
@@ -430,9 +429,11 @@ hyper.UI = {}
 	// to open. Guard against this case.
 	hyper.runAppGuard = function(path)
 	{
-		if (mRunAppGuardFlag) { return }
-		mRunAppGuardFlag = true
-		hyper.runApp(path)
+		if (!mRunAppGuardFlag)
+		{
+			mRunAppGuardFlag = true
+			hyper.runApp(path)
+		}
 	}
 
 	// The Run button in the UI has been clicked.
@@ -448,7 +449,7 @@ hyper.UI = {}
 
 		SERVER.setAppPath(path)
 
-		if (mOpenExternalBrowser)
+		if (mNumberOfConnectedClients <= 0)
 		{
 			// Open a local browser automatially if no clients are connected.
 			// This is done so that something will happen when you first try
@@ -467,30 +468,30 @@ hyper.UI = {}
 			// Otherwise, load the requested file on connected clients.
 			SERVER.runApp()
 		}
+
+		mNumberOfConnectedClients = 0
+
+		clearTimeout(mConnectedCounterTimer)
+		mConnectedCounterTimer = setTimeout(function() {
+			hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
+			5000)
 	}
 
-	function clientConnectedCallback(numberOfConnectedClients)
+	function clientConnectedCallback()
 	{
 		mRunAppGuardFlag = false
-		mOpenExternalBrowser = false
+
+		++mNumberOfConnectedClients
 
 		clearTimeout(mConnectedCounterTimer)
 		mConnectedCounterTimer = setTimeout(function() {
-			hyper.UI.displayConnectedCounter() },
+			hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
 			1000)
 	}
 
-	function clientDisconnectedCallback(numberOfConnectedClients)
+	function reloadCallback()
 	{
-		if (0 >= numberOfConnectedClients)
-		{
-			mOpenExternalBrowser = true
-		}
-
-		clearTimeout(mConnectedCounterTimer)
-		mConnectedCounterTimer = setTimeout(function() {
-			hyper.UI.displayConnectedCounter() },
-			1000)
+		mNumberOfConnectedClients = 0
 	}
 
 	function readProjectList()
