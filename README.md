@@ -18,6 +18,33 @@ HyperReload uses [node-webkit](https://github.com/rogerwang/node-webkit) as its 
 
 There is no need to do an actual build, you can clone the source, then run using node-webkit. Just place the node-webkit [executable files](https://github.com/rogerwang/node-webkit) in the same folder as package.json and launch node-webkit.
 
+## Building from source
+
+There is a script that can build stand-alone redistributable packages:
+
+     hyper/build/buildHyper.rb 
+
+In addition, there is a script 'buildPlugin.rb' that you should copy and modify to customise the build (e.g. defining the name of the package to build).
+
+This script requires that a directory named 'node-webkit-bin-0.8.0' exists parallel to the HyperReload source dir. This directory contains the uncompressed node-webkit binaries. Note that depending on the version of node-webkit used, you must update the directory names and executabe names in the build script.
+
+Folder structure:
+
+    HyperReload
+    node-webkit-bin-0.8.0
+        node-webkit-v0.8.0-linux-ia32
+            creadits.html
+            libffmpegsumo.so
+            nw
+            nw.pak
+            nwsnapshot
+        node-webkit-v0.8.0-linux-x64
+            ...
+        node-webkit-v0.8.0-osx-ia32
+            ...
+        node-webkit-v0.8.0-win-ia32
+            ...
+
 ## Documentation and issue tracker
 
 Documentation and downloads for HyperReload are on [hyperreload.com](http://hyperreload.com).
