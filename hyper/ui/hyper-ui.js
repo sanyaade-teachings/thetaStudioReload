@@ -266,7 +266,7 @@ hyper.UI = {}
 		if (!data)
 		{
 			// Return on error, skipping rest of the code.
-			console.log('createProjectEntry failed: ' + err)
+			console.log('createProjectEntry failed: ' + path)
 			return
 		}
 
