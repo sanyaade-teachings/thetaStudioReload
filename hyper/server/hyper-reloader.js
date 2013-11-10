@@ -56,10 +56,15 @@ Copyright (c) 2013 Mikael Kindborg
 
 	window.onerror = function(msg, url, linenumber)
 	{
+		url = url || 'unknown'
+		//console.log('@@@ url: ' + url)
 		// Strip off hostname from url.
+		//@@@ url: http://192.168.0.102:4042/hyper.reloader
 		var pos = url.indexOf('//', 0)
-		pos = url.indexOf('/', pos + 2)
-		var file = url.substring(pos + 1)
+		if (pos < 0) { pos = 0 }
+		var pos2 = url.indexOf('/', pos + 2)
+		if (pos2 < 0) { pos2 = pos } else { ++pos2 }
+		var file = url.substring(pos2)
 		hyper.log('[ERR] ' + msg + ' [' + file + ': ' + linenumber + ']')
 		return true
 	}
