@@ -7,11 +7,12 @@ Copyright (c) 2013 Mikael Kindborg
 
 /*** Modules used ***/
 
-var WEBSERVER = require('./webserver')
+var OS = require('os')
 var SOCKETIO = require('socket.io')
 var FS = require('fs')
 var PATH = require('path')
 var FILEUTIL = require('./fileutil.js')
+var WEBSERVER = require('./webserver')
 var SETTINGS = require('../settings/settings.js')
 
 /*********************************/
@@ -31,17 +32,6 @@ var mClientConnectedCallback = null
 var mReloadCallback = null
 
 /*** Server functions ***/
-
-/**
- * Internal.
- */
-function startWebServer(basePath, port, fun)
-{
-	var server = WEBSERVER.create()
-	server.setBasePath(basePath)
-	server.start(port)
-	fun(server)
-}
 
 /**
  * NOT USED.
@@ -232,69 +222,9 @@ function startServers()
 {
 	console.log('Starting servers')
 
-	// Start socket.io server.
-	// TODO: Move to a separate function for clarity.
+	startUDPServer(4088)
 
-	//mIO = SOCKETIO.listen(SETTINGS.SocketIoPort, {log: false})
-	mIO = SOCKETIO.listen(SETTINGS.SocketIoPort)
-
-	mIO.set('log level', 1)
-	mIO.set('close timeout', 60 * 60 * 24)
-	mIO.set('transports', ['xhr-polling'])
-	mIO.set('browser client minification', true)
-	mIO.set('polling duration', 5)
-
-	// Handle socket connections.
-	mIO.sockets.on('connection', function(socket)
-	{
-		// Debug logging.
-		console.log('Client connected')
-
-		socket.on('disconnect', function ()
-		{
-			// Debug logging.
-			console.log('Client disconnected')
-		})
-
-		socket.on('hyper.client-connected', function(data)
-		{
-			// Debug logging.
-			console.log('hyper.client-connected')
-
-			mClientConnectedCallback && mClientConnectedCallback()
-		})
-
-		socket.on('hyper.log', function(data)
-		{
-			displayLogMessage(data)
-		})
-
-		socket.on('hyper.result', function(data)
-		{
-			//console.log('data result type: ' + (typeof data))
-			//console.log('data result : ' + data)
-
-			// Functions cause a cloning error.
-			if (typeof data == 'function')
-			{
-				data = typeof data
-			}
-			displayJsResult(data)
-		})
-
-		// Closure that holds socket connection.
-		/*(function(socket)
-		{
-			//mSockets.push_back(socket)
-			//socket.emit('news', { hello: 'world' });
-			socket.on('unregister', function(data)
-			{
-				mSockets.remove(socket)
-			})
-		})(socket)*/
-	})
-
-	// Start web server.
+	startSocketIoServer()
 
 	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
 	{
@@ -443,6 +373,126 @@ function displayJsResult(result)
 	{
 		mMessageCallback({ message: 'hyper.result', result: result })
 	}
+}
+
+/**
+ * Internal.
+ */
+function startWebServer(basePath, port, fun)
+{
+	var server = WEBSERVER.create()
+	server.setBasePath(basePath)
+	server.start(port)
+	fun(server)
+}
+
+/**
+ * Internal.
+ */
+function startSocketIoServer()
+{
+	//mIO = SOCKETIO.listen(SETTINGS.SocketIoPort, {log: false})
+	mIO = SOCKETIO.listen(SETTINGS.SocketIoPort)
+
+	mIO.set('log level', 1)
+	mIO.set('close timeout', 60 * 60 * 24)
+	mIO.set('transports', ['xhr-polling'])
+	mIO.set('browser client minification', true)
+	mIO.set('polling duration', 5)
+
+	// Handle socket connections.
+	mIO.sockets.on('connection', function(socket)
+	{
+		// Debug logging.
+		console.log('Client connected')
+
+		socket.on('disconnect', function ()
+		{
+			// Debug logging.
+			console.log('Client disconnected')
+		})
+
+		socket.on('hyper.client-connected', function(data)
+		{
+			// Debug logging.
+			console.log('hyper.client-connected')
+
+			mClientConnectedCallback && mClientConnectedCallback()
+		})
+
+		socket.on('hyper.log', function(data)
+		{
+			displayLogMessage(data)
+		})
+
+		socket.on('hyper.result', function(data)
+		{
+			//console.log('data result type: ' + (typeof data))
+			//console.log('data result : ' + data)
+
+			// Functions cause a cloning error.
+			if (typeof data == 'function')
+			{
+				data = typeof data
+			}
+			displayJsResult(data)
+		})
+
+		// Closure that holds socket connection.
+		/*(function(socket)
+		{
+			//mSockets.push_back(socket)
+			//socket.emit('news', { hello: 'world' });
+			socket.on('unregister', function(data)
+			{
+				mSockets.remove(socket)
+			})
+		})(socket)*/
+	})
+}
+
+/**
+ * Experimental.
+ */
+function startUDPServer(port)
+{
+	var DATAGRAM = require('dgram')
+	var server = DATAGRAM.createSocket('udp4')
+
+	server.on('message', function (msg, info)
+	{
+		console.log(
+			'UDP server got: ' + msg + ' from ' +
+			info.address + ':' + info.port)
+		if (msg == 'hyper.whoIsThere')
+		{
+			var serverData =
+			{
+				name: OS.hostname(),
+				url: 'http://' + mIpAddress + ':' + SETTINGS.WebServerPort
+			}
+
+			var message = new Buffer(JSON.stringify(serverData))
+
+			server.send(
+				message,
+				0,
+				message.length,
+				info.port,
+				info.address,
+				function(err, bytes)
+				{
+				})
+		}
+	})
+
+	server.on('listening', function ()
+	{
+		var address = server.address()
+		console.log('UDP server listening')
+	})
+
+	server.bind(port);
 }
 
 // Display version info.

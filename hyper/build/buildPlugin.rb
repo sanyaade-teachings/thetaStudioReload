@@ -9,8 +9,6 @@ def distCopyright
 	"Copyright (c) 2013 Mikael Kindborg"
 end
 
-#puts distCopyright
-
 def root
 	"../../"
 end
