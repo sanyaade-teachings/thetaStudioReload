@@ -190,16 +190,27 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 
 <div id="toolbar" class="header-footer">
 	<button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
-	<button id="button-undo" type="button" class="btn btn-warning">Undo</button>
+	<button id="button-undo" type="button" class="btn btn-primary">Undo</button>
 	<button id="button-redo" type="button" class="btn btn-primary">Redo</button>
-	<button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
+	<button id="button-clear-log" type="button" class="btn btn-warning">Clear Log</button>
 	<button id="button-clear-editor" type="button" class="btn btn-danger">Clear Editor</button>
-	<button id="button-eval-node" type="button" class="btn btn-danger">Node Eval</button>
+	<button id="button-eval-node" type="button" class="btn btn-success">Node Eval</button>
 </div>
 
 <div id="result-area" class="ui-layout-content">
 <textarea id="result-editor">
-(Log messages and eval results are displayed here)
+// This is the message area where log messages and errors
+// are displayed.
+//
+// Select one or more lines of code in the code area above.
+// Then press "Eval Selection" to evaluate (run the code)
+// on connected devices.
+//
+// "Node Eval" is special, it evaluates selected code in
+// node-webkit, the platform on which HyperReload is built.
+// With this button, you can interactively develop and test
+// node.js servers and functions in node-webkit. This is a
+// very powerful feature.
 </textarea>
 </div>
 

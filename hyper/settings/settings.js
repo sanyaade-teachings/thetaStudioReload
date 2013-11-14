@@ -25,3 +25,7 @@ exports.ServeCordovaJsFiles = true
 // Font settings for the Workbench editors.
 exports.WorkbenchFontFamily = 'monospace'
 exports.WorkbenchFontSize = '18px'
+
+// Settings for UDP server discovery.
+exports.ServerDiscoveryEnabled = false
+exports.ServerDiscoveryPort = 4088

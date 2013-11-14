@@ -218,28 +218,6 @@ function insertReloaderScript(file, request)
 /**
  * External.
  */
-function startServers()
-{
-	console.log('Starting servers')
-
-	startUDPServer(4088)
-
-	startSocketIoServer()
-
-	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
-	{
-		mWebServer = server
-		mWebServer.getIpAddress(function(address)
-		{
-			mIpAddress = ensureIpAddress(address)
-		})
-		mWebServer.setHookFun(webServerHookFunForScriptInjection)
-	})
-}
-
-/**
- * External.
- */
 function getWebServerIpAndPort(fun)
 {
 	mWebServer.getIpAddress(function(address)
@@ -333,6 +311,31 @@ function setMessageCallbackFun(fun)
 function setClientConnenctedCallbackFun(fun)
 {
 	mClientConnectedCallback = fun
+}
+
+/**
+ * External.
+ */
+function startServers()
+{
+	console.log('Starting servers')
+
+	if (SETTINGS.ServerDiscoveryEnabled)
+	{
+		startUDPServer(SETTINGS.ServerDiscoveryPort || 4088)
+	}
+
+	startSocketIoServer()
+
+	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
+	{
+		mWebServer = server
+		mWebServer.getIpAddress(function(address)
+		{
+			mIpAddress = ensureIpAddress(address)
+		})
+		mWebServer.setHookFun(webServerHookFunForScriptInjection)
+	})
 }
 
 /**

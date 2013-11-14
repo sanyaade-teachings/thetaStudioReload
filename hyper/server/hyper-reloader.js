@@ -10,9 +10,8 @@ Copyright (c) 2013 Mikael Kindborg
 {
 	// Measure page load time in a way that works on all platforms.
 	hyper.documentLoadTime = Date.now()
-	document.addEventListener('load', function(event)
+	window.addEventListener('load', function(event)
 	{
-		hyper.log("Page loaded")
 		hyper.documentLoadTime = Date.now() - hyper.documentLoadTime
   	})
 
@@ -49,17 +48,17 @@ Copyright (c) 2013 Mikael Kindborg
 	hyper.log = hyper.log || hyper.rlog
 
 	// Called from native code. NOT USED.
-	hyper.nativeConsoleMessageCallBack = function(message)
+	/*hyper.nativeConsoleMessageCallBack = function(message)
 	{
 		hyper.log(message)
-	}
+	}*/
 
 	window.onerror = function(msg, url, linenumber)
 	{
 		url = url || 'unknown'
 		//console.log('@@@ url: ' + url)
 		// Strip off hostname from url.
-		//@@@ url: http://192.168.0.102:4042/hyper.reloader
+		// url: http://192.168.0.102:4042/hyper.reloader
 		var pos = url.indexOf('//', 0)
 		if (pos < 0) { pos = 0 }
 		var pos2 = url.indexOf('/', pos + 2)
@@ -86,9 +85,15 @@ Copyright (c) 2013 Mikael Kindborg
 		{
 			// If this page took long to load, show a message
 			// when reloading.
-			;(hyper.documentLoadTime > 800) && hyper.showMessage('Loading')
-			socket.disconnect()
-			window.location.reload(true)
+			if (hyper.documentLoadTime > 800)
+			{
+				hyper.showMessage('Loading')
+			}
+
+			setTimeout(function() {
+				socket.disconnect()
+				window.location.reload(true) }, 200)
+
 		})
 		socket.on('hyper.eval', function(data)
 		{
@@ -111,6 +116,15 @@ Copyright (c) 2013 Mikael Kindborg
 				hyper.onConnectedFun()
 			}
 		})
+	}
+
+	/**
+	 * Go to the start page. When using the
+	 * HyperReload app, this is the main screen.
+	 */
+	hyper.gotoStartPage = function()
+	{
+		history.go(-(history.length-1))
 	}
 
 	/**
