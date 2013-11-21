@@ -1,5 +1,7 @@
 # Definitions of build paths.
 # Author: Mikael Kindborg
+# Copyright (c) 2013 Mikael Kindborg
+# License: Apache Version 2.0
 
 def distPackageName
 	"HyperReload"

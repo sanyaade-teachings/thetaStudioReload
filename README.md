@@ -22,7 +22,7 @@ There is no need to do an actual build, you can clone the source, then run using
 
 There is a script that can build stand-alone redistributable packages:
 
-     hyper/build/buildHyper.rb 
+     hyper/build/buildHyper.rb
 
 In addition, there is a script 'buildPlugin.rb' that you should copy and modify to customise the build (e.g. defining the name of the package to build).
 
@@ -129,7 +129,7 @@ HyperReload is Copyright (c) 2013 Mikael Kindborg
 
 The source code in the HyperReload repository is licensed under the Apache license. You are welcome to contribute to the project and use the source code with your own projects.
 
-See the folder "hyper/license" for full licensing information, including licenses for software used by HyperReload.
+See file LICENSE.md and folder "hyper/license" for full licensing information, including licenses for software used by HyperReload.
 
 ## Relation to the HyperReload software product
 

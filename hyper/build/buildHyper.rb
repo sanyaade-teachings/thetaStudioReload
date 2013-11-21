@@ -10,6 +10,8 @@
 # see instructions in the README.md file.             #
 #                                                     #
 # Author: Mikael Kindborg                             #
+# Copyright (c) 2013 Mikael Kindborg                  #
+# License: Apache Version 2.0                         #
 #######################################################
 
 require "fileutils"
@@ -60,12 +62,6 @@ def buildCopyHyperToDistDir
 	FileUtils.copy_entry(
 		pathSourceDoc,
 		pathDistSource + "documentation/")
-	FileUtils.copy_entry(
-		pathSourceDemo,
-		pathDistSource + "demo/")
-	FileUtils.copy_entry(
-		pathSourceProjectList,
-		pathDistSource + "hyper/settings/project-list.json")
 	FileUtils.copy_entry(
 		pathSourceHyper + "node_modules/",
 		pathDistSource + "node_modules/")
