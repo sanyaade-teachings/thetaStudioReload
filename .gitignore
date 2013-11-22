@@ -9,3 +9,6 @@ HyperReload.app
 
 # HyperReload project list file
 project-list.json
+
+# HyperReload settings file
+hyper/settings/settings.js

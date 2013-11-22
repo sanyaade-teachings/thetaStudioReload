@@ -31,6 +31,8 @@ var FS = require('fs')
 var PATH = require('path')
 var OS = require('os')
 var GUI = require('nw.gui')
+
+require('../server/prepare-settings.js')
 var FILEUTIL = require('../server/fileutil.js')
 var SETTINGS = require('../settings/settings.js')
 
@@ -347,11 +349,11 @@ hyper.UI = {}
 		hyper.setProjectList(projects)
 	}
 
-	hyper.UI.displayIpAddress = function(ip, port)
+	hyper.UI.displayIpAddress = function(ip)
 	{
 		// document.querySelector('#ip-address').innerHTML = ip
 		//document.querySelector('#connect-address-1').innerHTML = ip + ':' + port
-		document.querySelector('#connect-address').innerHTML = ip + ':' + port
+		document.querySelector('#connect-address').innerHTML = ip
 		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
 
@@ -434,8 +436,30 @@ hyper.UI = {}
 
 	function displayServerIpAddress()
 	{
-		SERVER.getWebServerIpAndPort(function(ip, port) {
-			hyper.UI.displayIpAddress(ip, port)
+		SERVER.getIpAddresses(function(addresses)
+		{
+			var connectAddress = ''
+			var numAddresses = addresses.length
+			if (numAddresses == 0)
+			{
+				connectAddress = '127.0.0.1:' + SETTINGS.WebServerPort
+			}
+			else
+			{
+				if (numAddresses > 1)
+				{
+					connectAddress = 'TRY: '
+				}
+				for (var i = 0; i < numAddresses; ++i)
+				{
+					connectAddress += addresses[i] + ':' + SETTINGS.WebServerPort
+					if (i + 1 < numAddresses)
+					{
+						connectAddress += ' OR '
+					}
+				}
+			}
+			hyper.UI.displayIpAddress(connectAddress)
 		})
 	}
 
@@ -502,6 +526,12 @@ hyper.UI = {}
 		mConnectedCounterTimer = setTimeout(function() {
 			hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
 			1000)
+
+		// Update ip address in the UI to the actual ip used by the server.
+
+		SERVER.getIpAddress(function(address) {
+			hyper.UI.displayIpAddress(address + ':' + SETTINGS.WebServerPort)
+		})
 	}
 
 	function reloadCallback()
@@ -585,32 +615,6 @@ hyper.UI = {}
 
 	setupServer()
 })()
-
-/*
-1What I found easier than downloading, installing, and finding Icon Composer was using the command-line tool iconutil.
-
-    Put your png files of each size into a folder. The folder must have the extension .iconset
-
-    Enter this command into the Terminal window:
-
-    iconutil -c icns <iconset filename>
-
-    where <iconset filename> is the path to the folder containing the set of pngs.
-    The output .icns file is written to the same location as the folder.
-
-You must have the following set of pngs:
-
-icon_16x16.png
-icon_16x16@2x.png
-icon_32x32.png
-icon_32x32@2x.png
-icon_128x128.png
-icon_128x128@2x.png
-icon_256x256.png
-icon_256x256@2x.png
-icon_512x512.png
-icon_512x512@2x.png
-*/
 
 /* OLD CODE
 

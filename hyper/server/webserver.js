@@ -110,6 +110,7 @@ function CreateServerObject()
 
 	/**
 	 * Get the public IP address of the machine.
+	 * Tries to get the most appropriate IP-address.
 	 * webserver.getIpAddress(function (address) {
 	 *	 // Do something with address.
 	 *	 })
@@ -126,7 +127,7 @@ function CreateServerObject()
 
 		// Found multiple ip, select the most "suitable" one.
 		// Score system:
-		// 1 127.0.0.1
+		// 1 127.0.0.1 (whole of 127.x.y.z is localhost)
 		// 2 10.x.y.x
 		// 3 192.168.x.y
 		// 4 not one of the above
@@ -165,6 +166,17 @@ function CreateServerObject()
 		}
 
 		callbackFun(addresses[bestIp])
+	}
+
+	/**
+	 * Get a list of the public IP address of the machine.
+	 * webserver.getIpAddresses(function (array) {
+	 *	 // Do something with addresses in array.
+	 *	 })
+	 */
+	self.getIpAddresses = function(callbackFun)
+	{
+		callbackFun(GetIpAddresses())
 	}
 
 	self.writeRespose = WriteResponse

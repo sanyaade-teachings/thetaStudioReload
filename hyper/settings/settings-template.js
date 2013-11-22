@@ -27,5 +27,5 @@ exports.WorkbenchFontFamily = 'monospace'
 exports.WorkbenchFontSize = '18px'
 
 // Settings for UDP server discovery.
-exports.ServerDiscoveryEnabled = false
+exports.ServerDiscoveryEnabled = true
 exports.ServerDiscoveryPort = 4088

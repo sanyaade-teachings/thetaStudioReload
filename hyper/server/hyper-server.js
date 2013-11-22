@@ -81,6 +81,9 @@ function webServerHookFunForIframe(request, response, path)
  */
 function webServerHookFunForScriptInjection(request, response, path)
 {
+	// Update the server address on every request (overkill but simple).
+	mIpAddress = request.socket.address().address
+
 	//console.log('webServerHookFun path: ' + path)
 	if (path == '/')
 	{
@@ -233,11 +236,19 @@ function insertReloaderScript(file, request)
 /**
  * External.
  */
-function getWebServerIpAndPort(fun)
+function getIpAddress(fun)
 {
-	mWebServer.getIpAddress(function(address)
+	fun(ensureIpAddress(mIpAddress))
+}
+
+/**
+ * External.
+ */
+function getIpAddresses(fun)
+{
+	mWebServer.getIpAddresses(function(addresses)
 	{
-		fun(ensureIpAddress(address), SETTINGS.WebServerPort)
+		fun(addresses)
 	})
 }
 
@@ -638,7 +649,8 @@ for (var i in files)
 /*********************************/
 
 exports.startServers = startServers
-exports.getWebServerIpAndPort = getWebServerIpAndPort
+exports.getIpAddress = getIpAddress
+exports.getIpAddresses = getIpAddresses
 exports.setAppPath = setAppPath
 exports.getAppFileName = getAppFileName
 exports.getAppFileURL = getAppFileURL
