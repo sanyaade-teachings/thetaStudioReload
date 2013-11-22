@@ -448,14 +448,14 @@ hyper.UI = {}
 			{
 				if (numAddresses > 1)
 				{
-					connectAddress = 'TRY: '
+					connectAddress = 'Try: '
 				}
 				for (var i = 0; i < numAddresses; ++i)
 				{
 					connectAddress += addresses[i] + ':' + SETTINGS.WebServerPort
 					if (i + 1 < numAddresses)
 					{
-						connectAddress += ' OR '
+						connectAddress += ' or '
 					}
 				}
 			}

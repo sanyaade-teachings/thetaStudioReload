@@ -169,6 +169,51 @@ function CreateServerObject()
 	}
 
 	/**
+	 * Get the ip address of the machine that is the best
+	 * match for the given ip.
+	 */
+	self.getMatchingServerIpAddress = function(ip, callbackFun)
+	{
+		var addresses = GetIpAddresses()
+
+		// No address found.
+		if (addresses.length == 0) { callbackFun(null); return }
+
+		// One address found.
+		if (addresses.length > 0)  { callbackFun(addresses[0]); return }
+
+		// Found multiple addresses, select the most similar one.
+		// The score is the number of matching characters from
+		// start of string.
+		var bestIp = 0
+		var bestScore = 0
+		for (var i = 0; i < addresses.length; ++i)
+		{
+			var score = charsInCommon(addresses[i], ip)
+			if (score > bestScore)
+			{
+				bestScore = score
+				bestIp = i
+			}
+		}
+
+		callbackFun(addresses[bestIp])
+	}
+
+	/**
+	 * Helper function.
+	 */
+	function charsInCommon(a, b)
+	{
+		var length = a.length > b.length ? b.length : a.length
+		for (var i = 0; i < length; ++i)
+		{
+			if (a[i] != b[i]) { return i }
+		}
+		return i
+	}
+
+	/**
 	 * Get a list of the public IP address of the machine.
 	 * webserver.getIpAddresses(function (array) {
 	 *	 // Do something with addresses in array.

@@ -485,43 +485,59 @@ function startSocketIoServer()
  */
 function startUDPServer(port)
 {
+	// Send info about this server back to the client.
+	function sendServerInfo(info)
+	{
+		// Get the best matching server ip address and use that.
+		mWebServer.getMatchingServerIpAddress(
+			info.address,
+			function(bestMatchingIp)
+			{
+				var serverData =
+				{
+					name: OS.hostname(),
+					url: 'http://' + ensureIpAddress(bestMatchingIp) +
+						':' + SETTINGS.WebServerPort
+				}
+
+				var message = new Buffer(JSON.stringify(serverData))
+
+				server.send(
+					message,
+					0,
+					message.length,
+					info.port,
+					info.address,
+					function(err, bytes)
+					{
+					}
+				)
+			}
+		)
+	}
+
+	// Create server socket.
 	var DATAGRAM = require('dgram')
 	var server = DATAGRAM.createSocket('udp4')
 
+	// Set handler for incoming messages.
 	server.on('message', function (msg, info)
 	{
-		console.log(
-			'UDP server got: ' + msg + ' from ' +
-			info.address + ':' + info.port)
 		if (msg == 'hyper.whoIsThere')
 		{
-			var serverData =
-			{
-				name: OS.hostname(),
-				url: 'http://' + mIpAddress + ':' + SETTINGS.WebServerPort
-			}
-
-			var message = new Buffer(JSON.stringify(serverData))
-
-			server.send(
-				message,
-				0,
-				message.length,
-				info.port,
-				info.address,
-				function(err, bytes)
-				{
-				})
+			sendServerInfo(info)
 		}
 	})
 
+	// Set handler for incoming messages.
 	server.on('listening', function ()
 	{
-		var address = server.address()
+		// Not used: var address = server.address()
 		console.log('UDP server listening')
 	})
 
-	server.bind(port);
+	// Bind server socket to port.
+	server.bind(port)
 }
 
 // Display version info.
