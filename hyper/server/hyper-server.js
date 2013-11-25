@@ -488,16 +488,21 @@ function startUDPServer(port)
 	// Send info about this server back to the client.
 	function sendServerInfo(info)
 	{
+		// TODO: We now get the ip address on the client side.
+		// Remove commented out code when we have tested the new code.
 		// Get the best matching server ip address and use that.
-		mWebServer.getMatchingServerIpAddress(
-			info.address,
-			function(bestMatchingIp)
-			{
+		//mWebServer.getMatchingServerIpAddress(
+		//	info.address,
+		//	function(bestMatchingIp)
+		//	{
 				var serverData =
 				{
 					name: OS.hostname(),
-					url: 'http://' + ensureIpAddress(bestMatchingIp) +
-						':' + SETTINGS.WebServerPort
+					port: SETTINGS.WebServerPort
+					// The ip address is now fetched by the client from
+					// the incoming packet.
+					// url: 'http://' + ensureIpAddress(bestMatchingIp) +
+					// 	':' + SETTINGS.WebServerPort
 				}
 
 				var message = new Buffer(JSON.stringify(serverData))
@@ -512,8 +517,8 @@ function startUDPServer(port)
 					{
 					}
 				)
-			}
-		)
+		//	}
+		//)
 	}
 
 	// Create server socket.
