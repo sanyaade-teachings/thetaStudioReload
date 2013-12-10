@@ -14,4 +14,4 @@ project-list.json
 hyper/settings/settings.js
 
 # Local build settings
-local_config.rb
+localConfig.rb

@@ -89,6 +89,6 @@ def buildPostProcess
 		pathDistSource + "LICENSE")
 end
 
-# load local_config.rb, if it exists.
-lc = "#{File.dirname(__FILE__)}/local_config.rb"
-require lc if(File.exists?(lc))
+# load localConfig.rb, if it exists.
+localConfig = "#{File.dirname(__FILE__)}/localConfig.rb"
+require localConfig if(File.exists?(localConfig))
