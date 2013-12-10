@@ -314,17 +314,16 @@ end
 #######################################################
 #                 START BUILD PROCESS                 #
 #######################################################
+$VersionString = distVersion
 
-if (ARGV.size == 1)
-	$VersionString = ARGV[0]
+if (ARGV.size == 0)
 	buildDist "nozip"
-elsif (ARGV.size == 2 and ARGV[1] == "zip")
-	$VersionString = ARGV[0]
+elsif (ARGV.size == 1 and ARGV[0] == "zip")
 	buildDist "zip"
 else
 	puts "Usage:"
-	puts "	ruby build.rb <version> [zip]"
+	puts "	ruby build.rb [zip]"
 	puts "Example:"
-	puts "	ruby build.rb 0.1.0"
-	puts "	ruby build.rb 0.1.0 zip"
+	puts "	ruby build.rb"
+	puts "	ruby build.rb zip"
 end

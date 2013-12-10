@@ -12,3 +12,6 @@ project-list.json
 
 # HyperReload settings file
 hyper/settings/settings.js
+
+# Local build settings
+local_config.rb
