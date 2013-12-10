@@ -99,5 +99,19 @@ License: Apache Version 2.0
 
 	<!-- <script src="update/hyper-update.js"></script> -->
 	<script src="hyper-ui.js"></script>
+	<script>
+	// Setup UI buttons (using closure to make variables local).
+	(function()
+	{
+		var PATH = require('path')
+		var GUI = require('nw.gui')
+		var url = 'file://' + PATH.resolve('./documentation/index.html')
+		var button = $('#button-documentation')
+		button && button.click(function()
+		{
+			GUI.Shell.openExternal(url)
+		})
+	})()
+	</script>
 </body>
 </html>

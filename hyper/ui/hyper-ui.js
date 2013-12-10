@@ -49,8 +49,8 @@ hyper.UI = {}
 ;(function()
 {
 	var mWorkbenchWindow = null
-	var mDocumentationWindow = null
-	var mStoreWindow = null
+	// UNUSED: var mDocumentationWindow = null
+	// UNUSED: var mStoreWindow = null
 
 	function setupUI()
 	{
@@ -109,6 +109,9 @@ hyper.UI = {}
 			}
 		})
 
+		/*
+		// UNUSED
+		// Documentation window is opened from hyper-ui.html.
 		// Documentation button action.
 		button = $('#button-documentation')
 		button && button.click(function()
@@ -134,6 +137,7 @@ hyper.UI = {}
 			}
 		})
 
+		// UNUSED
 		// Store button action.
 		button = $('#button-store')
 		button && button.click(function()
@@ -154,6 +158,7 @@ hyper.UI = {}
 				mStoreWindow.focus()
 			}
 		})
+		*/
 
 		// Reorder of project list by drag and drop.
 		$(function()
