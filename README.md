@@ -26,7 +26,12 @@ There is a script that can build stand-alone redistributable packages:
 
 In addition, there is a script 'buildPlugin.rb' that you should copy and modify to customise the build (e.g. defining the name of the package to build).
 
+buildPlugin.rb may include local_config.rb, if it exists. Use it for non-version-controlled settings.
+
 This script requires that a directory named 'node-webkit-bin-0.8.0' exists parallel to the HyperReload source dir. This directory contains the uncompressed node-webkit binaries. Note that depending on the version of node-webkit used, you must update the directory names and executabe names in the build script.
+
+If you want to use a different version of node-webkit, replace "0.8.0" in this example with the number of your chosen version.
+You must also change the function "nodeWebKitVersion" in buildPlugin.rb, or override it in local_config.rb.
 
 Folder structure:
 

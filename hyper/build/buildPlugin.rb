@@ -11,6 +11,10 @@ def distCopyright
 	"Copyright (c) 2013 Mikael Kindborg"
 end
 
+def distVersion
+	"0.5"
+end
+
 def root
 	"../../"
 end
@@ -50,25 +54,41 @@ def pathSourceDoc
 	"./documentation/"
 end
 
+def nodeWebKitVersion
+	"0.8.0"
+end
+
 def pathNodeWebkitLinux32
-	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-linux-ia32/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-linux-ia32/"
 end
 
 def pathNodeWebkitLinux64
-	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-linux-x64/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-linux-x64/"
 end
 
 def pathNodeWebkitWin
-	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-win-ia32/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-win-ia32/"
 end
 
 def pathNodeWebkitMac
-	root + "node-webkit-bin-0.8.0/node-webkit-v0.8.0-osx-ia32/"
+	root + "node-webkit-bin-" + nodeWebKitVersion +
+		"/node-webkit-v" + nodeWebKitVersion +
+		"-osx-ia32/"
 end
 
 def buildPostProcess
 	# Copy license file.
 	FileUtils.copy_entry(
-		"LICENSE.md",
-		pathDistSource + "LICENSE.md")
+		"LICENSE",
+		pathDistSource + "LICENSE")
 end
+
+# load local_config.rb, if it exists.
+lc = "#{File.dirname(__FILE__)}/local_config.rb"
+require lc if(File.exists?(lc))
