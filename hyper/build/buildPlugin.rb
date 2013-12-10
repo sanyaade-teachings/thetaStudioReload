@@ -82,6 +82,9 @@ def pathNodeWebkitMac
 		"-osx-ia32/"
 end
 
+def buildPreProcess
+end
+
 def buildPostProcess
 	# Copy license file.
 	FileUtils.copy_entry(
