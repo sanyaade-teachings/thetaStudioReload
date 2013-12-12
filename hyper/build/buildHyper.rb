@@ -216,6 +216,7 @@ end
 def buildDist zipFlag
 	puts "Building " + distPackageName + " version " + version
 	buildCreateDistDir
+	buildPreProcess
 	buildCopyHyperToDistDir
 	buildPostProcess
 	buildDistBinaries
