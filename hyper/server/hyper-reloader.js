@@ -79,17 +79,26 @@ License: Apache Version 2.0
 		hyper.IoSocket = socket
 		socket.on('hyper.run', function(data)
 		{
-			socket.disconnect()
-			window.location.replace(data.url)
+			// Always show the loading toast.
+			hyper.showMessage('Loading')
+
+			setTimeout(function() {
+				socket.disconnect()
+				window.location.replace(data.url) }, 200)
 		})
 		socket.on('hyper.reload', function(data)
 		{
+			/*
 			// If this page took long to load, show a message
 			// when reloading.
 			if (hyper.documentLoadTime > 800)
 			{
 				hyper.showMessage('Loading')
 			}
+			*/
+
+			// Always show the loading toast.
+			hyper.showMessage('Loading')
 
 			setTimeout(function() {
 				socket.disconnect()
