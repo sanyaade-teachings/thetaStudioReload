@@ -82,86 +82,209 @@ function webServerHookFunForIframe(request, response, path)
 function webServerHookFunForScriptInjection(request, response, path)
 {
 	// Update the server address on every request (overkill but simple).
+	// Note: If connecting using 'localhost' or '127.0.0.1' this
+	// will break existing wifi connections! This should be fixed and/or
+	// documented.
 	mIpAddress = request.socket.address().address
 
-	//console.log('webServerHookFun path: ' + path)
 	if (path == '/')
 	{
-		// If the root path is requested, send the connect page.
-		var file = FILEUTIL.readFileSync('./hyper/server/hyper-connect.html')
-		if (file)
-		{
-			file = insertReloaderScript(file, request)
-			mWebServer.writeRespose(response, file, 'text/html')
-			return true
-		}
-		else
-		{
-			return false
-		}
+		return serveRootRequest(request, response)
 	}
 	else if (path == '/hyper.reloader')
 	{
-		// Send reloader script.
-		var script = FILEUTIL.readFileSync('./hyper/server/hyper-reloader.js')
-		if (script)
-		{
-			script = script.replace(
-				'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
-				SETTINGS.SocketIoPort)
-			mWebServer.writeRespose(response, script, 'application/javascript')
-			return true
-		}
-		else
-		{
-			return false
-		}
+		return serveReloaderScript(response)
 	}
 	else if (SETTINGS.ServeCordovaJsFiles &&
 		(path == '/cordova.js' ||
 		path == '/cordova_plugins.js' ||
 		path.indexOf('/plugins/') == 0))
 	{
-		// iOS is default platform.
-		var platformPath = './hyper/libs-cordova/ios'
-
-		// Check for Android.
-		if (request['headers']['user-agent'].indexOf('Android') > 0)
-		{
-			platformPath = './hyper/libs-cordova/android'
-		}
-		//console.log('path1: ' + path)
-		//console.log('path2: ' + platformPath + path)
-		var script = FILEUTIL.readFileSync(platformPath + path)
-		if (script)
-		{
-			mWebServer.writeRespose(response, script, 'application/javascript')
-			return true
-		}
-		else
-		{
-			return false
-		}
+		return serveCordovaFile(request, response, path)
 	}
 	else if (mBasePath && FILEUTIL.fileIsHTML(path))
 	{
-		// Insert reloader script into HTML page.
-		var filePath = mBasePath + path.substr(1)
-		var file = FILEUTIL.readFileSync(filePath)
-		if (file)
-		{
-			file = insertReloaderScript(file, request)
-			mWebServer.writeRespose(response, file, 'text/html')
-			return true
-		}
-		else
-		{
-			return false
-		}
+		return serveHtmlFileWithScriptInjection(request, response, path)
 	}
 	else
 	{
 		// Use default processing for all other pages.
+		return false
+	}
+}
+
+/**
+ * Internal.
+ *
+ * Serve root file.
+ */
+function serveRootRequest(request, response)
+{
+	// Root path is requested, send the current page if set.
+	if (mAppPath)
+	{
+		console.log('@@@ serving mAppPath: ' + mAppPath)
+		return serveHtmlFile(
+			request,
+			response,
+			mAppPath)
+	}
+	// Otherwise send the connect page.
+	else
+	{
+		return serveHtmlFile(
+			request,
+			response,
+			'./hyper/server/hyper-connect.html')
+	}
+}
+
+/**
+ * Internal.
+ *
+ * Serve reloader script.
+ */
+function serveReloaderScript(response)
+{
+	var script = FILEUTIL.readFileSync('./hyper/server/hyper-reloader.js')
+	if (script)
+	{
+		script = script.replace(
+			'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
+			SETTINGS.SocketIoPort)
+		mWebServer.writeRespose(response, script, 'application/javascript')
+		return true
+	}
+	else
+	{
+		return false
+	}
+}
+
+/**
+ * Internal.
+ *
+ * Serve HTML file. Will insert reloader script.
+ */
+function serveHtmlFileWithScriptInjection(request, response, path)
+{
+	var filePath = mBasePath + path.substr(1)
+	return serveHtmlFile(
+		request,
+		response,
+		filePath)
+}
+
+/**
+ * Internal.
+ *
+ * Serve Cordova JavaScript file for the platform making the request.
+ */
+function serveCordovaFile(request, response, path)
+{
+	// If we are inside a cordova project, we use the
+	// files in that project.
+	// Folder structure:
+	//   www <-- mBasePath (root of running app)
+	//     index.html
+	//   platforms
+	//     android
+	//       assets
+	//         www
+	//           cordova.js
+	//           cordova_plugins.js
+	//           plugins
+	//     ios
+	//       www
+	//         cordova.js
+	//         cordova_plugins.js
+	//         plugins
+
+	// Platform flags (boolean values)
+	var isAndroid = request['headers']['user-agent'].indexOf('Android') > 0
+	var isIOS = !isAndroid
+
+	// Path to Cordova file in current project.
+	// Note that mBasePath ends with path separator.
+	var androidCordovaAppPath =
+		mBasePath +
+		'..' + PATH.sep +
+		'platforms' + PATH.sep +
+		'android' + PATH.sep +
+		'assets' + PATH.sep +
+		'www' + path
+	var iosCordovaAppPath =
+		mBasePath +
+		'..' + PATH.sep +
+		'platforms' + PATH.sep +
+		'ios' + PATH.sep +
+		'www' + path
+
+	// Path to Cordova file in HyperReload library.
+	var androidCordovaLibPath = './hyper/libs-cordova/android' + path
+	var iosCordovaLibPath = './hyper/libs-cordova/ios' + path
+
+	/*
+	console.log('@@@ mBasePath: ' + mBasePath)
+	console.log('@@@ androidCordovaAppPath: ' + androidCordovaAppPath)
+	console.log('@@@ iosCordovaAppPath: ' + iosCordovaAppPath)
+	console.log('@@@ androidCordovaLibPath: ' + androidCordovaLibPath)
+	console.log('@@@ iosCordovaLibPath: ' + iosCordovaLibPath)
+	*/
+
+	if (isAndroid)
+	{
+		if (serveJsFile(response, androidCordovaAppPath)) { return true }
+		if (serveJsFile(response, androidCordovaLibPath)) { return true }
+		return false
+	}
+
+	if (isIOS)
+	{
+		if (serveJsFile(response, iosCordovaAppPath)) { return true }
+		if (serveJsFile(response, iosCordovaLibPath)) { return true }
+		return false
+	}
+
+	return false
+}
+
+/**
+ * Internal.
+ *
+ * If file exists, serve it and return true, otherwise return false.
+ * Insert the reloader script if file exists.
+ */
+function serveHtmlFile(request, response, path)
+{
+	var content = FILEUTIL.readFileSync(path)
+	if (content)
+	{
+		content = insertReloaderScript(content, request)
+		mWebServer.writeRespose(response, content, 'text/html')
+		return true
+	}
+	else
+	{
+		return false
+	}
+}
+
+/**
+ * Internal.
+ *
+ * If file exists, serve it and return true, otherwise return false.
+ */
+function serveJsFile(response, path)
+{
+	var content = FILEUTIL.readFileSync(path)
+	if (content)
+	{
+		mWebServer.writeRespose(response, content, 'application/javascript')
+		return true
+	}
+	else
+	{
 		return false
 	}
 }
