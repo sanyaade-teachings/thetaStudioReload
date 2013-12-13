@@ -312,7 +312,7 @@ hyper.UI = {}
 		//console.log(html)
 
 		// Insert element first in list.
-		$('#project-list').prepend(element)
+		$('#project-list').append(element)
 	}
 
 	function getTagContent(data, tag)
