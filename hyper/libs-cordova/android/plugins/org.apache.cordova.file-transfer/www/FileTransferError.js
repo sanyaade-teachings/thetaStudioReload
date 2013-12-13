@@ -1,4 +1,4 @@
-cordova.define("org.apache.cordova.file.FileSystem", function(require, exports, module) {/*
+cordova.define("org.apache.cordova.file-transfer.FileTransferError", function(require, exports, module) {/*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,21 +19,22 @@ cordova.define("org.apache.cordova.file.FileSystem", function(require, exports, 
  *
 */
 
-var DirectoryEntry = require('./DirectoryEntry');
-
 /**
- * An interface representing a file system
- *
+ * FileTransferError
  * @constructor
- * {DOMString} name the unique name of the file system (readonly)
- * {DirectoryEntry} root directory of the file system (readonly)
  */
-var FileSystem = function(name, root) {
-    this.name = name || null;
-    if (root) {
-        this.root = new DirectoryEntry(root.name, root.fullPath, this);
-    }
+var FileTransferError = function(code, source, target, status, body) {
+    this.code = code || null;
+    this.source = source || null;
+    this.target = target || null;
+    this.http_status = status || null;
+    this.body = body || null;
 };
 
-module.exports = FileSystem;
+FileTransferError.FILE_NOT_FOUND_ERR = 1;
+FileTransferError.INVALID_URL_ERR = 2;
+FileTransferError.CONNECTION_ERR = 3;
+FileTransferError.ABORT_ERR = 4;
+
+module.exports = FileTransferError;
 });
