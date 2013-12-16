@@ -121,7 +121,7 @@ def buildDistBinaryLinux(sourcePath, targetPath, sourceBin)
 	# Copy files.
 	FileUtils.copy_entry(
 		sourceBin + "nw",
-		targetPath + distPackageName)
+		targetPath + applicationName)
 	FileUtils.copy_entry(
 		sourceBin + "nw.pak",
 		targetPath + "nw.pak")
@@ -138,7 +138,7 @@ def buildDistBinaryMac
 	sourcePath = pathDistSource
 	targetPath = distPackageMac
 	sourceBin = pathNodeWebkitMac
-	appPath = targetPath + distPackageName + ".app"
+	appPath = targetPath + applicationName + ".app"
 
 	# Copy JavaScript/HTML files.
 	FileUtils.copy_entry(sourcePath, targetPath)
@@ -156,7 +156,7 @@ def buildDistBinaryMac
 	infoPlistPath = appPath + "/Contents/Info.plist"
 	info = fileReadContent(infoPlistPath)
 	#puts(info)
-	info = macPatchValue(info, "CFBundleName", distPackageName)
+	info = macPatchValue(info, "CFBundleName", applicationName)
 	info = macPatchValue(info, "CFBundleShortVersionString", version)
 	info = macPatchValue(info, "CFBundleVersion", distCopyright)
 	#puts(info)
@@ -184,7 +184,7 @@ def buildDistBinaryWin
 	# Copy files.
 	FileUtils.copy_entry(
 		sourceBin + "nw.exe",
-		targetPath + distPackageName + ".exe")
+		targetPath + applicationName + ".exe")
 	FileUtils.copy_entry(
 		sourceBin + "nw.pak",
 		targetPath + "nw.pak")

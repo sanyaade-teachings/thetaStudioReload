@@ -7,6 +7,10 @@ def distPackageName
 	"HyperReload"
 end
 
+def applicationName
+	"HyperReload"
+end
+
 def distCopyright
 	"Copyright (c) 2013 Mikael Kindborg"
 end
