@@ -73,6 +73,9 @@ License: Apache Version 2.0
 
 	function connect()
 	{
+		// Only connect in the topmost window!
+		if (window !== window.top) { return }
+
 		var socket = io.connect(
 			baseUrl + ':' + socketIoPort,
 			{ 'sync disconnect on unload': true })

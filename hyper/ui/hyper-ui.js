@@ -311,7 +311,7 @@ hyper.UI = {}
 		var element = $(html)
 		//console.log(html)
 
-		// Insert element first in list.
+		// Insert element last in list.
 		$('#project-list').append(element)
 	}
 
@@ -375,7 +375,7 @@ hyper.UI = {}
 
 	hyper.UI.displayProjectList = function(projectList)
 	{
-		for (var i = projectList.length - 1; i > -1; --i)
+		for (var i = 0; i < projectList.length; ++i)
 		{
 			var path = projectList[i]
 			createProjectEntry(path)
