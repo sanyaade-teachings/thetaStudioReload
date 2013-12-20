@@ -433,7 +433,10 @@ module.exports = [
     },
     {
         "file": "plugins/com.evothings.ble/ble.js",
-        "id": "com.evothings.ble.BLE"
+        "id": "com.evothings.ble.BLE",
+        "clobbers": [
+            "evothings.ble"
+        ]
     },
     {
         "file": "plugins/org.chromium.common/events.js",

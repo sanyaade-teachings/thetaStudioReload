@@ -120,6 +120,13 @@ function webServerHookFunForScriptInjection(request, response, path)
  */
 function serveRootRequest(request, response)
 {
+	// Always serve the connect page for the root url.
+	return serveHtmlFile(
+		request,
+		response,
+		'./hyper/server/hyper-connect.html')
+
+	/* UNUSED
 	// Root path is requested, send the current page if set.
 	if (mAppPath)
 	{
@@ -137,6 +144,7 @@ function serveRootRequest(request, response)
 			response,
 			'./hyper/server/hyper-connect.html')
 	}
+	*/
 }
 
 /**

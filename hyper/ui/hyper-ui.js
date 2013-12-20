@@ -265,7 +265,7 @@ hyper.UI = {}
 				+	'type="button" '
 				+	'class="button-open btn btn-default" '
 				+	'onclick="hyper.openFileFolder(\'__PATH1__\')">'
-				+	'Open'
+				+	'Code'
 				+ '</button>'
 				+ '<button '
 				+	'type="button" '
