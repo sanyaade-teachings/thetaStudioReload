@@ -65,7 +65,10 @@ License: Apache Version 2.0
 		var pos2 = url.indexOf('/', pos + 2)
 		if (pos2 < 0) { pos2 = pos } else { ++pos2 }
 		var file = url.substring(pos2)
-		hyper.log('[ERR] ' + msg + ' [' + file + ': ' + linenumber + ']')
+		var errorMessage = '[ERR] ' + msg + ' [' + file + ': ' + linenumber + ']'
+		// Log to both console and hyper
+		console.log(errorMessage)
+		hyper.log(errorMessage)
 		return true
 	}
 
