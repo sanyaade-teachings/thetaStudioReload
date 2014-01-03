@@ -92,7 +92,7 @@ body
 .button-run
 {
 	position: absolute;
-	right: 110px;
+	right: 20px;
 	top: 10px;
 	bottom: 10px;
 	width: 80px;
@@ -102,7 +102,7 @@ body
 .button-open
 {
 	position: absolute;
-	right: 20px;
+	right: 110px;
 	top: 10px;
 	bottom: 10px;
 	width: 80px;
