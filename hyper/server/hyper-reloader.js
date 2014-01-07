@@ -152,7 +152,7 @@ License: Apache Version 2.0
 		var width = Math.min(
 			message.length * 16,
 			window.innerWidth - 40)
-		var left = ((window.innerWidth - width) / 2) - 10 //padding
+		var left = ((window.innerWidth - width) / 2) - 20 //padding
 
 		toast.id = id || 'hyper-message'
 		toast.style.width = width + 'px'
@@ -171,7 +171,7 @@ License: Apache Version 2.0
 		toast.style.color = '#000000'
 		toast.style.textAlign = 'center'
 		toast.style.visibility = 'visible'
-		toast.style.zIndex = '9000000'
+		toast.style.zIndex = '999999'
 		toast.innerHTML = message
 
 		document.body.appendChild(toast)
