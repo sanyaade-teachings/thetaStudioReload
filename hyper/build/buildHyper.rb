@@ -21,7 +21,7 @@ require "pathname"
 #               BUILD PROCESS OVERVIEW                #
 #######################################################
 
-# Copy files from the HyperOpen repository into the
+# Copy files from the HyperReload repository into the
 # destination folder named <dist>_<version>
 #
 # Do some processing of the files.
@@ -327,4 +327,5 @@ else
 	puts "Example:"
 	puts "	ruby build.rb"
 	puts "	ruby build.rb zip"
+	puts "(zip option does not work very well...)"
 end
