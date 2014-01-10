@@ -319,6 +319,9 @@ function createReloaderScriptTags(address)
  *
  * It is desirable to have script tags inserted as early as possible,
  * to enable hyper.log and error reportning during document loading.
+ *
+ * The param 'file' is a string with the document content.
+ * TODO: Rename this to a better name, e.g. 'content'.
  */
 function insertReloaderScript(file, request)
 {
@@ -362,6 +365,9 @@ function insertReloaderScript(file, request)
 	{
 		return file.replace('</body>', script + '</body>')
 	}
+
+	// If no place to insert the reload script, just return the file unmodified.
+	return file
 }
 
 /**
