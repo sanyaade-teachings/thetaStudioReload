@@ -214,7 +214,7 @@ end
 
 # Build distribution package.
 def buildDist zipFlag
-	puts "Building " + distPackageName + " version " + version
+	puts "Building " + distPackageName + " version " + version + " with node-webkit version " + nodeWebKitVersion
 	buildCreateDistDir
 	buildPreProcess
 	buildCopyHyperToDistDir
