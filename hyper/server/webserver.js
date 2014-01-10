@@ -310,7 +310,6 @@ function CreateServerObject()
 		response.end()
 	}
 
-
 	function FileNotFoundResponse(path, response)
 	{
 		response.writeHead(404)
