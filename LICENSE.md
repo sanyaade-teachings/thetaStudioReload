@@ -6,7 +6,7 @@ HyperReload is Copyright (c) 2013 Mikael Kindborg
 
 The source code in the HyperReload repository is licensed under the Apache license:
 
-	Copyright (c) 2013 Mikael Kindborg
+	Copyright (c) 2013 Mikael Kindborg and contributors
 
 	Apache License
 	Version 2.0, January 2004
@@ -212,11 +212,9 @@ The source code in the HyperReload repository is licensed under the Apache licen
 
 For licenses for software used by HyperReload, see files in the hyper/license folder.
 
-## Relation to the HyperReload software product
+## Contributors
 
-The [HyperReload software product](http://hyperreload.com) contains tutorials and other material that are not open source, and the downloadable package (which includes the full source code) is released under a proprietary license. You are free to use HyperReload at work and at home, and modify it for your own needs and share with friends, but you may not sell, publish, or distribute the HyperReload software product.
-
-Commercial licenses for HyperReload and support and development services are available upon request.
+* Fredrik Eldh - https://github.com/fredrikeldh
 
 ## Credits
 
@@ -227,3 +225,9 @@ HyperReload is based on several truly wonderful open-source projects, including:
 * [CodeMirror](http://codemirror.net/)
 * [jQuery](http://jquery.com/)
 * [Apache Cordova](http://cordova.apache.org/)
+
+## Relation to the HyperReload software product
+
+The [HyperReload software product](http://hyperreload.com) contains tutorials and other material that are not open source, and the downloadable package (which includes the full source code) is released under a proprietary license. You are free to use HyperReload at work and at home, and modify it for your own needs and share with friends, but you may not sell, publish, or distribute the HyperReload software product.
+
+Commercial licenses for HyperReload and support and development services are available upon request.
