@@ -81,6 +81,8 @@ function webServerHookFunForIframe(request, response, path)
  */
 function webServerHookFunForScriptInjection(request, response, path)
 {
+	console.log('@@@ hookfun: ' + path)
+
 	// Update the server address on every request (overkill but simple).
 	// Note: If connecting using 'localhost' or '127.0.0.1' this
 	// will break existing wifi connections! This should be fixed and/or
@@ -182,7 +184,7 @@ function serveHtmlFileWithScriptInjection(request, response, path)
 		response,
 		filePath)
 }
-
+console.log('llllllll-------------------------------')
 /**
  * Internal.
  *
@@ -190,6 +192,17 @@ function serveHtmlFileWithScriptInjection(request, response, path)
  */
 function serveCordovaFile(request, response, path)
 {
+	// Platform flags (boolean values).
+	var isAndroid = request['headers']['user-agent'].indexOf('Android') > 0
+	var isIOS = request['headers']['user-agent'].indexOf('iPhone') > 0
+	var isWP = request['headers']['user-agent'].indexOf('Windows Phone') > 0
+
+	console.log('@@@ serveCordovafile: ' + path + ' ' + isWP)
+
+	// Two methods are used to find cordova files for the
+	// platform making the request.
+
+	// Method 1:
 	// If we are inside a cordova project, we use the
 	// files in that project.
 	// Folder structure:
@@ -208,11 +221,7 @@ function serveCordovaFile(request, response, path)
 	//         cordova_plugins.js
 	//         plugins
 
-	// Platform flags (boolean values)
-	var isAndroid = request['headers']['user-agent'].indexOf('Android') > 0
-	var isIOS = !isAndroid
-
-	// Path to Cordova file in current project.
+	// Search path to Cordova files in current project.
 	// Note that mBasePath ends with path separator.
 	var androidCordovaAppPath =
 		mBasePath +
@@ -227,19 +236,22 @@ function serveCordovaFile(request, response, path)
 		'platforms' + PATH.sep +
 		'ios' + PATH.sep +
 		'www' + path
+	var wpCordovaAppPath =
+		mBasePath +
+		'..' + PATH.sep +
+		'platforms' + PATH.sep +
+		'wp8' + PATH.sep +
+		'www' + path
 
-	// Path to Cordova file in HyperReload library.
+	// Method 2:
+	// Paths to Cordova files in the HyperReload library.
+	// This is used if the application is not a Cordova project.
 	var androidCordovaLibPath = './hyper/libs-cordova/android' + path
 	var iosCordovaLibPath = './hyper/libs-cordova/ios' + path
+	var wpCordovaLibPath = './hyper/libs-cordova/wp' + path
 
-	/*
-	console.log('@@@ mBasePath: ' + mBasePath)
-	console.log('@@@ androidCordovaAppPath: ' + androidCordovaAppPath)
-	console.log('@@@ iosCordovaAppPath: ' + iosCordovaAppPath)
-	console.log('@@@ androidCordovaLibPath: ' + androidCordovaLibPath)
-	console.log('@@@ iosCordovaLibPath: ' + iosCordovaLibPath)
-	*/
-
+	// Get the file, first try the path for a Cordova project, next
+	// get the file from the HyperReload Cordova library folder.
 	if (isAndroid)
 	{
 		if (serveJsFile(response, androidCordovaAppPath)) { return true }
@@ -251,6 +263,13 @@ function serveCordovaFile(request, response, path)
 	{
 		if (serveJsFile(response, iosCordovaAppPath)) { return true }
 		if (serveJsFile(response, iosCordovaLibPath)) { return true }
+		return false
+	}
+
+	if (isWP)
+	{
+		if (serveJsFile(response, wpCordovaAppPath)) { return true }
+		if (serveJsFile(response, wpCordovaLibPath)) { return true }
 		return false
 	}
 
@@ -285,6 +304,8 @@ function serveHtmlFile(request, response, path)
  */
 function serveJsFile(response, path)
 {
+	console.log('@@@ serverJSfile: ' + path)
+
 	var content = FILEUTIL.readFileSync(path)
 	if (content)
 	{
@@ -293,6 +314,7 @@ function serveJsFile(response, path)
 	}
 	else
 	{
+		console.log('@@@ file not found')
 		return false
 	}
 }

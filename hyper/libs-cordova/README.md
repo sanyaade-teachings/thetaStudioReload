@@ -1,1 +1,1 @@
-JavaScript files for Cordova 3.1.0
+JavaScript files for Cordova 3.3.0

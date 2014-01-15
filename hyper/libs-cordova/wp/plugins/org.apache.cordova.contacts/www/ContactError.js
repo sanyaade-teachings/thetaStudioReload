@@ -1,4 +1,4 @@
-cordova.define("org.apache.cordova.splashscreen.SplashScreen", function(require, exports, module) {/*
+cordova.define("org.apache.cordova.contacts.ContactError", function(require, exports, module) {/*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,16 +19,25 @@ cordova.define("org.apache.cordova.splashscreen.SplashScreen", function(require,
  *
 */
 
-var exec = require('cordova/exec');
-
-var splashscreen = {
-    show:function() {
-        exec(null, null, "SplashScreen", "show", []);
-    },
-    hide:function() {
-        exec(null, null, "SplashScreen", "hide", []);
-    }
+/**
+ *  ContactError.
+ *  An error code assigned by an implementation when an error has occurred
+ * @constructor
+ */
+var ContactError = function(err) {
+    this.code = (typeof err != 'undefined' ? err : null);
 };
 
-module.exports = splashscreen;
+/**
+ * Error codes
+ */
+ContactError.UNKNOWN_ERROR = 0;
+ContactError.INVALID_ARGUMENT_ERROR = 1;
+ContactError.TIMEOUT_ERROR = 2;
+ContactError.PENDING_OPERATION_ERROR = 3;
+ContactError.IO_ERROR = 4;
+ContactError.NOT_SUPPORTED_ERROR = 5;
+ContactError.PERMISSION_DENIED_ERROR = 20;
+
+module.exports = ContactError;
 });

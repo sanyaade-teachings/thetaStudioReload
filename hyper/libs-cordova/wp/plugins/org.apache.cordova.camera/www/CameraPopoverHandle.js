@@ -1,4 +1,4 @@
-cordova.define("org.apache.cordova.splashscreen.SplashScreen", function(require, exports, module) {/*
+cordova.define("org.apache.cordova.camera.CameraPopoverHandle", function(require, exports, module) {/*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,14 +21,14 @@ cordova.define("org.apache.cordova.splashscreen.SplashScreen", function(require,
 
 var exec = require('cordova/exec');
 
-var splashscreen = {
-    show:function() {
-        exec(null, null, "SplashScreen", "show", []);
-    },
-    hide:function() {
-        exec(null, null, "SplashScreen", "hide", []);
-    }
+/**
+ * A handle to an image picker popover.
+ */
+var CameraPopoverHandle = function() {
+    this.setPosition = function(popoverOptions) {
+        console.log('CameraPopoverHandle.setPosition is only supported on iOS.');
+    };
 };
 
-module.exports = splashscreen;
+module.exports = CameraPopoverHandle;
 });
