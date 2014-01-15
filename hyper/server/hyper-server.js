@@ -81,8 +81,6 @@ function webServerHookFunForIframe(request, response, path)
  */
 function webServerHookFunForScriptInjection(request, response, path)
 {
-	console.log('@@@ hookfun: ' + path)
-
 	// Update the server address on every request (overkill but simple).
 	// Note: If connecting using 'localhost' or '127.0.0.1' this
 	// will break existing wifi connections! This should be fixed and/or
@@ -184,7 +182,7 @@ function serveHtmlFileWithScriptInjection(request, response, path)
 		response,
 		filePath)
 }
-console.log('llllllll-------------------------------')
+
 /**
  * Internal.
  *
@@ -196,8 +194,6 @@ function serveCordovaFile(request, response, path)
 	var isAndroid = request['headers']['user-agent'].indexOf('Android') > 0
 	var isIOS = request['headers']['user-agent'].indexOf('iPhone') > 0
 	var isWP = request['headers']['user-agent'].indexOf('Windows Phone') > 0
-
-	console.log('@@@ serveCordovafile: ' + path + ' ' + isWP)
 
 	// Two methods are used to find cordova files for the
 	// platform making the request.
@@ -304,8 +300,6 @@ function serveHtmlFile(request, response, path)
  */
 function serveJsFile(response, path)
 {
-	console.log('@@@ serverJSfile: ' + path)
-
 	var content = FILEUTIL.readFileSync(path)
 	if (content)
 	{
@@ -314,7 +308,6 @@ function serveJsFile(response, path)
 	}
 	else
 	{
-		console.log('@@@ file not found')
 		return false
 	}
 }
