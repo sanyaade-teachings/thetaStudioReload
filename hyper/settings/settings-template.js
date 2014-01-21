@@ -29,3 +29,11 @@ exports.WorkbenchFontSize = '18px'
 // Settings for UDP server discovery.
 exports.ServerDiscoveryEnabled = true
 exports.ServerDiscoveryPort = 4088
+
+// Display a dialog for each new connection made from clients,
+// to let the user allow of deny the client to connect.
+// Allowed connections are added to a white list, which is
+// sessing based (when restarting HyperReload, connections
+// need to be confimed again), and the IP-address is used
+// to identify clients.
+exports.UseDialogToAllowForConnection = true

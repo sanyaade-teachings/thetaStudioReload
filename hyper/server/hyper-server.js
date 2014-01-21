@@ -45,6 +45,7 @@ var mIpAddress
 var mMessageCallback = null
 var mClientConnectedCallback = null
 var mReloadCallback = null
+var mWhiteList = {}
 
 /*** Server functions ***/
 
@@ -81,17 +82,38 @@ function webServerHookFunForIframe(request, response, path)
  */
 function webServerHookFunForScriptInjection(request, response, path)
 {
+	// TODO: Implement!
+
+	console.log('@@@ remote address: ' + request.socket.remoteAddress)
+	console.log('@@@ path: ' + path)
+
+	// Check whitelist.
+	if (!requestIsAuthorized(request, response))
+	{
+		// Request was not allowed, but has been processed.
+		return true
+	}
+
 	// Update the server address on every request (overkill but simple).
-	// Note: If connecting using 'localhost' or '127.0.0.1' this
+	// TODO: If connecting using 'localhost' or '127.0.0.1' this
 	// will break existing wifi connections! This should be fixed and/or
 	// documented.
 	mIpAddress = request.socket.address().address
 
 	if (path == '/')
 	{
+		// Serve the root request.
 		return serveRootRequest(request, response)
 	}
-	else if (path == '/hyper.reloader')
+
+	// If other request than the root request, check for white listing.
+	if (false)//!mWhiteList[request.socket.remoteAddress])
+	{
+		return serveUnauthorizedRequest(request, response)
+	}
+
+	// Proceed serving requests.
+	if (path == '/hyper.reloader')
 	{
 		return serveReloaderScript(response)
 	}
@@ -109,6 +131,66 @@ function webServerHookFunForScriptInjection(request, response, path)
 	else
 	{
 		// Use default processing for all other pages.
+		return false
+	}
+}
+
+/**
+ * Internal.
+ *
+ * Check that requesting client is authorized, and if not
+ * serve status pages.
+ */
+function requestIsAuthorized(request, response)
+{
+	// Is security setting is turned off, all connections are allowed.
+	if (!SETTINGS.UseDialogToAllowForConnection)
+	{
+		return true
+	}
+
+	// Is request whitelisted?
+	if (1 === mWhiteList[request.socket.remoteAddress])
+	{
+		return true
+	}
+
+	// Is request blacklisted?
+	if (2 === mWhiteList[request.socket.remoteAddress])
+	{
+		serveHtmlFilePlainlyWithoutReloaderScript(
+			request,
+			response,
+			'./hyper/server/hyper-unauthorized.html')
+		return false
+	}
+
+	// TODO: To handle this in an async way, send the
+	// page 'hyper-waiting-for-ok.html' and display an
+	// non-blocking UI-element to get the confirmation.
+
+	// Device IP is not in whitelist, ask for confirmation.
+	// Note that window.confirm is BLOCKING. The request will
+	// hang here until the user responded to the dialog.
+	var allow = window.confirm(
+		'Allow connection from ' +
+		request.socket.remoteAddress +
+		'?')
+	if (allow)
+	{
+		mWhiteList[request.socket.remoteAddress] = 1
+		return true
+	}
+	else
+	{
+		mWhiteList[request.socket.remoteAddress] = 2
+
+		// Send page telling access is not allowed.
+		serveHtmlFilePlainlyWithoutReloaderScript(
+			request,
+			response,
+			'./hyper/server/hyper-unauthorized.html')
+
 		return false
 	}
 }
@@ -284,6 +366,25 @@ function serveHtmlFile(request, response, path)
 	if (content)
 	{
 		content = insertReloaderScript(content, request)
+		mWebServer.writeRespose(response, content, 'text/html')
+		return true
+	}
+	else
+	{
+		return false
+	}
+}
+
+/**
+ * Internal.
+ *
+ * Serve HTML file without inserting reloader script.
+ */
+function serveHtmlFilePlainlyWithoutReloaderScript(request, response, path)
+{
+	var content = FILEUTIL.readFileSync(path)
+	if (content)
+	{
 		mWebServer.writeRespose(response, content, 'text/html')
 		return true
 	}
@@ -586,7 +687,13 @@ function startSocketIoServer()
 	{
 		// Debug logging.
 		console.log('Client connected')
-
+/*
+		if (!isWhiteListed(socket.ip))
+		{
+			socket.disconnect()
+			return
+		}
+*/
 		socket.on('disconnect', function ()
 		{
 			// Debug logging.
@@ -669,6 +776,8 @@ function startUDPServer(port)
 	{
 		if (msg == 'hyper.whoIsThere')
 		{
+			// TODO: Make some allow/deny/whitelist type of
+			// check here? Only send server info if user allows?
 			sendServerInfo(info)
 		}
 	})

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<!--
+File: hyper-waiting-for-ok.html
+Description: Loaded whenclient makes an unauthorized request.
+Author: Mikael Kindborg
+Copyright (c) 2014 Mikael Kindborg
+License: Apache Version 2.0
+-->
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
+	<title>Waiting for OK</title>
+	<style>
+	body
+	{
+		font-family: sans-serif;
+	}
+	</style>
+</head>
+<body>
+	<div>
+		<h1>Waiting for OK</h1>
+		<p>You must click OK in the dialog box shown on your computer to
+		allow connections from this device.</p>
+		<script>
+		setTimeout(function() {
+		console.log('@@@ reloading waiting page')
+			window.location.replace('/') }, 5000)
+		</script>
+	</div>
+</body>
+</html>
