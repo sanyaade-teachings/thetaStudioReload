@@ -273,9 +273,13 @@ function serveHtmlFileWithScriptInjection(request, response, path)
 function serveCordovaFile(request, response, path)
 {
 	// Platform flags (boolean values).
-	var isAndroid = request['headers']['user-agent'].indexOf('Android') > 0
-	var isIOS = request['headers']['user-agent'].indexOf('iPhone') > 0
-	var isWP = request['headers']['user-agent'].indexOf('Windows Phone') > 0
+	var userAgent = request['headers']['user-agent']
+	var isAndroid = userAgent.indexOf('Android') > 0
+	var isIOS =
+		(userAgent.indexOf('iPhone') > 0) ||
+		(userAgent.indexOf('iPad') > 0) ||
+		(userAgent.indexOf('iPod') > 0)
+	var isWP = userAgent.indexOf('Windows Phone') > 0
 
 	// Two methods are used to find cordova files for the
 	// platform making the request.
