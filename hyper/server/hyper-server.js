@@ -30,6 +30,119 @@ var FILEUTIL = require('./fileutil.js')
 var WEBSERVER = require('./webserver')
 var SETTINGS = require('../settings/settings.js')
 
+
+/*********************************/
+/***    Security interface     ***/
+/*********************************/
+
+// Used for white listing and for black listing ip addresses.
+var mWhiteList = {}
+var mUnknownIpHandlerFun = null
+
+/**
+ * External.
+ */
+function setUnknownIpHandler(fun)
+{
+	mUnknownIpHandlerFun = fun
+}
+
+/**
+ * External.
+ */
+function whiteListIp(ip)
+{
+	mWhiteList[ip] = 1 // Allow
+}
+
+/**
+ * External.
+ */
+function blackListIp(ip)
+{
+	mWhiteList[ip] = 2 // Deny
+}
+
+/**
+ * Internal.
+ *
+ * Check that requesting client is authorized, and if not
+ * serve status pages.
+ */
+function authorizeRequest(request, response)
+{
+	// Is security setting is turned off, all connections are allowed.
+	if (!SETTINGS.UseDialogToAllowForConnection)
+	{
+		return true
+	}
+
+	// Is request whitelisted?
+	if (1 === mWhiteList[request.socket.remoteAddress])
+	{
+		return true
+	}
+
+	// Is request blacklisted?
+	if (2 === mWhiteList[request.socket.remoteAddress])
+	{
+		serveHtmlFilePlainlyWithoutReloaderScript(
+			request,
+			response,
+			'./hyper/server/hyper-unauthorized.html')
+		return false
+	}
+
+	// Is dialog being displayed?
+	if (3 === mWhiteList[request.socket.remoteAddress])
+	{
+		serveWaitingForOkPage()
+		return false
+	}
+
+	// To handle authorization in an async way, send the
+	// page 'hyper-waiting-for-ok.html' and display an
+	// non-blocking UI-element to get the confirmation.
+
+	// Device IP is not in whitelist, ask for confirmation.
+	mWhiteList[request.socket.remoteAddress] = 3 // Dialog displayed
+	mUnknownIpHandlerFun && mUnknownIpHandlerFun(request.socket.remoteAddress)
+	serveWaitingForOkPage()
+	return false
+
+	function serveWaitingForOkPage()
+	{
+		serveHtmlFilePlainlyWithoutReloaderScript(
+			request,
+			response,
+			'./hyper/server/hyper-waiting-for-ok.html',
+			function(content)
+			{
+				return content.replace('__CLIENT_IP__', request.socket.remoteAddress)
+			})
+	}
+}
+
+/**
+ * Internal.
+ *
+ * Serve HTML file without inserting reloader script.
+ */
+function serveHtmlFilePlainlyWithoutReloaderScript(request, response, path)
+{
+	var content = FILEUTIL.readFileSync(path)
+	if (content)
+	{
+		file.replace('<!--hyper.reloader-->', script)
+		mWebServer.writeRespose(response, content, 'text/html')
+		return true
+	}
+	else
+	{
+		return false
+	}
+}
+
 /*********************************/
 /***	   Server code		   ***/
 /*********************************/
@@ -45,7 +158,6 @@ var mIpAddress
 var mMessageCallback = null
 var mClientConnectedCallback = null
 var mReloadCallback = null
-var mWhiteList = {}
 
 /*** Server functions ***/
 
@@ -82,13 +194,8 @@ function webServerHookFunForIframe(request, response, path)
  */
 function webServerHookFunForScriptInjection(request, response, path)
 {
-	// TODO: Implement!
-
-	console.log('@@@ remote address: ' + request.socket.remoteAddress)
-	console.log('@@@ path: ' + path)
-
 	// Check whitelist.
-	if (!requestIsAuthorized(request, response))
+	if (!authorizeRequest(request, response))
 	{
 		// Request was not allowed, but has been processed.
 		return true
@@ -131,66 +238,6 @@ function webServerHookFunForScriptInjection(request, response, path)
 	else
 	{
 		// Use default processing for all other pages.
-		return false
-	}
-}
-
-/**
- * Internal.
- *
- * Check that requesting client is authorized, and if not
- * serve status pages.
- */
-function requestIsAuthorized(request, response)
-{
-	// Is security setting is turned off, all connections are allowed.
-	if (!SETTINGS.UseDialogToAllowForConnection)
-	{
-		return true
-	}
-
-	// Is request whitelisted?
-	if (1 === mWhiteList[request.socket.remoteAddress])
-	{
-		return true
-	}
-
-	// Is request blacklisted?
-	if (2 === mWhiteList[request.socket.remoteAddress])
-	{
-		serveHtmlFilePlainlyWithoutReloaderScript(
-			request,
-			response,
-			'./hyper/server/hyper-unauthorized.html')
-		return false
-	}
-
-	// TODO: To handle this in an async way, send the
-	// page 'hyper-waiting-for-ok.html' and display an
-	// non-blocking UI-element to get the confirmation.
-
-	// Device IP is not in whitelist, ask for confirmation.
-	// Note that window.confirm is BLOCKING. The request will
-	// hang here until the user responded to the dialog.
-	var allow = window.confirm(
-		'Allow connection from ' +
-		request.socket.remoteAddress +
-		'?')
-	if (allow)
-	{
-		mWhiteList[request.socket.remoteAddress] = 1
-		return true
-	}
-	else
-	{
-		mWhiteList[request.socket.remoteAddress] = 2
-
-		// Send page telling access is not allowed.
-		serveHtmlFilePlainlyWithoutReloaderScript(
-			request,
-			response,
-			'./hyper/server/hyper-unauthorized.html')
-
 		return false
 	}
 }
@@ -383,12 +430,18 @@ function serveHtmlFile(request, response, path)
  * Internal.
  *
  * Serve HTML file without inserting reloader script.
+ * An optional modification function allows the caller
+ * to update the content of the file being served.
  */
-function serveHtmlFilePlainlyWithoutReloaderScript(request, response, path)
+function serveHtmlFilePlainlyWithoutReloaderScript(request, response, path, modFun)
 {
 	var content = FILEUTIL.readFileSync(path)
 	if (content)
 	{
+		if (modFun)
+		{
+			content = modFun(content)
+		}
 		mWebServer.writeRespose(response, content, 'text/html')
 		return true
 	}
@@ -933,3 +986,6 @@ exports.setReloadCallbackFun = setReloadCallbackFun
 exports.setTraverseNumDirectoryLevels = setTraverseNumDirectoryLevels
 exports.getNumberOfMonitoredFiles = getNumberOfMonitoredFiles
 exports.fileSystemMonitor = fileSystemMonitor
+exports.setUnknownIpHandler = setUnknownIpHandler
+exports.whiteListIp = whiteListIp
+exports.blackListIp = blackListIp

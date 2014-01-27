@@ -402,6 +402,55 @@ hyper.UI = {}
 		updateProjectList()
 	}
 
+	hyper.UI.askForClientVerification = function(ip)
+	{
+		// Style buttons: http://stackoverflow.com/questions/1828010/apply-css-to-jquery-dialog-buttons
+		var isClosed = false
+		var html = '<div title="Client Connected">'
+        	+ '<p>Allow connection from <strong>' + ip + '</strong>?</p></div>'
+		$(html).dialog(
+		{
+			autoOpen: false,
+			width: 400,
+			open: function()
+			{
+        		$('.ui-dialog-buttonpane')
+        			.find('button:contains("Allow")')
+        				.css('background', 'rgb(0,175,0)')
+        				.css('color', 'rgb(255,255,255)')
+        		$('.ui-dialog-buttonpane')
+        			.find('button:contains("Deny")')
+        				.css('background', 'rgb(175,0,0)')
+        				.css('color', 'rgb(255,255,255)')
+        	},
+			close: function(event, ui)
+			{
+				if (!isClosed)
+				{
+					$(this).remove()
+					hyper.SERVER.blackListIp(ip)
+				}
+			},
+			buttons:
+			{
+				'Allow': function ()
+				{
+					isClosed = true
+					$(this).dialog('close')
+					$(this).remove()
+					hyper.SERVER.whiteListIp(ip)
+				},
+				'Deny': function ()
+				{
+					isClosed = true
+					$(this).dialog('close')
+					$(this).remove()
+					hyper.SERVER.blackListIp(ip)
+				}
+			}
+		}).dialog('open')
+	}
+
 	setupUI()
 })()
 
@@ -437,6 +486,7 @@ hyper.UI = {}
 
 		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
 		SERVER.setReloadCallbackFun(reloadCallback)
+		SERVER.setUnknownIpHandler(hyper.UI.askForClientVerification)
 	}
 
 	function displayServerIpAddress()
