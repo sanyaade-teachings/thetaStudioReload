@@ -192,8 +192,9 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 	<button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
 	<button id="button-undo" type="button" class="btn btn-primary">Undo</button>
 	<button id="button-redo" type="button" class="btn btn-primary">Redo</button>
-	<button id="button-clear-log" type="button" class="btn btn-warning">Clear Log</button>
 	<button id="button-clear-editor" type="button" class="btn btn-danger">Clear Editor</button>
+	<button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
+	<button id="button-toggle-autoscroll" type="button" class="btn btn-info">Toggle AutoScroll</button>
 	<button id="button-eval-node" type="button" class="btn btn-success">Node Eval</button>
 </div>
 
@@ -238,6 +239,9 @@ $(function()
 	var mResult = CodeMirror.fromTextArea(document.getElementById('result-editor'),
 	{
 	})
+
+	// Flag for toggling autoscroll of log view.
+	var mAutoScroll = true
 
 	$('#button-eval').click(function()
 	{
@@ -305,6 +309,11 @@ $(function()
 		mEditor.setValue('\n\n\n\n\n\n\n\n\n')
 	})
 
+	$('#button-toggle-autoscroll').click(function()
+	{
+		mAutoScroll = !mAutoScroll
+	})
+
 	/*
 	$('input.buttonEvalInBrowser').click(function()
 	{
@@ -324,8 +333,10 @@ $(function()
 	function showResult(res)
 	{
 		mResult.setValue(mResult.getValue() + '\n' + res)
-		var lastLine = mResult.lastLine()
-		mResult.scrollIntoView({ line: lastLine, ch: 0 })
+		if (mAutoScroll)
+		{
+			mResult.scrollIntoView({ line: mResult.lastLine(), ch: 0 })
+		}
 	}
 
 	window.hyper = {}
