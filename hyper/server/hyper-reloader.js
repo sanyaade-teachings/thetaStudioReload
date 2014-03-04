@@ -16,9 +16,19 @@ License: Apache Version 2.0
 		hyper.documentLoadTime = Date.now() - hyper.documentLoadTime
   	})
 
-	// Connection notifications.
+	// This variable is true if we are connected to the server.
 	hyper.isConnected = false
+
+	// User-defined function that is called when the app is
+	// connected to the server.
 	hyper.onConnectedFun = null
+
+	// User-defined function that is called when the app is
+	// about to reload (called before reload).
+	hyper.onReloadFun = null
+
+	// Sets the onConnected function. You can use this function
+	// to display a status message, for example.
 	hyper.onConnected = function(fun)
 	{
 		if (hyper.isConnected)
@@ -31,6 +41,14 @@ License: Apache Version 2.0
 			// Call when connected.
 			hyper.onConnectedFun = fun
 		}
+	}
+
+	// Sets the onReload function. You can use this function
+	// to perform cleanup before the page is reloaded, free
+	// resources etc.
+	hyper.onReload = function(fun)
+	{
+		hyper.onReloadFun = fun
 	}
 
 	// Send result of evaluating JS to the UI.
@@ -85,6 +103,9 @@ License: Apache Version 2.0
 		hyper.IoSocket = socket
 		socket.on('hyper.run', function(data)
 		{
+			// Call the reload function.
+			hyper.onReloadFun && hyper.onReloadFun()
+
 			// Always show the loading toast.
 			hyper.showMessage('Loading')
 
@@ -102,6 +123,9 @@ License: Apache Version 2.0
 				hyper.showMessage('Loading')
 			}
 			*/
+
+			// Call the reload function.
+			hyper.onReloadFun && hyper.onReloadFun()
 
 			// Always show the loading toast.
 			hyper.showMessage('Loading')
