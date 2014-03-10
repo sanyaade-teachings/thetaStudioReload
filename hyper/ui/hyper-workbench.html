@@ -6,24 +6,17 @@ Description: JavaScript Workbench and Log panel.
 Author: Mikael Kindborg
 Copyright (c) 2013 Mikael Kindborg
 License: Apache Version 2.0
+jQuery Layout: http://layout.jquery-dev.net/
 -->
 <head>
 <meta charset="utf-8">
 
 <title>JavaScript Workbench</title>
 
-<link href="../libs/jquery-ui-bootstrap-0.5/assets/css/bootstrap.min.css" rel="stylesheet" />
-<link href="../libs/jquery-ui-bootstrap-0.5/css/custom-theme/jquery-ui-1.10.0.custom.css" rel="stylesheet" />
-
-<!-- <link rel="stylesheet" href="../libs/jquery/themes/sunny/jquery-ui.min.css" /> -->
+<link href="../libs/bootstrap-3.1.1/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../libs/jquery/layout-default-latest.css" />
-
-<script src="../libs/jquery/jquery-2.0.3.min.js"></script>
-
-<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/bootstrap.min.js"></script>
-<script src="../libs/jquery-ui-bootstrap-0.5/assets/js/jquery-ui-1.10.0.custom.min.js"></script>
-
-<!-- <script src="../libs/jquery/jquery-ui-1.10.3.custom.min.js"></script> -->
+<script src="../libs/jquery/jquery-2.1.0.min.js"></script>
+<script src="../libs/jquery/jquery-ui-1.10.3.custom.min.js"></script>
 <script src="../libs/jquery/jquery.layout-latest.min.js"></script>
 
 <link rel="stylesheet" href="../libs/codemirror-3.15/lib/codemirror.css">
@@ -57,9 +50,16 @@ License: Apache Version 2.0
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
 	border-bottom-color: #BBB;
-	padding: 5px 5px 5px 5px;
+	padding: 0px;
 	font-size: 0.8em;
 	font-family: Sans-serif;
+}
+
+.btn
+{
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
 }
 
 #code-area
@@ -112,8 +112,48 @@ button
 <div class="ui-layout-center">
 
 <div id="code-area">
-<textarea id="code-editor">
-// Select a snippet of code, then click the "Eval" button.
+	<textarea id="code-editor">
+	</textarea>
+</div>
+
+</div> <!-- center -->
+
+<div class="ui-layout-south">
+
+<!--
+<div id="toolbar" class="header-footer">
+	<button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
+	<button id="button-undo" type="button" class="btn btn-primary">Undo</button>
+	<button id="button-redo" type="button" class="btn btn-primary">Redo</button>
+	<button id="button-clear-editor" type="button" class="btn btn-danger">Clear Editor</button>
+	<button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
+	<button id="button-toggle-autoscroll" type="button" class="btn btn-info">Toggle AutoScroll</button>
+	<button id="button-eval-node" type="button" class="btn btn-success">Node Eval</button>
+</div>
+-->
+
+<div id="toolbar">
+	<div class="btn-group xbtn-group-justified">
+		<a href="javascript:void(0)" id="button-eval" class="btn btn-primary">Eval Selection</a>
+		<a href="javascript:void(0)" id="button-eval-node" class="btn btn-primary">Node Eval</a>
+		<a href="javascript:void(0)" id="button-undo" class="btn btn-primary">Undo</a>
+		<a href="javascript:void(0)" id="button-redo" class="btn btn-primary">Redo</a>
+		<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn btn-primary">Toggle AutoScroll</a>
+		<a href="javascript:void(0)" id="button-clear-log" class="btn btn-primary">Clear Log</a>
+		<a href="javascript:void(0)" id="button-clear-editor" class="btn btn-primary">Clear Editor</a>
+		<a href="javascript:void(0)" id="button-restore" class="btn btn-primary">Restore</a>
+	</div>
+</div>
+
+<div id="result-area" class="ui-layout-content">
+	<textarea id="result-editor">
+	</textarea>
+</div>
+
+</div> <!-- south -->
+
+<div id="code-editor-default-content" style="display:none;"
+>// Select a snippet of code, then click the "Eval" button.
 // This will run the connected devices/browsers.
 
 // Compute a value, the return value is shown in the
@@ -145,9 +185,9 @@ clearInterval(timer)
 // the timer is running.
 
 // Have fun!
-</textarea>
+</div>
+
 <!--
-<textarea id="code-editor">
 // -----------------------------------------------------
 //			Welcome to HyperReload Workbench
 // -----------------------------------------------------
@@ -180,27 +220,10 @@ hyper.log('Hello World')
 // Replace the browser content with the given HTML. What do you
 // think will happen if you evaluate this with "Eval in Node"?
 document.body.innerHTML = '<h1>Hello World</h1>'
-</textarea>
 -->
-</div>
 
-</div> <!-- center -->
-
-<div class="ui-layout-south">
-
-<div id="toolbar" class="header-footer">
-	<button id="button-eval" type="button" class="btn btn-success">Eval Selection</button>
-	<button id="button-undo" type="button" class="btn btn-primary">Undo</button>
-	<button id="button-redo" type="button" class="btn btn-primary">Redo</button>
-	<button id="button-clear-editor" type="button" class="btn btn-danger">Clear Editor</button>
-	<button id="button-clear-log" type="button" class="btn btn-danger">Clear Log</button>
-	<button id="button-toggle-autoscroll" type="button" class="btn btn-info">Toggle AutoScroll</button>
-	<button id="button-eval-node" type="button" class="btn btn-success">Node Eval</button>
-</div>
-
-<div id="result-area" class="ui-layout-content">
-<textarea id="result-editor">
-// This is the message area where log messages and errors
+<div id="result-editor-default-content" style="display:none;"
+>// This is the message area where log messages and errors
 // are displayed.
 //
 // Select one or more lines of code in the code area above.
@@ -212,10 +235,7 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 // With this button, you can interactively develop and test
 // node.js servers and functions in node-webkit. This is a
 // very powerful feature.
-</textarea>
 </div>
-
-</div> <!-- south -->
 
 <script>
 $(function()
@@ -314,6 +334,11 @@ $(function()
 		mAutoScroll = !mAutoScroll
 	})
 
+	$('#button-restore').click(function()
+	{
+		restoreState()
+	})
+
 	/*
 	$('input.buttonEvalInBrowser').click(function()
 	{
@@ -410,7 +435,76 @@ $(function()
 		}
 	}
 
+	var GUI = require('nw.gui')
+
+	function saveUIState()
+	{
+		localStorage.setItem('workbench-code-editor-content', mEditor.getValue())
+		localStorage.setItem('workbench-result-editor-content', mResult.getValue())
+
+		localStorage.setItem('workbench-window-geometry', JSON.stringify({
+			x: win.x,
+			y: win.y,
+			width: win.width,
+			height: win.height
+			})
+		)
+
+		var layout = $('body').layout()
+		localStorage.setItem('workbench-divider-position', layout.state.south.size)
+	}
+
+	// Global reference.
+	window.saveUIState = saveUIState
+
+	function restoreSavedUIState()
+	{
+		var editorContent = localStorage.getItem('workbench-code-editor-content')
+			|| $('#code-editor-default-content').html()
+		var resultContent = localStorage.getItem('workbench-result-editor-content')
+			|| $('#result-editor-default-content').html()
+		mEditor.setValue(editorContent)
+		mResult.setValue(resultContent)
+
+		var geometry = localStorage.getItem('workbench-window-geometry')
+		if (geometry)
+		{
+			var win = GUI.Window.get()
+			var data = JSON.parse(geometry)
+			win.x = data.x
+			win.y = data.y
+			win.width = data.width
+			win.height = data.height
+		}
+
+		var size = localStorage.getItem('workbench-divider-position')
+		if (size)
+		{
+			var layout = $('body').layout()
+			layout.sizePane('south', size)
+		}
+	}
+
+	// Restore the original content of the panes.
+	function restoreState()
+	{
+		var editorContent = $('#code-editor-default-content').html()
+		var resultContent = $('#result-editor-default-content').html()
+		mEditor.setValue(editorContent)
+		mResult.setValue(resultContent)
+	}
+
+	// Set the save state since last session.
+	restoreSavedUIState()
+
 	window.addEventListener('message', receiveMessage, false)
+
+	var win = GUI.Window.get()
+	win.on('close', function()
+	{
+		saveUIState()
+		this.close(true)
+	})
 })
 </script>
 
@@ -420,7 +514,7 @@ $(function()
 </script>
 <script src="../settings/settings.js"></script>
 <script>
-	// Set fonts based on the settings.
+	// Set fonts based on settings.
 	setTimeout(function() {
 		$('.CodeMirror').css('font-family', exports.WorkbenchFontFamily)
 		$('.CodeMirror').css('font-size', exports.WorkbenchFontSize) }, 1)

@@ -1,5 +1,8 @@
-body
+html, body
 {
+	margin: 0;
+	padding: 0;
+	width: 100%;
 	font-family: sans-serif;
 }
 
@@ -17,27 +20,36 @@ body
 	left: 0px;
 	top: 0px;
 	right: 0px;
-	margin-top: 4px;
-	height: 36px;
+}
+
+#panel-tool-buttons
+{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	left: 50px;
 }
 
 #panel-tool-menu
 {
 	position: absolute;
-	left: 0px;
 	top: 0px;
-	right: 0px;
-	margin-left: 4px;
-	margin-right: 4px;
+	left: 0px;
 }
 
-#button-workbench, #button-documentation, #button-store
+#button-tool-menu
 {
-	/* If you remove the store button, change width from 33.33% to 50%. */
-	width: 50%;
-	height: 36px;
+	width: 50px;
+}
+
+.btn-hyper-toolbar
+{
+	height: 40px;
 	font-size: 18px;
 	/*font-weight: bold;*/
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
 }
 
 #panel-middle
@@ -84,7 +96,11 @@ body
 	margin: 5px;
 	padding: 0 10px;
 	min-height: 40px;
+	background: rgb(255,255,255);
 	border: 1px solid #000000;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 	cursor: pointer;
 	overflow: hidden;
 }
@@ -132,9 +148,12 @@ body
 {
 	position: absolute;
 	left: 40px;
-	top: 40px;
+	top: 50px;
 	right: 40px;
 	padding: 20px;
 	border: 1px solid #000000;
-	background-color: rgba(255,255,255,0.7);
+	background-color: rgba(255,255,255,0.8);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 }

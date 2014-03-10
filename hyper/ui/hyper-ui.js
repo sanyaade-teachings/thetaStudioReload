@@ -49,8 +49,6 @@ hyper.UI = {}
 ;(function()
 {
 	var mWorkbenchWindow = null
-	// UNUSED: var mDocumentationWindow = null
-	// UNUSED: var mStoreWindow = null
 
 	function setupUI()
 	{
@@ -58,6 +56,7 @@ hyper.UI = {}
 		setUIActions()
 		setWindowActions()
 		setUpFileDrop()
+		restoreSavedUIState()
 	}
 
 	function styleUI()
@@ -92,7 +91,8 @@ hyper.UI = {}
 			else
 			{
 				// Create new window.
-				/*mWorkbenchWindow = GUI.Window.open('hyper-workbench.html', {
+				/* This does not work:
+				mWorkbenchWindow = GUI.Window.open('hyper-workbench.html', {
 					//position: 'mouse',
 					width: 901,
 					height: 600,
@@ -104,63 +104,12 @@ hyper.UI = {}
 					'resizable=1,width=800,height=600')
 				mWorkbenchWindow.moveTo(50, 50)
 				mWorkbenchWindow.focus()
-				// Establish contact. Not needed/used.
+				// Establish contact. Not really needed.
 				mWorkbenchWindow.postMessage({ message: 'hyper.hello' }, '*')
 			}
 		})
 
-		/*
-		// UNUSED
-		// Documentation window is opened from hyper-ui.html.
-		// Documentation button action.
-		button = $('#button-documentation')
-		button && button.click(function()
-		{
-			if (mDocumentationWindow && !mDocumentationWindow.closed)
-			{
-				// Bring existing window to front.
-				mDocumentationWindow.focus()
-			}
-			else
-			{
-				// Create new window.
-				// Note: The documentation is not part of the
-				// HyperReload GitHub repo. This code assumes
-				// that ../documentation/index.html exists.
-				// TODO: The window parameters do not take effect.
-				mDocumentationWindow = window.open(
-					'../../documentation/documentation.html',
-					'documentation',
-					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
-				mDocumentationWindow.moveTo(75, 75)
-				mDocumentationWindow.focus()
-			}
-		})
-
-		// UNUSED
-		// Store button action.
-		button = $('#button-store')
-		button && button.click(function()
-		{
-			if (mStoreWindow && !mStoreWindow.closed)
-			{
-				// Bring existing window to front.
-				mStoreWindow.focus()
-			}
-			else
-			{
-				// Create new window.
-				mStoreWindow = window.open(
-					'../../documentation/hyper-store.html',
-					'store',
-					'menubar=1,toolbar=1,location=1,scrollbars=1,resizable=1,width=800,height=600')
-				mStoreWindow.moveTo(100, 100)
-				mStoreWindow.focus()
-			}
-		})
-		*/
-
-		// Reorder of project list by drag and drop.
+		// Enable reorder of project list by drag and drop.
 		$(function()
 		{
 			$('#project-list').sortable(
@@ -187,8 +136,41 @@ hyper.UI = {}
 		// Listen to main window's close event
 		GUI.Window.get().on('close', function()
 		{
+			saveUIState()
+
+			if (mWorkbenchWindow && !mWorkbenchWindow.closed)
+			{
+				mWorkbenchWindow.window.saveUIState()
+			}
+
 			GUI.App.quit()
 		})
+	}
+
+	function saveUIState()
+	{
+		var win = GUI.Window.get()
+		localStorage.setItem('project-window-geometry', JSON.stringify({
+			x: win.x,
+			y: win.y,
+			width: win.width,
+			height: win.height
+			})
+		)
+	}
+
+	function restoreSavedUIState()
+	{
+		var geometry = localStorage.getItem('project-window-geometry')
+		if (geometry)
+		{
+			var win = GUI.Window.get()
+			var data = JSON.parse(geometry)
+			win.x = data.x
+			win.y = data.y
+			win.width = data.width
+			win.height = data.height
+		}
 	}
 
 	function receiveMessage(event)
@@ -240,20 +222,22 @@ hyper.UI = {}
 			console.log(files[i].path);
 		}*/
 
-		if (files.length > 0)
+		for (var i = 0; i < files.length; ++i)
 		{
-			var path = files[0].path
+			var path = files[i].path
 			if (FILEUTIL.fileIsHTML(path))
 			{
-				hyper.SERVER.setAppPath(path)
+				//hyper.SERVER.setAppPath(path)
 				hyper.addProject(path)
-				createProjectEntry(path)
 			}
 			else
 			{
 				alert('Only HTML files (extension .html or .htm) can be used')
+				break;
 			}
 		}
+
+		hyper.UI.displayProjectList()
 	}
 
 	function createProjectEntry(path)
@@ -281,6 +265,7 @@ hyper.UI = {}
 				+	'onclick="hyper.UI.deleteEntry(this)">'
 				+	'&times;'
 				+ '</button>'
+				+ '<div class="project-list-entry-path" style="display:none;">__PATH4__</div>'
 			+ '</div>'
 
 		// Get name of project, use title tag as first choise.
@@ -304,14 +289,15 @@ hyper.UI = {}
 		// Replace fields in template.
 		html = html.replace('__PATH1__', escapedPath)
 		html = html.replace('__PATH2__', escapedPath)
-		html = html.replace('__PATH3__', path)
+		html = html.replace('__PATH3__', getShortPathFromPath(path))
+		html = html.replace('__PATH4__', path)
 		html = html.replace('__NAME__', name)
 
 		// Create element.
 		var element = $(html)
 		//console.log(html)
 
-		// Insert element last in list.
+		// Insert element first in list.
 		$('#project-list').append(element)
 	}
 
@@ -338,14 +324,45 @@ hyper.UI = {}
 		return path.substring(pos + 1)
 	}
 
+	// Get last part of path. Purpose is to make path fit
+	// inside a project list item.
+	function getShortPathFromPath(path)
+	{
+		var limit = 58
+		if (path.length < limit)
+		{
+			return path
+		}
+		else
+		{
+			var shortPath = path.substring(path.length - limit, path.length)
+			var index1 = shortPath.indexOf('/') // OS X, Linux
+			var index2 = shortPath.indexOf('\\') // Windows
+			if (index1 > -1)
+			{
+				return shortPath.substring(index1 + 1)
+			}
+			else if (index2 > -1)
+			{
+				return shortPath.substring(index2 + 1)
+			}
+			else
+			{
+				// Fallback
+				return '...' + shortPath.substring(3, shortPath.length)
+			}
+		}
+	}
+
 	// Project list has been reordered/changed, save new list.
+	// Reads data from the DOM tree.
 	function updateProjectList()
 	{
 		var projects = []
-		var elements = $('#project-list > div')
+		var elements = $('#project-list .project-list-entry-path')
 		elements.each(function(index, element)
 		{
-			var path = $(element).find('p').text()
+			var path = $(element).text()
 			if (path != '')
 			{
 				projects.push(path)
@@ -356,10 +373,7 @@ hyper.UI = {}
 
 	hyper.UI.displayIpAddress = function(ip)
 	{
-		// document.querySelector('#ip-address').innerHTML = ip
-		//document.querySelector('#connect-address-1').innerHTML = ip + ':' + port
 		document.querySelector('#connect-address').innerHTML = ip
-		// TODO: Does not work. Window.title = 'HyperReload LaunchPad ' + ip
 	}
 
 	hyper.UI.setConnectedCounter = function(value)
@@ -373,8 +387,13 @@ hyper.UI = {}
 			hyper.SERVER.getNumberOfMonitoredFiles()
 	}
 
-	hyper.UI.displayProjectList = function(projectList)
+	hyper.UI.displayProjectList = function()
 	{
+		// Clear current list.
+		$('#project-list').empty()
+
+		// Create new list.
+		var projectList = hyper.getProjectList()
 		for (var i = 0; i < projectList.length; ++i)
 		{
 			var path = projectList[i]
@@ -402,6 +421,8 @@ hyper.UI = {}
 		updateProjectList()
 	}
 
+	/*
+	//jQueryUI implementation. NOT USED.
 	hyper.UI.askForClientVerification = function(ip)
 	{
 		// Style buttons: http://stackoverflow.com/questions/1828010/apply-css-to-jquery-dialog-buttons
@@ -450,6 +471,7 @@ hyper.UI = {}
 			}
 		}).dialog('open')
 	}
+	*/
 
 	setupUI()
 })()
@@ -480,7 +502,7 @@ hyper.UI = {}
 		// Populate the UI.
 		// TODO: Consider moving these calls to a function in hyper.UI.
 		readProjectList()
-		hyper.UI.displayProjectList(mProjectList)
+		hyper.UI.displayProjectList()
 		hyper.UI.setServerMessageFun()
 		displayServerIpAddress()
 
@@ -550,7 +572,7 @@ hyper.UI = {}
 			// out Hyper by clicking the buttons in the user interface.
 			GUI.Shell.openExternal(SERVER.getAppFileURL())
 
-			/* This was used with iframe loading (hyper-client.html)
+			/* This was used with iframe loading (see hyper-client.html)
 			GUI.Shell.openExternal(
 				SERVER.getServerBaseURL() +
 				'#' +
@@ -583,7 +605,6 @@ hyper.UI = {}
 			1000)
 
 		// Update ip address in the UI to the actual ip used by the server.
-
 		SERVER.getIpAddress(function(address) {
 			hyper.UI.displayIpAddress(address + ':' + SETTINGS.WebServerPort)
 		})
@@ -626,14 +647,6 @@ hyper.UI = {}
 		FS.writeFileSync(mProjectListFile, json, {encoding: 'utf8'})
 	}
 
-	function openFolder(path)
-	{
-		// Debug logging.
-		console.log('Open folder: ' + path)
-
-		GUI.Shell.showItemInFolder(path)
-	}
-
 	// TODO: Simplify, use updateProjectList instead.
 	hyper.addProject = function(path)
 	{
@@ -645,6 +658,19 @@ hyper.UI = {}
 	{
 		mProjectList = list
 		saveProjectList()
+	}
+
+	hyper.getProjectList = function()
+	{
+		return mProjectList
+	}
+
+	function openFolder(path)
+	{
+		// Debug logging.
+		console.log('Open folder: ' + path)
+
+		GUI.Shell.showItemInFolder(path)
 	}
 
 	hyper.openFileFolder = function(path)
@@ -670,91 +696,3 @@ hyper.UI = {}
 
 	setupServer()
 })()
-
-/* OLD CODE
-
-	// Check: https://github.com/jjrdn/node-open
-	function openFolder(folderPath)
-	{
-		try
-		{
-			var exec = require('child_process').exec;
-
-			function puts(error, stdout, stderr)
-			{
-				//console.log('stdout: ' + stdout);
-				//console.log('stderr: ' + stderr);
-				//console.log('error: ' + error);
-			}
-
-			var isLinux = (OS.platform() === "linux")
-			var isMac = (OS.platform() === "darwin")
-			var isWindows = (OS.platform() === "win32")
-
-			if (isLinux)
-			{
-				var command = 'nautilus "' + folderPath + '"'
-				exec(command, puts)
-			}
-			else if (isMac)
-			{
-				var command = 'open "' + folderPath + '"'
-				exec(command, puts)
-			}
-			else if (isWindows)
-			{
-				var command = 'explorer "' + folderPath + '"'
-				exec(command, puts)
-			}
-			else
-			{
-				console.log('@@@ openFolder: Unknown platform: ' + OS.platform())
-			}
-		}
-		catch (err)
-		{
-			console.log("ERROR in openFolder: " + err)
-		}
-	}
-
-
-TODO: DELETE
-
-var darwin = vars.globals.localPlatform.indexOf("darwin") >= 0;
-var linux = vars.globals.localPlatform.indexOf("linux") >=0;
-if (darwin) {
-	var command =
-		"open "
-		+ this.fixPathsUnix(vars.globals.rootWorkspacePath)
-		+ vars.globals.fileSeparator
-		+ this.fixPathsUnix(projectFolder)
-		+ "/LocalFiles"
-		;
-} else if (linux) {
-	var commandStat = fs.statSync("/usr/bin/nautilus");
-	if(commandStat.isFile()) {
-	  var command =
-		  "nautilus "
-		  + this.fixPathsUnix(vars.globals.rootWorkspacePath)
-		  + vars.globals.fileSeparator
-		  + this.fixPathsUnix(projectFolder)
-		  + "/LocalFiles &"
-		  ;
-	} else {
-	  var command =
-		  "dolphin "
-		  + this.fixPathsUnix(vars.globals.rootWorkspacePath)
-		  + vars.globals.fileSeparator
-		  + this.fixPathsUnix(projectFolder)
-		  + "/LocalFiles &"
-		  ;
-	}
-} else {
-	var command =
-		"explorer \""
-		+ vars.globals.rootWorkspacePath
-		+ vars.globals.fileSeparator
-		+ projectFolder
-		+ "\\LocalFiles\"";
-}
-*/

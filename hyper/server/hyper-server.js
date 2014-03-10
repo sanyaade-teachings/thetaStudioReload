@@ -68,11 +68,14 @@ function blackListIp(ip)
  *
  * Check that requesting client is authorized, and if not
  * serve status pages.
+ *
+ * TODO: Authorization is not implemented. Plan is to do this with a
+ * pincode/password passed by the initial client request.
  */
 function authorizeRequest(request, response)
 {
 	// Is security setting is turned off, all connections are allowed.
-	if (!SETTINGS.UseDialogToAllowForConnection)
+	if (!SETTINGS.AuthorizeConnections)
 	{
 		return true
 	}
@@ -91,35 +94,6 @@ function authorizeRequest(request, response)
 			response,
 			'./hyper/server/hyper-unauthorized.html')
 		return false
-	}
-
-	// Is dialog being displayed?
-	if (3 === mWhiteList[request.socket.remoteAddress])
-	{
-		serveWaitingForOkPage()
-		return false
-	}
-
-	// To handle authorization in an async way, send the
-	// page 'hyper-waiting-for-ok.html' and display an
-	// non-blocking UI-element to get the confirmation.
-
-	// Device IP is not in whitelist, ask for confirmation.
-	mWhiteList[request.socket.remoteAddress] = 3 // Dialog displayed
-	mUnknownIpHandlerFun && mUnknownIpHandlerFun(request.socket.remoteAddress)
-	serveWaitingForOkPage()
-	return false
-
-	function serveWaitingForOkPage()
-	{
-		serveHtmlFilePlainlyWithoutReloaderScript(
-			request,
-			response,
-			'./hyper/server/hyper-waiting-for-ok.html',
-			function(content)
-			{
-				return content.replace('__CLIENT_IP__', request.socket.remoteAddress)
-			})
 	}
 }
 
