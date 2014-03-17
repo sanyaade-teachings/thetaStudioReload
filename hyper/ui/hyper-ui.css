@@ -22,14 +22,6 @@ html, body
 	right: 0px;
 }
 
-#panel-tool-buttons
-{
-	position: absolute;
-	right: 0px;
-	top: 0px;
-	left: 50px;
-}
-
 #panel-tool-menu
 {
 	position: absolute;
@@ -40,6 +32,14 @@ html, body
 #button-tool-menu
 {
 	width: 50px;
+}
+
+#panel-tool-buttons
+{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	left: 50px;
 }
 
 .btn-hyper-toolbar

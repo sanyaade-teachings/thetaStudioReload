@@ -4,7 +4,7 @@
 File: hyper-workbench.html
 Description: JavaScript Workbench and Log panel.
 Author: Mikael Kindborg
-Copyright (c) 2013 Mikael Kindborg
+Copyright (c) 2013-2014 Mikael Kindborg
 License: Apache Version 2.0
 jQuery Layout: http://layout.jquery-dev.net/
 -->
@@ -45,17 +45,17 @@ jQuery Layout: http://layout.jquery-dev.net/
 #toolbar
 {
 	color: #111111;
-	background-color: rgb(200,200,200);
-	border: 1px solid #BBB;
+	background-color: rgb(230,230,230);
+	border: 0px solid #BBB;
 	border-bottom-style: solid;
-	border-bottom-width: 1px;
+	border-bottom-width: 0px;
 	border-bottom-color: #BBB;
 	padding: 0px;
 	font-size: 0.8em;
 	font-family: Sans-serif;
 }
 
-.btn
+.unused-btn
 {
 	-webkit-border-radius: 0;
 	-moz-border-radius: 0;
@@ -132,18 +132,40 @@ button
 </div>
 -->
 
+<!--
 <div id="toolbar">
-	<div class="btn-group xbtn-group-justified">
-		<a href="javascript:void(0)" id="button-eval" class="btn btn-primary">Eval Selection</a>
-		<a href="javascript:void(0)" id="button-eval-node" class="btn btn-primary">Node Eval</a>
-		<a href="javascript:void(0)" id="button-undo" class="btn btn-primary">Undo</a>
-		<a href="javascript:void(0)" id="button-redo" class="btn btn-primary">Redo</a>
-		<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn btn-primary">Toggle AutoScroll</a>
-		<a href="javascript:void(0)" id="button-clear-log" class="btn btn-primary">Clear Log</a>
-		<a href="javascript:void(0)" id="button-clear-editor" class="btn btn-primary">Clear Editor</a>
-		<a href="javascript:void(0)" id="button-restore" class="btn btn-primary">Restore</a>
+	<div class="btn-toolbar" role="toolbar">
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-eval" class="btn btn-success">Eval Selection</a>
+			<a href="javascript:void(0)" id="button-eval-node" class="btn btn-success">Node Eval</a>
+		</div>
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-undo" class="btn btn-success">Undo</a>
+			<a href="javascript:void(0)" id="button-redo" class="btn btn-success">Redo</a>
+		</div>
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn btn-success">Toggle AutoScroll</a>
+		</div>
+		<div class="btn-group">
+			<a href="javascript:void(0)" id="button-clear-log" class="btn btn-success">Clear Log</a>
+			<a href="javascript:void(0)" id="button-clear-editor" class="btn btn-success">Clear Editor</a>
+			<a href="javascript:void(0)" id="button-restore" class="btn btn-success">Restore</a>
+		</div>
 	</div>
 </div>
+-->
+
+<div id="toolbar">
+	<a href="javascript:void(0)" id="button-eval" class="btn btn-success">Eval Selection</a>
+	<a href="javascript:void(0)" id="button-undo" class="btn btn-primary">Undo</a>
+	<a href="javascript:void(0)" id="button-redo" class="btn btn-primary">Redo</a>
+	<a href="javascript:void(0)" id="button-toggle-autoscroll" class="btn btn-info">Toggle AutoScroll</a>
+	<a href="javascript:void(0)" id="button-clear-log" class="btn btn-danger">Clear Log</a>
+	<a href="javascript:void(0)" id="button-clear-editor" class="btn btn-danger">Clear Editor</a>
+	<a href="javascript:void(0)" id="button-restore" class="btn btn-warning">Restore</a>
+	<a href="javascript:void(0)" id="button-eval-node" class="btn btn-success">Node Eval</a>
+</div>
+
 
 <div id="result-area" class="ui-layout-content">
 	<textarea id="result-editor">
@@ -231,7 +253,7 @@ document.body.innerHTML = '<h1>Hello World</h1>'
 // on connected devices.
 //
 // "Node Eval" is special, it evaluates selected code in
-// node-webkit, the platform on which HyperReload is built.
+// node-webkit, the platform on which this software is running.
 // With this button, you can interactively develop and test
 // node.js servers and functions in node-webkit. This is a
 // very powerful feature.
@@ -439,8 +461,20 @@ $(function()
 
 	function saveUIState()
 	{
-		localStorage.setItem('workbench-code-editor-content', mEditor.getValue())
-		localStorage.setItem('workbench-result-editor-content', mResult.getValue())
+		var maxStorageSize = 100000
+		var editorContent = mEditor.getValue()
+		var resultContent = mResult.getValue()
+		if (editorContent.length > maxStorageSize)
+		{
+			editorContent = editorContent.substring(0, maxStorageSize)
+		}
+		if (resultContent.length > maxStorageSize)
+		{
+			resultContent = resultContent.substring(0, maxStorageSize)
+		}
+
+		localStorage.setItem('workbench-code-editor-content', editorContent)
+		localStorage.setItem('workbench-result-editor-content', resultContent)
 
 		localStorage.setItem('workbench-window-geometry', JSON.stringify({
 			x: win.x,
