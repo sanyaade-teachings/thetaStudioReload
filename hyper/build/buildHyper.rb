@@ -286,9 +286,13 @@ def zip(source, dest)
 end
 
 def zipPackage(distPackage)
+	oldDir = FileUtils.pwd
+	FileUtils.cd pathDist
+	distPackage.gsub!(pathDist, '')
 	zipName = distPackage + "__ZIP__"
 	zipName = zipName.gsub("/__ZIP__", ".zip")
 	zip(distPackage, zipName)
+	FileUtils.cd oldDir
 end
 
 
