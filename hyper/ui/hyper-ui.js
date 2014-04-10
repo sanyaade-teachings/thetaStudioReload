@@ -567,17 +567,8 @@ hyper.UI = {}
 
 		if (mNumberOfConnectedClients <= 0)
 		{
-			// Open a local browser automatially if no clients are connected.
-			// This is done so that something will happen when you first try
-			// out Hyper by clicking the buttons in the user interface.
-			GUI.Shell.openExternal(SERVER.getAppFileURL())
-
-			/* This was used with iframe loading (see hyper-client.html)
-			GUI.Shell.openExternal(
-				SERVER.getServerBaseURL() +
-				'#' +
-				SERVER.getAppFileName())
-			*/
+			mRunAppGuardFlag = false
+			hyper.noClientConnectedHander()
 		}
 		else
 		{
@@ -591,6 +582,21 @@ hyper.UI = {}
 		mConnectedCounterTimer = setTimeout(function() {
 			hyper.UI.setConnectedCounter(mNumberOfConnectedClients) },
 			5000)
+	}
+
+	hyper.noClientConnectedHander = function()
+	{
+		// Open a local browser automatially if no clients are connected.
+		// This is done so that something will happen when you first try
+		// out Hyper by clicking the buttons in the user interface.
+		GUI.Shell.openExternal(SERVER.getAppFileURL())
+
+		/* This was used with iframe loading (see hyper-client.html)
+		GUI.Shell.openExternal(
+			SERVER.getServerBaseURL() +
+			'#' +
+			SERVER.getAppFileName())
+		*/
 	}
 
 	function clientConnectedCallback()
