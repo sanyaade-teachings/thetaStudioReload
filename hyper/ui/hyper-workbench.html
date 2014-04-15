@@ -505,6 +505,19 @@ $(function()
 		{
 			var win = GUI.Window.get()
 			var data = JSON.parse(geometry)
+
+			// Make sure top-left corner is visible.
+			var offsetY = 0
+			if ('darwin' == require('os').platform())
+			{
+				offsetY = 22
+			}
+			data.x = Math.max(data.x, 1)
+			data.y = Math.max(data.y, 1 + offsetY)
+			data.x = Math.min(data.x, screen.width - 100)
+			data.y = Math.min(data.y, screen.height - 200)
+
+			// Set window size.
 			win.x = data.x
 			win.y = data.y
 			win.width = data.width
