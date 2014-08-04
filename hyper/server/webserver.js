@@ -252,9 +252,12 @@ function CreateServerObject()
 
 	function ServeFile(path, response)
 	{
-		//console.log('ServeFile fillpath: ' + mBasePath + path)
-		basePaths = [mBasePath, "./hyper/ui/style"]
-		
+		// TODO: Hack for Evothings Studio to find shared
+		// stylesheets and UI-files. This could be made
+		// configurable, with possibility to add paths
+		// to a list of base paths.
+		basePaths = [mBasePath, './hyper/ui']
+
 		var file = null
 		var fullPath = '';
 
@@ -268,7 +271,7 @@ function CreateServerObject()
 				break;
 			}
 		}
-		
+
 		if (!file)
 		{
 			FileNotFoundResponse(fullPath, response)
