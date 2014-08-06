@@ -150,6 +150,16 @@ hyper.UI = {}
 	function saveUIState()
 	{
 		var win = GUI.Window.get()
+
+		// Do not save if window is minimized on Windows.
+		// On Windows an icon has x,y coords -32000 when
+		// window is minimized. On Linux and OS X the window
+		// coordinates and size are intact when minimized.
+		if (win.x < -1000)
+		{
+			return;
+		}
+
 		localStorage.setItem('project-window-geometry', JSON.stringify({
 			x: win.x,
 			y: win.y,
