@@ -21,6 +21,7 @@ limitations under the License.
 */
 
 var PATH = require('path')
+var URL = require('url')
 var HTTP = require('http')
 var FS = require('fs')
 
@@ -52,9 +53,10 @@ exports.fileIsHTML = function(path)
 // Download a document as a text string.
 // callbackFun(resultCode, dataOrError)
 // On error, resultCode is -1, on success the HTTP status code.
-exports.downloadAsString = function(url, callbackFun)
+exports.downloadAsString = function(url, userAgent, callbackFun)
 {
-	HTTP.get(url, function(response)
+	uri = URL.parse(url);
+	HTTP.get({hostname:uri.hostname, path:uri.path, headers:{'user-agent':userAgent}}, function(response)
 	{
 		response.setEncoding('utf8')
 		var data = ''
