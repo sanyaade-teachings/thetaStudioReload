@@ -103,25 +103,35 @@ def buildDistBinaryLinux32
 	buildDistBinaryLinux(
 		pathDistSource,
 		distPackageLinux32,
-		pathNodeWebkitLinux32)
+		pathNodeWebkitLinux32, true)
 end
 
 def buildDistBinaryLinux64
 	buildDistBinaryLinux(
 		pathDistSource,
 		distPackageLinux64,
-		pathNodeWebkitLinux64)
+		pathNodeWebkitLinux64, true)
 end
 
-def buildDistBinaryLinux(sourcePath, targetPath, sourceBin)
+def buildDistBinaryLinux(sourcePath, targetPath, sourceBin, wrap)
 
 	# Copy JavaScript/HTML files.
 	FileUtils.copy_entry(sourcePath, targetPath)
 
 	# Copy files.
-	FileUtils.copy_entry(
-		sourceBin + "nw",
-		targetPath + applicationName)
+	if(wrap)
+		FileUtils.copy_entry(
+			sourceBin + "nw",
+			targetPath + "nw")
+		FileUtils.copy_entry(
+			sourcePath + "wrap-nw.sh",
+			targetPath + applicationName)
+		FileUtils.rm(targetPath + "wrap-nw.sh")
+	else
+		FileUtils.copy_entry(
+			sourceBin + "nw",
+			targetPath + applicationName)
+	end
 	FileUtils.copy_entry(
 		sourceBin + "nw.pak",
 		targetPath + "nw.pak")
