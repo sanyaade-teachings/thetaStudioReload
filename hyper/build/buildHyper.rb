@@ -124,9 +124,8 @@ def buildDistBinaryLinux(sourcePath, targetPath, sourceBin, wrap)
 			sourceBin + "nw",
 			targetPath + "nw")
 		FileUtils.copy_entry(
-			sourcePath + "wrap-nw.sh",
+			pathSourceHyper + "wrap-nw.sh",
 			targetPath + applicationName)
-		FileUtils.rm(targetPath + "wrap-nw.sh")
 	else
 		FileUtils.copy_entry(
 			sourceBin + "nw",
