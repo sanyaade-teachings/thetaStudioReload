@@ -282,11 +282,15 @@ end
 
 # Helper function to run shell commands.
 def sh(cmd)
-	# TODO: Remove the extra shell. Class Process could be used.
-	$stderr.puts cmd
-	if (!system(cmd)) then
-		error "Command failed: '#{$?}'"
+	# Print the command to stdout.
+	if(cmd.is_a?(Array))
+		p cmd
+	else
+		puts cmd
 	end
+	# Run it.
+	success = system(cmd)
+	raise "Command failed" unless(success)
 end
 
 def zip(source, dest)
