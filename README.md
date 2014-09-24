@@ -8,61 +8,15 @@ Edit your HTML/CSS/JS on your desktop machine, save the edited file, and the cha
 
 Any number of clients can connect. You can connect from any browser (desktop or mobile), or you can connect from a mobile WebView widget of a native app (this should work on all mobile platforms that supports a Web widget, Android, iOS, Windows Phone, Firefox OS, Tizen, etc).
 
-## Get started quickly
-
-The easiest way to get started is to download the [HyperReload](http://hyperreload.com), product package (available for Linux, OS X, and Windows). The download includes documentation and tutorials, and the full source code (which you can modify as needed).
-
-## Running from source
+## Getting started
 
 HyperReload uses [node-webkit](https://github.com/rogerwang/node-webkit) as its runtime (an amazing piece of software).
 
-There is no need to do an actual build, you can clone the source, then run using node-webkit. Just place the node-webkit [executable files](https://github.com/rogerwang/node-webkit) in the same folder as package.json and launch node-webkit.
-
-## Building from source
-
-There is a script that can build stand-alone redistributable packages:
-
-     hyper/build/buildHyper.rb
-
-In addition, there is a script 'buildPlugin.rb' that you should copy and modify to customise the build (e.g. defining the name of the package to build).
-
-buildPlugin.rb may include localConfig.rb, if it exists. Use it for non-version-controlled settings.
-
-This script requires that a directory named 'node-webkit-bin-0.8.0' exists parallel to the HyperReload source dir. This directory contains the uncompressed node-webkit binaries. Note that depending on the version of node-webkit used, you must update the directory names and executabe names in the build script.
-
-If you want to use a different version of node-webkit, replace "0.8.0" in this example with the number of your chosen version.
-You must also change the function "nodeWebKitVersion" in buildPlugin.rb, or override it in localConfig.rb.
-
-Folder structure:
-
-    HyperReload
-    node-webkit-bin-0.8.0
-        node-webkit-v0.8.0-linux-ia32
-            creadits.html
-            libffmpegsumo.so
-            nw
-            nw.pak
-            nwsnapshot
-        node-webkit-v0.8.0-linux-x64
-            ...
-        node-webkit-v0.8.0-osx-ia32
-            ...
-        node-webkit-v0.8.0-win-ia32
-            ...
-
-## Documentation and issue tracker
-
-Documentation and downloads for HyperReload are on [hyperreload.com](http://hyperreload.com).
-
-Developer documentation and design documents are on the [HyperReload GitHub wiki] (https://github.com/divineprog/HyperReload/wiki/_pages).
-
-Use the [Github issue tracker](https://github.com/divineprog/HyperReload/issues) to report bugs, ask questions, and make suggestions (there are labels for different issue types you can use).
+To run HyperReload, there is no need to do an actual build, just clone the source, then run using node-webkit. Just place the node-webkit [executable files](https://github.com/rogerwang/node-webkit) in the same folder as package.json and launch the node-webkit executable file.
 
 ## How to use HyperReload
 
 ### 1. Launch the HyperReload desktop application
-
-Download [HyperReload](http://hyperreload.com), unzip the download file and launch the  application.
 
 When you run HyperReload on your desktop machine, it will start a local web server and listen for file updates, notifying connected clients to reload when files are saved.
 
@@ -110,11 +64,43 @@ For example, for this file, the script tag would be inserted after the ending ti
 	</body>
 	</html>
 
-## Roadmap
+## Building from source
 
-HyperReload is under development, with ongoing changes/updates.
+Here is a script that can build stand-alone redistributable packages:
 
-New releases are made continously. Downloads are available at [hyperreload.com](http://hyperreload.com).
+     hyper/build/buildHyper.rb
+
+In addition, there is a script 'buildPlugin.rb' that you should copy and modify to customise the build (e.g. defining the name of the package to build).
+
+buildPlugin.rb may include localConfig.rb, if it exists. Use it for non-version-controlled settings.
+
+This script requires that a directory named 'node-webkit-bin-0.8.0' exists parallel to the HyperReload source dir. This directory contains the uncompressed node-webkit binaries. Note that depending on the version of node-webkit used, you must update the directory names and executabe names in the build script.
+
+If you want to use a different version of node-webkit, replace "0.8.0" in this example with the number of your chosen version.
+You must also change the function "nodeWebKitVersion" in buildPlugin.rb, or override it in localConfig.rb.
+
+Folder structure:
+
+    HyperReload
+    node-webkit-bin-0.8.0
+        node-webkit-v0.8.0-linux-ia32
+            creadits.html
+            libffmpegsumo.so
+            nw
+            nw.pak
+            nwsnapshot
+        node-webkit-v0.8.0-linux-x64
+            ...
+        node-webkit-v0.8.0-osx-ia32
+            ...
+        node-webkit-v0.8.0-win-ia32
+            ...
+
+## Documentation and issue tracker
+
+Developer documentation and design documents are on the [GitHub wiki] (https://github.com/divineprog/HyperReload/wiki/_pages).
+
+Use the [Github issue tracker](https://github.com/divineprog/HyperReload/issues) to report bugs, ask questions, and make suggestions (there are labels for different issue types you can use).
 
 ## Credits
 
@@ -128,19 +114,11 @@ HyperReload is based on several truly wonderful open-source projects, including:
 
 For a full listing of software used by HyperReload, see folder "license".
 
-## License information
+## License
 
-HyperReload is Copyright (c) 2013 Mikael Kindborg
-
-The source code in the HyperReload repository is licensed under the Apache license. You are welcome to contribute to the project and use the source code with your own projects.
+HyperReload is licensed under the Apache license. You are welcome to contribute to the project and use the source code with your own projects.
 
 See file LICENSE.md and folder "hyper/license" for full licensing information, including licenses for software used by HyperReload.
-
-## Relation to the HyperReload software product
-
-The [HyperReload software product](http://hyperreload.com) contains tutorials and other material that are not open source, and the downloadable package (which includes the full source code) is released under a proprietary license. You are free to use HyperReload at work and at home, and modify it for your own needs and share with friends, but you may not sell, publish, or distribute the HyperReload software product.
-
-Commercial licenses for HyperReload and support and development services are available upon request.
 
 ## Contact
 
@@ -175,28 +153,4 @@ With the HyperApp mobile application (under development) you get additional func
 * Quick-connect to the running HyperApp UI
 * Get console error messages displayed in the HyperApp UI (Android)
 * No need to build the application, just install from the app store (forthcoming)
--->
-
-<!--
-## License
-
-HyperReload is both and open-source project and a product. You are welcome to contribute to the project and use HyperReload source code for your own projects, but you may not copy or distribute the HyperReload software product.
-
-Licensing information:
-
-	Copyright (c) 2013 Mikael Kindborg
-
-	You are free to use HyperReload at work and at home. You are free to
-	modify the program to fit your own needs, and share with friends.
-
-	You are NOT allowed to sell or distribute the HyperReload product package.
-
-	The HyperReload source code files are licensed under the MIT license.
-
-	The HyperReload software product, including the user interface design
-	and user documentation, is NOT subject to the MIT license, and may NOT
-	be sold, published, distributed, or sublicensed.
-
-See the folder "license" for full licensing information, including licenses for software used by HyperReload.
-
 -->
