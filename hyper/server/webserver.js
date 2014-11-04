@@ -253,25 +253,10 @@ function CreateServerObject()
 	function ServeFile(path, response)
 	{
 		//console.log('ServeFile fillpath: ' + mBasePath + path)
-		basePaths = [mBasePath, "./hyper/server/ui"]
-		
-		var file = null
-		var fullPath = '';
-
-		for (var bp in basePaths)
-		{
-			var f = GetFileStatus(basePaths[bp] + path)
-			if (f)
-			{
-				fullPath = basePaths[bp] + path
-				file = f
-				break;
-			}
-		}
-		
+		var file = GetFileStatus(mBasePath + path)
 		if (!file)
 		{
-			FileNotFoundResponse(fullPath, response)
+			FileNotFoundResponse(path, response)
 			return
 		}
 
@@ -279,27 +264,27 @@ function CreateServerObject()
 		{
 			// Get default page 'index.html'.
 			// Add ending slash separator if not present.
-			if ('/' != fullPath.charAt(fullPath.length - 1))
+			if ('/' != path.charAt(path.length - 1))
 			{
-				fullPath = fullPath + '/'
+				path = path + '/'
 			}
-			fullPath = fullPath + 'index.html'
-			var indexFile = GetFileStatus(fullPath)
+			path = path + 'index.html'
+			var indexFile = GetFileStatus(mBasePath + path)
 			if (!indexFile)
 			{
-				FileNotFoundResponse(fullPath, response)
+				FileNotFoundResponse(path, response)
 				return
 			}
 		}
 		else
 		if (!file.isFile())
 		{
-			FileNotFoundResponse(fullPath, response)
+			FileNotFoundResponse(path, response)
 			return
 		}
 
 		// Write file data to reponse object.
-		WriteFileResponse(fullPath, response)
+		WriteFileResponse(mBasePath + path, response)
 	}
 
 	function WriteFileResponse(fullPath, response)
