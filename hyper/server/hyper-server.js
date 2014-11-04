@@ -223,7 +223,7 @@ function webServerHookFunForScriptInjection(request, response, path)
  */
 function serveRootRequest(request, response)
 {
-	// Set the app path so that e.g. the ui directory can be accessed.
+	// Set the app path so that the server/ui directory can be accessed.
 	setAppPath(process.cwd() + '/hyper/server/hyper-connect.html')
 
 	// Always serve the connect page for the root url.
