@@ -253,7 +253,7 @@ function CreateServerObject()
 	function ServeFile(path, response)
 	{
 		//console.log('ServeFile fillpath: ' + mBasePath + path)
-		basePaths = [mBasePath, "./hyper/ui/style"]
+		basePaths = [mBasePath, "./hyper/server/ui"]
 		
 		var file = null
 		var fullPath = '';
