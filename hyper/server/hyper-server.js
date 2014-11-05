@@ -331,22 +331,15 @@ function serveCordovaFile(request, response, path)
 	// Note that mBasePath ends with path separator.
 	var androidCordovaAppPath =
 		mBasePath +
-		'..' + PATH.sep +
-		'platforms' + PATH.sep +
-		'android' + PATH.sep +
-		'assets' + PATH.sep +
+		'../platforms/android/assets/' +
 		'www' + path
 	var iosCordovaAppPath =
 		mBasePath +
-		'..' + PATH.sep +
-		'platforms' + PATH.sep +
-		'ios' + PATH.sep +
+		'../platforms/ios/' +
 		'www' + path
 	var wpCordovaAppPath =
 		mBasePath +
-		'..' + PATH.sep +
-		'platforms' + PATH.sep +
-		'wp8' + PATH.sep +
+		'../platforms/wp8/' +
 		'www' + path
 
 	// Method 2:
@@ -546,8 +539,8 @@ function setAppPath(appPath)
 {
 	if (appPath != mAppPath)
 	{
-		mAppPath = appPath
-		var pos = mAppPath.lastIndexOf(PATH.sep) + 1
+		mAppPath = appPath.replace(new RegExp("\\"+PATH.sep, 'g'), '/')
+		var pos = mAppPath.lastIndexOf('/') + 1
 		mBasePath = mAppPath.substr(0, pos)
 		mAppFile = mAppPath.substr(pos)
 		mWebServer.setBasePath(mBasePath)
@@ -918,7 +911,7 @@ function fileSystemMonitorWorker(path, level)
 				{
 					//console.log('Decending into: ' + path + files[i])
 					var changed = fileSystemMonitorWorker(
-						path + files[i] + PATH.sep,
+						path + files[i] + '/',
 						level - 1)
 					if (changed) { return true }
 				}

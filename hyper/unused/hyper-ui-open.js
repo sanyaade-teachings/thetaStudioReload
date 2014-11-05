@@ -192,7 +192,7 @@ hyper.UI = {}
 		// Prepend base path if this is not an absolute path.
 		if (!FILEUTIL.isPathAbsolute(path))
 		{
-			path = mApplicationBasePath + PATH.sep + path
+			path = mApplicationBasePath + '/' + path
 		}
 
 		console.log('runApp: ' + path)

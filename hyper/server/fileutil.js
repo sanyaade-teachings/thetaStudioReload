@@ -40,7 +40,7 @@ exports.readFileSync = function(path, options)
 exports.isPathAbsolute = function(path)
 {
 	// Check for Linux/OS X and Windows.
-	return (path[0] === PATH.sep) || (path[1] === ':')
+	return (path[0] === '/') || (path[0] === PATH.sep) || (path[1] === ':')
 }
 
 exports.fileIsHTML = function(path)

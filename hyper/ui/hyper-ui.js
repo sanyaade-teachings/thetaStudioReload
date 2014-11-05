@@ -340,9 +340,10 @@ hyper.UI = {}
 	// Use full path as fallback.
 	function getNameFromPath(path)
 	{
-		var pos = path.lastIndexOf(PATH.sep)
+		path = path.replace(new RegExp("\\"+PATH.sep, 'g'), '/')
+		var pos = path.lastIndexOf('/')
 		if (-1 === pos) { return path }
-		pos = path.lastIndexOf(PATH.sep, pos - 1)
+		pos = path.lastIndexOf('/', pos - 1)
 		if (-1 === pos) { return path }
 		return path.substring(pos + 1)
 	}
@@ -581,7 +582,7 @@ hyper.UI = {}
 		// Prepend base path if this is not an absolute path.
 		if (!FILEUTIL.isPathAbsolute(path))
 		{
-			path = mApplicationBasePath + PATH.sep + path
+			path = mApplicationBasePath + '/' + path
 		}
 
 		console.log('runApp: ' + path)
@@ -707,17 +708,11 @@ hyper.UI = {}
 		// Prepend base path if this is not an absolute path.
 		if (!FILEUTIL.isPathAbsolute(path))
 		{
-			path = mApplicationBasePath + PATH.sep + path
+			path = mApplicationBasePath + '/' + path
 		}
 
 		// Show the file in the folder.
 		openFolder(path)
-
-		// TODO: New method used. This is old code.
-		// Drop filename part of path.
-		/*var pos = path.lastIndexOf(PATH.sep)
-		var folderPath = path.substring(0, pos)
-		openFolder(folderPath)*/
 	}
 
 	// Display Node.js version info. Not used.
