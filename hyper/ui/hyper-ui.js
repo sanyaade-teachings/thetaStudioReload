@@ -216,19 +216,23 @@ hyper.UI = {}
 
 		// Set up drop handling using a drop target overlay area.
 		var dropTarget = $('#panel-page')
+		var enterTarget;
 		dropTarget.on('dragenter', function(e)
 		{
 			e.stopPropagation()
 			e.preventDefault()
 			$('#drag-overlay').show();
+			enterTarget = event.target;
 		})
-		$('#drag-overlay').on('dragleave dragend', function(e)
+		dropTarget.on('dragleave', function(e)
 		{
-			e.stopPropagation()
-			e.preventDefault()
-			$('#drag-overlay').hide();
+			if (enterTarget == event.target) {
+				e.stopPropagation()
+				e.preventDefault()
+				$('#drag-overlay').hide();
+			}
 		})
-		$('#drag-overlay').on('drop', function(e)
+		dropTarget.on('drop', function(e)
 		{
 			e.stopPropagation()
 			e.preventDefault()
