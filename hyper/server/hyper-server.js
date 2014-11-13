@@ -459,12 +459,7 @@ function createReloaderScriptTags(address)
  * found, insert at alternative locations in the document.
  *
  * It is desirable to have script tags inserted as early as possible,
- * to enable hyper.log and error reportning during document loading.
- *
- * However, problems have been seen when inserting the reload script
- * before loading heavy CSS files. This has been fixed by a delay before
- * connection from the hyper-reloader.js script. Nevertheless, it is
- * good to keep an eye on this.
+ * to enable hyper.log and error reporting during document loading.
  *
  * Applications can use the tag <!--hyper.reloader--> to specify
  * where to insert the reloader script, in case of reload problems.

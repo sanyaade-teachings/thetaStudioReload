@@ -190,11 +190,8 @@ window.hyper = (function(hyper, socketIoPort)
 		document.body.removeChild(toast)
 	}
 
-	// Initiate connection sequence. The delay is here
-	// to fix a bug on iOS 8 (primarily) that causes
-	// page loading to hang if the socket.io connection
-	// is made without any delay.
-	setTimeout(function() { connect() }, 1000)
+	// Connect when page has loaded (connecting sooner may stall page load).
+	document.addEventListener('DOMContentLoaded', function(e) { connect() })
 
 	return hyper
 
