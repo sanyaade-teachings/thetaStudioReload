@@ -3,29 +3,18 @@ File: hyper-reloader.js
 Description: This code is loaded by the server
 when the reloader script is requested.
 Author: Mikael Kindborg
-Copyright (c) 2013 Mikael Kindborg
+Copyright (c) 2013-2014 Mikael Kindborg
 License: Apache Version 2.0
 */
 
-;window.hyper = (function(hyper, socketIoPort)
+window.hyper = (function(hyper, socketIoPort)
 {
-	// Measure page load time in a way that works on all platforms.
-	hyper.documentLoadTime = Date.now()
-	window.addEventListener('load', function(event)
-	{
-		hyper.documentLoadTime = Date.now() - hyper.documentLoadTime
-  	})
-
 	// This variable is true if we are connected to the server.
 	hyper.isConnected = false
 
 	// User-defined function that is called when the app is
 	// connected to the server.
 	hyper.onConnectedFun = null
-
-	// User-defined function that is called when the app is
-	// about to reload (called before reload).
-	hyper.onReloadFun = null
 
 	// Sets the onConnected function. You can use this function
 	// to display a status message, for example.
@@ -41,14 +30,6 @@ License: Apache Version 2.0
 			// Call when connected.
 			hyper.onConnectedFun = fun
 		}
-	}
-
-	// Sets the onReload function. You can use this function
-	// to perform cleanup before the page is reloaded, free
-	// resources etc.
-	hyper.onReload = function(fun)
-	{
-		hyper.onReloadFun = fun
 	}
 
 	// Send result of evaluating JS to the UI.
@@ -97,43 +78,35 @@ License: Apache Version 2.0
 		// Only connect in the topmost window!
 		if (window !== window.top) { return }
 
-		var socket = io.connect(
-			baseUrl + ':' + socketIoPort,
-			{ 'sync disconnect on unload': true })
+		var socket = io(baseUrl + ':' + socketIoPort)
 		hyper.IoSocket = socket
 		socket.on('hyper.run', function(data)
 		{
-			// Call the reload function.
-			hyper.onReloadFun && hyper.onReloadFun()
+			if (!hyper.isReloading)
+			{
+				hyper.isReloading = true
 
-			// Always show the loading toast.
-			hyper.showMessage('Loading')
+				// Show the loading toast.
+				hyper.showMessage('Loading')
 
-			setTimeout(function() {
-				socket.disconnect()
-				window.location.replace(data.url) }, 200)
+				setTimeout(function() {
+					window.location.replace(data.url) },
+					300)
+			}
 		})
 		socket.on('hyper.reload', function(data)
 		{
-			/*
-			// If this page took long to load, show a message
-			// when reloading.
-			if (hyper.documentLoadTime > 800)
+			if (!hyper.isReloading)
 			{
+				hyper.isReloading = true
+
+				// Show the loading toast.
 				hyper.showMessage('Loading')
+
+				setTimeout(function() {
+					window.location.reload(true) },
+					300)
 			}
-			*/
-
-			// Call the reload function.
-			hyper.onReloadFun && hyper.onReloadFun()
-
-			// Always show the loading toast.
-			hyper.showMessage('Loading')
-
-			setTimeout(function() {
-				socket.disconnect()
-				window.location.reload(true) }, 200)
-
 		})
 		socket.on('hyper.eval', function(data)
 		{
@@ -202,11 +175,8 @@ License: Apache Version 2.0
 
 		if (duration)
 		{
-			setTimeout(
-				function()
-				{
-					document.body.removeChild(toast)
-				},
+			setTimeout(function() {
+				document.body.removeChild(toast) },
 				duration)
 		}
 	}
@@ -220,9 +190,12 @@ License: Apache Version 2.0
 		document.body.removeChild(toast)
 	}
 
-	// Initiate connection sequence.
-	connect()
+	// Initiate connection sequence. The delay is here
+	// to fix a bug on iOS 8 (primarily) that causes
+	// page loading to hang if the socket.io connection
+	// is made without any delay.
+	setTimeout(function() { connect() }, 1000)
 
 	return hyper
 
-})(window.hyper || {}, __SOCKET_IO_PORT_INSERTED_BY_SERVER__);
+})(window.hyper || {}, __SOCKET_IO_PORT_INSERTED_BY_SERVER__)

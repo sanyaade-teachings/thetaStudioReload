@@ -265,7 +265,7 @@ function serveReloaderScript(response)
 	{
 		script = script.replace(
 			'__SOCKET_IO_PORT_INSERTED_BY_SERVER__',
-			SETTINGS.SocketIoPort)
+			SETTINGS.WebServerPort)
 		mWebServer.writeRespose(response, script, 'application/javascript')
 		return true
 	}
@@ -447,11 +447,9 @@ function serveJsFile(response, path)
  */
 function createReloaderScriptTags(address)
 {
-	return '' +
-		'<script src="http://' + address +
-		':' + SETTINGS.SocketIoPort +
-		'/socket.io/socket.io.js"></script>' +
-		'<script src="/hyper.reloader"></script>'
+	return ''
+		+ '<script src="/socket.io/socket.io.js"></script>'
+		+ '<script src="/hyper.reloader"></script>'
 }
 
 /**
@@ -463,10 +461,15 @@ function createReloaderScriptTags(address)
  * It is desirable to have script tags inserted as early as possible,
  * to enable hyper.log and error reportning during document loading.
  *
- * The param 'file' is a string with the document content.
- * TODO: Rename this to a better name, e.g. 'content'.
+ * However, problems have been seen when inserting the reload script
+ * before loading heavy CSS files. This has been fixed by a delay before
+ * connection from the hyper-reloader.js script. Nevertheless, it is
+ * good to keep an eye on this.
+ *
+ * Applications can use the tag <!--hyper.reloader--> to specify
+ * where to insert the reloader script, in case of reload problems.
  */
-function insertReloaderScript(file, request)
+function insertReloaderScript(html, request)
 {
 	var host = request.headers.host
 	var address = host.substr(0, host.indexOf(':'))
@@ -474,43 +477,45 @@ function insertReloaderScript(file, request)
 	var script = createReloaderScriptTags(address)
 
 	// Is there a template tag? In that case, insert script there.
-	var hasTemplateTag = (-1 != file.indexOf('<!--hyper.reloader-->'))
+	var hasTemplateTag = (-1 != html.indexOf('<!--hyper.reloader-->'))
 	if (hasTemplateTag)
 	{
-		return file.replace('<!--hyper.reloader-->', script)
+		return html.replace('<!--hyper.reloader-->', script)
 	}
 
 	// Insert after title tag.
-	var pos = file.indexOf('</title>')
+	var pos = html.indexOf('</title>')
 	if (pos > -1)
 	{
-		return file.replace('</title>', '</title>' + script)
+		return html.replace('</title>', '</title>' + script)
 	}
 
 	// Insert last in head.
-	var pos = file.indexOf('</head>')
+	var pos = html.indexOf('</head>')
 	if (pos > -1)
 	{
-		return file.replace('</head>', script + '</head>')
+		return html.replace('</head>', script + '</head>')
 	}
 
 	// Fallback: Insert first in body.
 	// TODO: Rewrite to use regular expressions to capture more cases.
-	pos = file.indexOf('<body>')
+	pos = html.indexOf('<body>')
 	if (pos > -1)
 	{
-		return file.replace('<body>', '<body>' + script)
+		return html.replace('<body>', '<body>' + script)
 	}
 
 	// Insert last in body.
-	pos = file.indexOf('</body>')
+	pos = html.indexOf('</body>')
 	if (pos > -1)
 	{
-		return file.replace('</body>', script + '</body>')
+		return html.replace('</body>', script + '</body>')
 	}
 
-	// If no place to insert the reload script, just return the file unmodified.
-	return file
+	// If no place to insert the reload script, just return the HTML unmodified.
+	// TODO: We could insert the script tag last in the document,
+	// as a last resort.
+	return html
 }
 
 /**
@@ -578,7 +583,7 @@ function getServerBaseURL()
  */
 function runApp()
 {
-	mIO.sockets.emit('hyper.run', {url: getAppFileURL()})
+	mIO.emit('hyper.run', {url: getAppFileURL()})
 }
 
 /**
@@ -587,7 +592,7 @@ function runApp()
  */
 function reloadApp()
 {
-	mIO.sockets.emit('hyper.reload', {})
+	mIO.emit('hyper.reload', {})
 	mReloadCallback && mReloadCallback()
 }
 
@@ -596,7 +601,7 @@ function reloadApp()
  */
 function evalJS(code)
 {
-	mIO.sockets.emit('hyper.eval', code)
+	mIO.emit('hyper.eval', code)
 }
 
 /**
@@ -630,8 +635,6 @@ function startServers()
 	{
 		startUDPServer(SETTINGS.ServerDiscoveryPort || 4088)
 	}
-
-	startSocketIoServer()
 
 	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
 	{
@@ -691,6 +694,8 @@ function startWebServer(basePath, port, fun)
 {
 	var server = WEBSERVER.create()
 	server.setBasePath(basePath)
+	server.create()
+	createSocketIoServer(server.getHTTPServer())
 	server.start(port)
 	fun(server)
 }
@@ -698,19 +703,12 @@ function startWebServer(basePath, port, fun)
 /**
  * Internal.
  */
-function startSocketIoServer()
+function createSocketIoServer(httpServer)
 {
-	//mIO = SOCKETIO.listen(SETTINGS.SocketIoPort, {log: false})
-	mIO = SOCKETIO.listen(SETTINGS.SocketIoPort)
-
-	mIO.set('log level', 1)
-	mIO.set('close timeout', 60 * 60 * 24)
-	mIO.set('transports', ['xhr-polling'])
-	mIO.set('browser client minification', true)
-	mIO.set('polling duration', 5)
+	mIO = SOCKETIO(httpServer)
 
 	// Handle socket connections.
-	mIO.sockets.on('connection', function(socket)
+	mIO.on('connection', function(socket)
 	{
 		// Debug logging.
 		console.log('Client connected')
@@ -753,6 +751,7 @@ function startSocketIoServer()
 			displayJsResult(data)
 		})
 
+		// TODO: This code is not used, remove it eventually.
 		// Closure that holds socket connection.
 		/*(function(socket)
 		{

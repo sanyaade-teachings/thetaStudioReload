@@ -12,13 +12,6 @@ License: Apache Version 2.0
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
 	<title>Connect</title>
-	<script>
-	hyper.onConnected(function()
-	{
-		document.getElementById('screen1').style.display = 'none'
-		document.getElementById('screen2').style.display = 'block'
-	})
-	</script>
 	<style>
 	body
 	{
@@ -39,6 +32,14 @@ License: Apache Version 2.0
 		display: none;
 	}
 	</style>
+	<!--hyper.reloader-->
+	<script>
+	window.hyper && hyper.onConnected(function()
+	{
+		document.getElementById('screen1').style.display = 'none'
+		document.getElementById('screen2').style.display = 'block'
+	})
+	</script>
 </head>
 <body>
 	<div id="screen1">

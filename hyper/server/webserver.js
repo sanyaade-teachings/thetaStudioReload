@@ -14,6 +14,7 @@ var webserver = require('./WebServer')
 var port = 4042
 var server = webserver.create()
 server.setBasePath('/web')
+server.create()
 server.start(port)
 server.getIpAddress(function(address)
 {
@@ -24,7 +25,7 @@ server.getIpAddress(function(address)
 
 License:
 
-Copyright (c) 2013 Mikael Kindborg
+Copyright (c) 2013-2014 Mikael Kindborg
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -60,6 +61,9 @@ function CreateServerObject()
 {
 	var self = {}
 
+	// Node.js HTTP server.
+	var mHTTPServer = null
+
 	// The current base directory. Must NOT end with a slash.
 	var mBasePath = ''
 
@@ -93,20 +97,45 @@ function CreateServerObject()
 	}
 
 	/**
-	 * Create and start the HTTP file server.
+	 * Create the HTTP file server.
+	 */
+	self.create = function()
+	{
+		try
+		{
+			mHTTPServer = HTTP.createServer(HandleRequest)
+			return mHTTPServer
+		}
+		catch (error)
+		{
+			console.log('Could not create webserver: ' + error)
+			return null
+		}
+	}
+
+	/**
+	 * Start the HTTP file server.
 	 */
 	self.start = function(port)
 	{
 		try
 		{
-			var server = HTTP.createServer(HandleRequest)
-			server.listen(port)
+			mHTTPServer.listen(port)
 		}
 		catch (error)
 		{
 			console.log('Could not start webserver: ' + error)
 		}
 	}
+
+	/**
+	 * Get the HTTP file server.
+	 */
+	self.getHTTPServer = function()
+	{
+		return mHTTPServer
+	}
+
 
 	/**
 	 * Get the public IP address of the machine.
@@ -231,17 +260,13 @@ function CreateServerObject()
 		FileNotFoundResponse('base path not set', response)
 	}
 
-	// Old debug print.
-	//var data = FS.readFileSync('/HackathonDemos/BasicWebUI/LocalFiles/index.html')
-	//console.log(data)
-
 	// Handler for web server requests.
 	function HandleRequest(request, response)
 	{
-		//console.log(request)
-		//request.setEncoding('utf8')
 		//console.log('HandleRequest url: ' + request.url)
+		//request.setEncoding('utf8')
 		var path = unescape(URL.parse(request.url).pathname)
+		//console.log(new Date().toTimeString() + ' SERVING: ' + path)
 		if (null != mHookFun)
 		{
 			// If the hook function returns true it processed the request.
