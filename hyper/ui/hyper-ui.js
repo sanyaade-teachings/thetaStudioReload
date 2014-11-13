@@ -701,6 +701,12 @@ hyper.UI = {}
 
 	function openFolder(path)
 	{
+		// Convert path separators on Windows.
+		if (process.platform === 'win32')
+		{
+			path = path.replace(/[\/]/g,'\\')
+		}
+
 		// Debug logging.
 		console.log('Open folder: ' + path)
 
