@@ -9,6 +9,9 @@ License: Apache Version 2.0
 
 window.hyper = (function(hyper, socketIoPort)
 {
+	// Buffer for storing hyper.log messages.
+	var hyperLogBuffer = []
+
 	// This variable is true if we are connected to the server.
 	hyper.isConnected = false
 
@@ -35,17 +38,34 @@ window.hyper = (function(hyper, socketIoPort)
 	// Send result of evaluating JS to the UI.
 	hyper.sendJsResult = function(result)
 	{
+		hyper.isConnected &&
 		hyper.IoSocket.emit('hyper.result', result)
 	}
 
 	// Log to remote HyperReload Workbench window.
 	hyper.rlog = function(message)
 	{
-		hyper.IoSocket.emit('hyper.log', message)
+		if (hyper.isConnected)
+		{
+			hyper.IoSocket.emit('hyper.log', message)
+		}
+		else
+		{
+			hyperLogBuffer.push(message)
+		}
 	}
 
 	// If you want, you can set hyper.log to console.log in your code.
 	hyper.log = hyper.log || hyper.rlog
+
+	function sendBufferedHyperLogMessages()
+	{
+		for (var i = 0; i < hyperLogBuffer.length; ++ i)
+		{
+			hyper.log(hyperLogBuffer[i])
+		}
+		hyperLogBuffer = []
+	}
 
 	// Called from native code. NOT USED.
 	/*hyper.nativeConsoleMessageCallBack = function(message)
@@ -65,8 +85,6 @@ window.hyper = (function(hyper, socketIoPort)
 		if (pos2 < 0) { pos2 = pos } else { ++pos2 }
 		var file = url.substring(pos2)
 		var errorMessage = '[ERR] ' + msg + ' [' + file + ': ' + linenumber + ']'
-		// Log to both console and hyper
-		console.log(errorMessage)
 		hyper.log(errorMessage)
 		return true
 	}
@@ -128,6 +146,7 @@ window.hyper = (function(hyper, socketIoPort)
 			{
 				hyper.onConnectedFun()
 			}
+			sendBufferedHyperLogMessages()
 		})
 	}
 
