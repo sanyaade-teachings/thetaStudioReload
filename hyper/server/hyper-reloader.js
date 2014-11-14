@@ -210,7 +210,7 @@ window.hyper = (function(hyper, socketIoPort)
 	}
 
 	// Connect when page has loaded (connecting sooner may stall page load).
-	window.addEventListener('DOMContentLoaded', function(e) { connect() })
+	window.addEventListener('DOMContentLoaded', function(e) { connect() }, true)
 
 	return hyper
 
