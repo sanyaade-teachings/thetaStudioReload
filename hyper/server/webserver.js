@@ -129,13 +129,27 @@ function CreateServerObject()
 	}
 
 	/**
+	 * Stop the HTTP server.
+	 */
+	self.stop = function(callback)
+	{
+		try
+		{
+			callback && mHTTPServer.close(callback)
+		}
+		catch (error)
+		{
+			console.log('Could not stop webserver: ' + error)
+		}
+	}
+
+	/**
 	 * Get the HTTP file server.
 	 */
 	self.getHTTPServer = function()
 	{
 		return mHTTPServer
 	}
-
 
 	/**
 	 * Get the public IP address of the machine.

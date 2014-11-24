@@ -41,6 +41,10 @@ var SETTINGS = require('../settings/settings.js')
 // Global object that holds globally available functions.
 var hyper = {}
 
+// Global Node.js reference to the main hyper object.
+// Useful for e.g. access from the JavaScript interactive tools.
+global.mainHyper = hyper
+
 // UI-related functions.
 hyper.UI = {}
 
@@ -518,11 +522,13 @@ hyper.UI = {}
 	var mRunAppGuardFlag = false
 	var mNumberOfConnectedClients = 0
 	var mConnectedCounterTimer = 0
+	var mIpAddressString = null
 
 	function setupServer()
 	{
 		// Start server tasks.
 		SERVER.startServers()
+
 		SERVER.setTraverseNumDirectoryLevels(
 			SETTINGS.NumberOfDirecoryLevelsToTraverse)
 		SERVER.fileSystemMonitor()
@@ -532,14 +538,42 @@ hyper.UI = {}
 		readProjectList()
 		hyper.UI.displayProjectList()
 		hyper.UI.setServerMessageFun()
+
 		displayServerIpAddress()
+		setInterval(checkServerIpAddressForRestart, 10000)
 
 		SERVER.setClientConnenctedCallbackFun(clientConnectedCallback)
 		SERVER.setReloadCallbackFun(reloadCallback)
 		SERVER.setUnknownIpHandler(hyper.UI.askForClientVerification)
 	}
 
+	// Check IP address and stop and start servers if it has changed.
+	function checkServerIpAddressForRestart()
+	{
+		serverIpAddressDisplayString(function(addressString)
+		{
+			// If address string has changed, then display
+			// the new address and restart servers.
+			if (mIpAddressString != addressString)
+			{
+				mIpAddressString = addressString
+				displayServerIpAddress()
+				SERVER.restartServers()
+			}
+		})
+	}
+
 	function displayServerIpAddress()
+	{
+		serverIpAddressDisplayString(function(addressString)
+		{
+			// Save current address string.
+			mIpAddressString = addressString
+			hyper.UI.displayIpAddress(addressString)
+		})
+	}
+
+	function serverIpAddressDisplayString(callback)
 	{
 		SERVER.getIpAddresses(function(addresses)
 		{
@@ -564,7 +598,7 @@ hyper.UI = {}
 					}
 				}
 			}
-			hyper.UI.displayIpAddress(connectAddress)
+			callback(connectAddress)
 		})
 	}
 

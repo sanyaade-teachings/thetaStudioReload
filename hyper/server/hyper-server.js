@@ -123,7 +123,8 @@ function serveHtmlFilePlainlyWithoutReloaderScript(request, response, path)
 
 /*** Server variables ***/
 
-var mWebServer
+var mWebServer = null
+var mUDPServer = null
 var mIO
 var mBasePath
 var mAppPath
@@ -624,15 +625,18 @@ function setClientConnenctedCallbackFun(fun)
  */
 function startServers()
 {
-	console.log('Starting servers')
+	console.log('Start servers')
 
 	if (SETTINGS.ServerDiscoveryEnabled)
 	{
+		console.log('Start UDP server')
 		startUDPServer(SETTINGS.ServerDiscoveryPort || 4088)
 	}
 
+	console.log('Start web server')
 	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
 	{
+		console.log('Web server started')
 		mWebServer = server
 		mWebServer.getIpAddress(function(address)
 		{
@@ -640,6 +644,43 @@ function startServers()
 		})
 		mWebServer.setHookFun(webServerHookFunForScriptInjection)
 	})
+}
+
+/**
+ * External.
+ */
+function stopServers(callback)
+{
+	console.log('Stop servers')
+
+	if (mWebServer)
+	{
+		mWebServer.stop(function()
+		{
+			console.log('Web server stopped.')
+			if (mUDPServer)
+			{
+				console.log('Stop UDP server.')
+				mUDPServer.close()
+				console.log('UDP server stopped.')
+				callback && callback()
+			}
+		})
+	}
+}
+
+/**
+ * External.
+ */
+function restartServers()
+{
+	console.log('Restart servers')
+
+	// Callback passed to stop servers is not always reliable.
+	stopServers()
+
+	// Using time out instead to start servers.
+	setTimeout(startServers, 5000)
 }
 
 /**
@@ -791,6 +832,7 @@ function startUDPServer(port)
 	// Create server socket.
 	var DATAGRAM = require('dgram')
 	var server = DATAGRAM.createSocket('udp4')
+	mUDPServer = server
 
 	// Set handler for incoming messages.
 	server.on('message', function (msg, info)
@@ -935,6 +977,8 @@ for (var i in files)
 /*********************************/
 
 exports.startServers = startServers
+exports.stopServers = stopServers
+exports.restartServers = restartServers
 exports.getIpAddress = getIpAddress
 exports.getIpAddresses = getIpAddresses
 exports.setAppPath = setAppPath
