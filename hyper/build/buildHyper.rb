@@ -89,11 +89,14 @@ def buildDistBinaries
 	puts "Building Linux64"
 	buildDistBinaryLinux64
 
-	puts "Building Mac"
-	buildDistBinaryMac
+	puts "Building Mac64"
+	buildDistBinaryMac64
 
-	puts "Building Win"
-	buildDistBinaryWin
+	puts "Building Win32"
+	buildDistBinaryWin32
+
+	puts "Building Win64"
+	buildDistBinaryWin64
 
 	# Delete hidden OS X files.
 	fileDeleteAll(pathDist + "**/.DS_Store")
@@ -142,11 +145,11 @@ def buildDistBinaryLinux(sourcePath, targetPath, sourceBin, wrap)
 		targetPath + "hyper/license/node-webkit-credits.html")
 end
 
-def buildDistBinaryMac
+def buildDistBinaryMac64
 
 	sourcePath = pathDistSource
-	targetPath = distPackageMac
-	sourceBin = pathNodeWebkitMac
+	targetPath = distPackageMac64
+	sourceBin = pathNodeWebkitMac64
 	appPath = targetPath + applicationName + ".app"
 
 	# Copy JavaScript/HTML files.
@@ -181,11 +184,21 @@ def macPatchValue(info, key, newValue)
 	info = info[0..index1] + newValue + info[index2..-1]
 end
 
-def buildDistBinaryWin
+def buildDistBinaryWin32
+	buildDistBinaryWin(
+		pathDistSource,
+		distPackageWin32,
+		pathNodeWebkitWin32)
+end
 
-	sourcePath = pathDistSource
-	targetPath = distPackageWin
-	sourceBin = pathNodeWebkitWin
+def buildDistBinaryWin64
+	buildDistBinaryWin(
+		pathDistSource,
+		distPackageWin64,
+		pathNodeWebkitWin64)
+end
+
+def buildDistBinaryWin(sourcePath, targetPath, sourceBin)
 
 	# Copy JavaScript/HTML files.
 	FileUtils.copy_entry(sourcePath, targetPath)
@@ -321,12 +334,16 @@ def distPackageLinux64
 	pathDist + distPackageName + "_Linux_64_" + version + "/"
 end
 
-def distPackageMac
-	pathDist + distPackageName + "_Mac_" + version + "/"
+def distPackageMac64
+	pathDist + distPackageName + "_Mac_64_" + version + "/"
 end
 
-def distPackageWin
-	pathDist + distPackageName + "_Win_" + version + "/"
+def distPackageWin32
+	pathDist + distPackageName + "_Win_32_" + version + "/"
+end
+
+def distPackageWin64
+	pathDist + distPackageName + "_Win_64_" + version + "/"
 end
 
 #######################################################
