@@ -211,11 +211,14 @@ def buildDistBinaryWin(sourcePath, targetPath, sourceBin)
 		sourceBin + "nw.pak",
 		targetPath + "nw.pak")
 	FileUtils.copy_entry(
+		sourceBin + "d3dcompiler_46.dll",
+		targetPath + "d3dcompiler_46.dll")
+	FileUtils.copy_entry(
 		sourceBin + "ffmpegsumo.dll",
 		targetPath + "ffmpegsumo.dll")
 	FileUtils.copy_entry(
-		sourceBin + "icudt.dll",
-		targetPath + "icudt.dll")
+		sourceBin + "icudtl.dat",
+		targetPath + "icudtl.dat")
 	FileUtils.copy_entry(
 		sourceBin + "libEGL.dll",
 		targetPath + "libEGL.dll")
