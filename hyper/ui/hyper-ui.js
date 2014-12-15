@@ -5,7 +5,7 @@ Author: Mikael Kindborg
 
 License:
 
-Copyright (c) 2013 Mikael Kindborg
+Copyright (c) 2013-2014 Mikael Kindborg
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -56,11 +56,43 @@ hyper.UI = {}
 
 	function setupUI()
 	{
+		createSystemMenuForOSX()
 		styleUI()
 		setUIActions()
 		setWindowActions()
 		setUpFileDrop()
 		restoreSavedUIState()
+	}
+
+	// System menus must be explicitly created on OS X,
+	// see node-webkit documentation:
+	// https://github.com/rogerwang/node-webkit/wiki/Menu#menucreatemacbuiltinappname
+	function createSystemMenuForOSX()
+	{
+		if ('darwin' == OS.platform())
+		{
+			try
+			{
+				var appName = getApplicationName()
+				var win = GUI.Window.get()
+				var nativeMenuBar = new GUI.Menu({ type: 'menubar' })
+				nativeMenuBar.createMacBuiltin(appName)
+				win.menu = nativeMenuBar;
+			}
+			catch (ex)
+			{
+				console.log('Error creating OS X menubar: ' + ex.message);
+			}
+		}
+	}
+
+	// Helper function that returns the application name
+	// specified in package.json.
+	function getApplicationName()
+	{
+		var data = FILEUTIL.readFileSync('package.json')
+		var applicationName = JSON.parse(data).name
+		return applicationName
 	}
 
 	function styleUI()
@@ -183,7 +215,7 @@ hyper.UI = {}
 
 			// Make sure top-left corner is visible.
 			var offsetY = 0
-			if ('darwin' == require('os').platform())
+			if ('darwin' == OS.platform())
 			{
 				offsetY = 22
 			}
