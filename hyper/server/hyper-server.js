@@ -743,11 +743,14 @@ function createSocketIoServer(httpServer)
 {
 	mIO = SOCKETIO(httpServer)
 
+	// Always use window.console since global.console can be undefined.
+	var console = window.console
+
 	// Handle socket connections.
 	mIO.on('connection', function(socket)
 	{
 		// Debug logging.
-		console.log('Client connected')
+		console && console.log('Client connected')
 /*
 		if (!isWhiteListed(socket.ip))
 		{
@@ -758,13 +761,13 @@ function createSocketIoServer(httpServer)
 		socket.on('disconnect', function ()
 		{
 			// Debug logging.
-			console.log('Client disconnected')
+			console && console.log('Client disconnected')
 		})
 
 		socket.on('hyper.client-connected', function(data)
 		{
 			// Debug logging.
-			console.log('hyper.client-connected')
+			console && console.log('hyper.client-connected')
 
 			mClientConnectedCallback && mClientConnectedCallback()
 		})
