@@ -237,7 +237,7 @@ function serveRootRequest(request, response)
 	// Root path is requested, send the current page if set.
 	if (mAppPath)
 	{
-		console.log('@@@ serving mAppPath: ' + mAppPath)
+		window.console.log('@@@ serving mAppPath: ' + mAppPath)
 		return serveHtmlFile(
 			request,
 			response,
@@ -469,7 +469,7 @@ function insertReloaderScript(html, request)
 {
 	var host = request.headers.host
 	var address = host.substr(0, host.indexOf(':'))
-	//console.log('address ' + address)
+	//window.console.log('address ' + address)
 	var script = createReloaderScriptTags(address)
 
 	// Is there a template tag? In that case, insert script there.
@@ -625,18 +625,18 @@ function setClientConnenctedCallbackFun(fun)
  */
 function startServers()
 {
-	console.log('Start servers')
+	window.console.log('Start servers')
 
 	if (SETTINGS.ServerDiscoveryEnabled)
 	{
-		console.log('Start UDP server')
+		window.console.log('Start UDP server')
 		startUDPServer(SETTINGS.ServerDiscoveryPort || 4088)
 	}
 
-	console.log('Start web server')
+	window.console.log('Start web server')
 	startWebServer(mBasePath, SETTINGS.WebServerPort, function(server)
 	{
-		console.log('Web server started')
+		window.console.log('Web server started')
 		mWebServer = server
 		mWebServer.getIpAddress(function(address)
 		{
@@ -651,18 +651,18 @@ function startServers()
  */
 function stopServers(callback)
 {
-	console.log('Stop servers')
+	window.console.log('Stop servers')
 
 	if (mWebServer)
 	{
 		mWebServer.stop(function()
 		{
-			console.log('Web server stopped.')
+			window.console.log('Web server stopped.')
 			if (mUDPServer)
 			{
-				console.log('Stop UDP server.')
+				window.console.log('Stop UDP server.')
 				mUDPServer.close()
-				console.log('UDP server stopped.')
+				window.console.log('UDP server stopped.')
 				callback && callback()
 			}
 		})
@@ -674,7 +674,7 @@ function stopServers(callback)
  */
 function restartServers()
 {
-	console.log('Restart servers')
+	window.console.log('Restart servers')
 
 	// Callback passed to stop servers is not always reliable.
 	stopServers()
@@ -776,8 +776,8 @@ function createSocketIoServer(httpServer)
 
 		socket.on('hyper.result', function(data)
 		{
-			//console.log('data result type: ' + (typeof data))
-			//console.log('data result : ' + data)
+			//window.console.log('data result type: ' + (typeof data))
+			//window.console.log('data result : ' + data)
 
 			// Functions cause a cloning error.
 			if (typeof data == 'function')
@@ -849,7 +849,7 @@ function startUDPServer(port)
 	server.on('listening', function ()
 	{
 		// Not used: var address = server.address()
-		console.log('UDP server listening')
+		window.console.log('UDP server listening')
 	})
 
 	// Bind server socket to port.
@@ -912,14 +912,14 @@ function fileSystemMonitor()
  */
 function fileSystemMonitorWorker(path, level)
 {
-	//console.log('fileSystemMonitorWorker path:level: ' + path + ':' + level)
+	//window.console.log('fileSystemMonitorWorker path:level: ' + path + ':' + level)
 	if (!path) { return false }
 	try
 	{
 		/*var files = FS.readdirSync(path)
 		for (var i in files)
 		{
-			console.log(path + files[i])
+			window.console.log(path + files[i])
 		}
 		return false*/
 
@@ -936,16 +936,16 @@ function fileSystemMonitorWorker(path, level)
 					++mFileCounter
 				}
 
-				//console.log('Checking file: ' + files[i] + ': ' + stat.mtime)
+				//window.console.log('Checking file: ' + files[i] + ': ' + stat.mtime)
 				if (stat.isFile() && t > mLastReloadTime)
 				{
-					//console.log('***** File has changed ***** ' + files[i])
+					//window.console.log('***** File has changed ***** ' + files[i])
 					mLastReloadTime = Date.now()
 					return true
 				}
 				else if (stat.isDirectory() && level > 0)
 				{
-					//console.log('Decending into: ' + path + files[i])
+					//window.console.log('Decending into: ' + path + files[i])
 					var changed = fileSystemMonitorWorker(
 						path + files[i] + '/',
 						level - 1)
@@ -954,22 +954,22 @@ function fileSystemMonitorWorker(path, level)
 			}
 			catch (err2)
 			{
-				console.log('***** ERROR2 fileSystemMonitorWorker ****** ' + err2)
+				window.console.log('***** ERROR2 fileSystemMonitorWorker ****** ' + err2)
 			}
 		}
 	}
 	catch(err1)
 	{
-		console.log('***** ERROR1 fileSystemMonitorWorker ****** ' + err1)
+		window.console.log('***** ERROR1 fileSystemMonitorWorker ****** ' + err1)
 	}
 	return false
 }
 
-/*console.log(mBasePath)
+/*window.console.log(mBasePath)
 var files = FS.readdirSync(mBasePath)
 for (var i in files)
 {
-	console.log(files[i])
+	window.console.log(files[i])
 }*/
 
 /*********************************/

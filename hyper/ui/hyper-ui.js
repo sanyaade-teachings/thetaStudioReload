@@ -81,7 +81,7 @@ hyper.UI = {}
 			}
 			catch (ex)
 			{
-				console.log('Error creating OS X menubar: ' + ex.message);
+				window.console.log('Error creating OS X menubar: ' + ex.message);
 			}
 		}
 	}
@@ -234,7 +234,7 @@ hyper.UI = {}
 
 	function receiveMessage(event)
 	{
-		//console.log('Main got : ' + event.data.message)
+		//window.console.log('Main got : ' + event.data.message)
 		if ('eval' == event.data.message)
 		{
 			hyper.SERVER.evalJS(event.data.code)
@@ -282,7 +282,7 @@ hyper.UI = {}
 		// Debug print.
 		/*for (var i = 0; i < files.length; ++i)
 		{
-			console.log(files[i].path);
+			window.console.log(files[i].path);
 		}*/
 
 		for (var i = 0; i < files.length; ++i)
@@ -336,7 +336,7 @@ hyper.UI = {}
 		if (!data)
 		{
 			// Return on error, skipping rest of the code.
-			console.log('createProjectEntry failed: ' + path)
+			window.console.log('createProjectEntry failed: ' + path)
 			return
 		}
 
@@ -358,7 +358,7 @@ hyper.UI = {}
 
 		// Create element.
 		var element = $(html)
-		//console.log(html)
+		//window.console.log(html)
 
 		// Insert element first in list.
 		$('#project-list').append(element)
@@ -480,7 +480,7 @@ hyper.UI = {}
 
 	hyper.UI.deleteEntry = function(obj)
 	{
-		console.log($(obj).parent())
+		window.console.log($(obj).parent())
 		$(obj).parent().remove()
 		updateProjectList()
 	}
@@ -655,7 +655,7 @@ hyper.UI = {}
 			path = mApplicationBasePath + '/' + path
 		}
 
-		console.log('runApp: ' + path)
+		window.console.log('runApp: ' + path)
 
 		SERVER.setAppPath(path)
 
@@ -774,7 +774,7 @@ hyper.UI = {}
 		}
 
 		// Debug logging.
-		console.log('Open folder: ' + path)
+		window.console.log('Open folder: ' + path)
 
 		GUI.Shell.showItemInFolder(path)
 	}
