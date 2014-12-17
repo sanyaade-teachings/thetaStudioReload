@@ -18,7 +18,7 @@ server.create()
 server.start(port)
 server.getIpAddress(function(address)
 {
-	console.log(
+	window.console.log(
 		'Web server running at:\n' +
 		'http://' + address + ':' + port)
 })
@@ -108,7 +108,7 @@ function CreateServerObject()
 		}
 		catch (error)
 		{
-			console.log('Could not create webserver: ' + error)
+			window.console.log('Could not create webserver: ' + error)
 			return null
 		}
 	}
@@ -124,7 +124,7 @@ function CreateServerObject()
 		}
 		catch (error)
 		{
-			console.log('Could not start webserver: ' + error)
+			window.console.log('Could not start webserver: ' + error)
 		}
 	}
 
@@ -139,7 +139,7 @@ function CreateServerObject()
 		}
 		catch (error)
 		{
-			console.log('Could not stop webserver: ' + error)
+			window.console.log('Could not stop webserver: ' + error)
 		}
 	}
 
@@ -277,10 +277,10 @@ function CreateServerObject()
 	// Handler for web server requests.
 	function HandleRequest(request, response)
 	{
-		//console.log('HandleRequest url: ' + request.url)
+		//window.console.log('HandleRequest url: ' + request.url)
 		//request.setEncoding('utf8')
 		var path = unescape(URL.parse(request.url).pathname)
-		//console.log(new Date().toTimeString() + ' SERVING: ' + path)
+		//window.console.log(new Date().toTimeString() + ' SERVING: ' + path)
 		if (null != mHookFun)
 		{
 			// If the hook function returns true it processed the request.
@@ -291,7 +291,7 @@ function CreateServerObject()
 
 	function ServeFile(path, response)
 	{
-		//console.log('ServeFile fillpath: ' + mBasePath + path)
+		//window.console.log('ServeFile fillpath: ' + mBasePath + path)
 		var file = GetFileStatus(mBasePath + path)
 		if (!file)
 		{
@@ -366,7 +366,7 @@ function GetFileStatus(fullPath)
 	}
 	catch (ex)
 	{
-		console.log('GetFileStatus exception: ' + ex)
+		window.console.log('GetFileStatus exception: ' + ex)
 		return null
 	}
 }
