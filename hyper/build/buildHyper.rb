@@ -141,6 +141,9 @@ def buildDistBinaryLinux(sourcePath, targetPath, sourceBin, wrap)
 		sourceBin + "libffmpegsumo.so",
 		targetPath + "libffmpegsumo.so")
 	FileUtils.copy_entry(
+		sourceBin + "icudtl.dat",
+		targetPath + "icudtl.dat")
+	FileUtils.copy_entry(
 		sourceBin + "credits.html",
 		targetPath + "hyper/license/node-webkit-credits.html")
 end
