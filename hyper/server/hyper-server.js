@@ -652,20 +652,26 @@ function startServers()
 function stopServers(callback)
 {
 	window.console.log('Stop servers')
-
-	if (mWebServer)
+	try
 	{
-		mWebServer.stop(function()
+		if (mWebServer)
 		{
-			window.console.log('Web server stopped.')
-			if (mUDPServer)
+			mWebServer.stop(function()
 			{
-				window.console.log('Stop UDP server.')
-				mUDPServer.close()
-				window.console.log('UDP server stopped.')
-				callback && callback()
-			}
-		})
+				window.console.log('Web server stopped.')
+				if (mUDPServer)
+				{
+					window.console.log('Stop UDP server.')
+					mUDPServer.close()
+					window.console.log('UDP server stopped.')
+					callback && callback()
+				}
+			})
+		}
+	}
+	catch (error)
+	{
+		window.console.log('Error in stopServers: ' + error)
 	}
 }
 
