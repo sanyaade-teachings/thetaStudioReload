@@ -388,6 +388,10 @@ function serveHtmlFile(request, response, path)
 	if (content)
 	{
 		content = insertReloaderScript(content, request)
+		if(!content)
+		{
+			return false
+		}
 		mWebServer.writeRespose(response, content, 'text/html')
 		return true
 	}
@@ -468,6 +472,10 @@ function createReloaderScriptTags(address)
 function insertReloaderScript(html, request)
 {
 	var host = request.headers.host
+	if(!host)
+	{
+		return false
+	}
 	var address = host.substr(0, host.indexOf(':'))
 	//window.console.log('address ' + address)
 	var script = createReloaderScriptTags(address)
