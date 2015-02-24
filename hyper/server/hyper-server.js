@@ -384,15 +384,13 @@ function serveCordovaFile(request, response, path)
  */
 function serveHtmlFile(request, response, path)
 {
-	var content = FILEUTIL.readFileSync(path)
-	if (content)
+	var document = FILEUTIL.readFileSync(path)
+	if (document)
 	{
-		content = insertReloaderScript(content, request)
-		if(!content)
-		{
-			return false
-		}
-		mWebServer.writeRespose(response, content, 'text/html')
+		mWebServer.writeRespose(
+			response,
+			insertReloaderScript(document, request),
+			'text/html')
 		return true
 	}
 	else
@@ -450,7 +448,7 @@ function serveJsFile(response, path)
  *
  * Return script tags for reload functionality.
  */
-function createReloaderScriptTags(address)
+function createReloaderScriptTags()
 {
 	return ''
 		+ '<script src="/socket.io/socket.io.js"></script>'
@@ -471,14 +469,8 @@ function createReloaderScriptTags(address)
  */
 function insertReloaderScript(html, request)
 {
-	var host = request.headers.host
-	if(!host)
-	{
-		return false
-	}
-	var address = host.substr(0, host.indexOf(':'))
-	//window.console.log('address ' + address)
-	var script = createReloaderScriptTags(address)
+	// Create HTML tags for the reloader script.
+	var script = createReloaderScriptTags()
 
 	// Is there a template tag? In that case, insert script there.
 	var hasTemplateTag = (-1 != html.indexOf('<!--hyper.reloader-->'))
