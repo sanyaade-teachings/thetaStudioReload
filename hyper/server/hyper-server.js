@@ -661,10 +661,17 @@ function stopServers(callback)
 				window.console.log('Web server stopped.')
 				if (mUDPServer)
 				{
-					window.console.log('Stop UDP server.')
-					mUDPServer.close()
-					window.console.log('UDP server stopped.')
-					callback && callback()
+					try
+					{
+						window.console.log('Stop UDP server.')
+						mUDPServer.close()
+						window.console.log('UDP server stopped.')
+						callback && callback()
+					}
+					catch (error)
+					{
+						window.console.log('Error when stopping UDP server: ' + error)
+					}
 				}
 			})
 		}
